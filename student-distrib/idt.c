@@ -4,13 +4,17 @@
 #include "x86_desc.h"
 #include "lib.h"
 #include "keyboard.h"
+#include "linkage.h"
 
 #define KEYBOARD  0x21
+#define RTC 0x28
+extern void handle0asm();
+
+extern void rtchandlerasm();
 void handle0(){
     printf("Divide by zero error");
-
-
 }
+
 void handle1(){
     printf("Debug exception");
 }
@@ -44,6 +48,14 @@ void handle10(){
 void keyboard_handler(){
     printf("keyboard interupt");
 }
+void rtchandler(){
+  /* referenced wiki.osdev.org/RTC#Interrupts_and_Registers_C*/ 
+  outb(0x0C,0x70);
+  inb(0x71);
+  test_interrupts();
+  send_eoi(8);
+  send_eoi(2);
+}
 void initialize_IDT(){
 
    int i=0;
@@ -61,7 +73,7 @@ void initialize_IDT(){
    idt[i].reserved0=0;
    idt[i].size=1;
    if(i==0)
-   SET_IDT_ENTRY(idt[i],handle0);
+   SET_IDT_ENTRY(idt[i],handle0asm);
    else if(i==1)
   SET_IDT_ENTRY(idt[i],handle1);
    else if(i==2)
@@ -93,6 +105,18 @@ idt[KEYBOARD].reserved1=1;
 idt[KEYBOARD].reserved0=0;
 idt[KEYBOARD].size=1;
 SET_IDT_ENTRY(idt[KEYBOARD],check_input);
+
+/* setting the RTC handler */
+ idt[RTC].dpl=0;
+ idt[RTC].present=1;
+ idt[RTC].seg_selector=KERNEL_CS;
+ idt[RTC].reserved4=0;
+ idt[RTC].reserved3=1;
+ idt[RTC].reserved2=1;
+ idt[RTC].reserved1=1;
+ idt[RTC].reserved0=0;
+ idt[RTC].size=1;
+ SET_IDT_ENTRY(idt[RTC],rtchandlerasm);
 
 
 

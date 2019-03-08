@@ -3,7 +3,9 @@
 #include "idt.h"
 #include "x86_desc.h"
 #include "lib.h"
+#include "keyboard.h"
 
+#define KEYBOARD  0x21
 void handle0(){
     printf("Divide by zero error");
 
@@ -38,6 +40,9 @@ void handle9(){
 }
 void handle10(){
     printf("Invalid TSS exception");
+}
+void keyboard_handler(){
+    printf("keyboard interupt");
 }
 void initialize_IDT(){
 
@@ -77,6 +82,17 @@ void initialize_IDT(){
      SET_IDT_ENTRY(idt[i],handle9);
 
  }
+/* setting the keyboard handler */
+idt[KEYBOARD].dpl=0;
+idt[KEYBOARD].present=1;
+idt[KEYBOARD].seg_selector=KERNEL_CS;
+idt[KEYBOARD].reserved4=0;
+idt[KEYBOARD].reserved3=1;
+idt[KEYBOARD].reserved2=1;
+idt[KEYBOARD].reserved1=1;
+idt[KEYBOARD].reserved0=0;
+idt[KEYBOARD].size=1;
+SET_IDT_ENTRY(idt[KEYBOARD],check_input);
 
 
 

@@ -76,5 +76,8 @@ if(irq_num>=8 && irq_num<15){
 /* Send end-of-interrupt signal for the specified IRQ */
 void send_eoi(uint32_t irq_num) {
  int returnvl = EOI | irq_num;
+ if(irq_num>=8)
+    outb(returnvl,SLAVE_8259_PORT);
+ outb(returnvl,MASTER_8259_PORT);
 
 }

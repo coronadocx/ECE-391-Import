@@ -6,7 +6,7 @@
 
 void handle0(){
     printf("Divide by zero error");
-  
+
 
 }
 void handle1(){

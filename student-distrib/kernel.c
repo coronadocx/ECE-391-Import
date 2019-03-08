@@ -11,6 +11,7 @@
 #include "idt.h"
 #include "keyboard.h"
 #include "rtc.h"
+#include "paging.h"
 #define RUN_TESTS
 
 /* Macros. */
@@ -140,7 +141,9 @@ void entry(unsigned long magic, unsigned long addr) {
     /*initialize the idt */
     clear();
     initialize_IDT();
+    //initialize_paging();
     /* Init the PIC */
+
     i8259_init();
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the

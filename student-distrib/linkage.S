@@ -1,12 +1,12 @@
 
 
 
-.global handle0asm
+.global keyboardhandlerasm
 .global rtchandlerasm
-handle0asm :
- 
+keyboardhandlerasm :
+
    pushal
-   call handle0
+   call keyboard_handler
 
    popal
 

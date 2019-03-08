@@ -11,6 +11,7 @@
 .globl tss, tss_desc_ptr, ldt, ldt_desc_ptr
 .globl gdt_ptr
 .globl idt_desc_ptr, idt
+.globl gdt_desc_ptr
 
 .align 4
 
@@ -99,6 +100,12 @@ idt_desc_ptr:
 
 
     .align  16
+gdt_desc_ptr:
+        .word gdt_bottom - gdt - 1
+        .long gdt
+
+
+        .align  16
 idt:
 _idt:
     .rept NUM_VEC

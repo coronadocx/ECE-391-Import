@@ -8,7 +8,8 @@
 #include "i8259.h"
 #include "debug.h"
 #include "tests.h"
-
+#include "idt.h"
+#include "keyboard.h"
 #define RUN_TESTS
 
 /* Macros. */
@@ -135,19 +136,21 @@ void entry(unsigned long magic, unsigned long addr) {
         tss.esp0 = 0x800000;
         ltr(KERNEL_TSS);
     }
-
+    /*initialize the idt */
+    initialize_IDT();
     /* Init the PIC */
     i8259_init();
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the
      * PIC, any other initialization stuff... */
+    init_keyboard();
 
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your
      * IDT correctly otherwise QEMU will triple fault and simple close
      * without showing you any output */
-    /*printf("Enabling Interrupts\n");
-    sti();*/
+    printf("Enabling Interrupts\n");
+    sti();
 
 #ifdef RUN_TESTS
     /* Run tests */
@@ -157,4 +160,5 @@ void entry(unsigned long magic, unsigned long addr) {
 
     /* Spin (nicely, so we don't chew up cycles) */
     asm volatile (".1: hlt; jmp .1;");
+
 }

@@ -5,15 +5,16 @@
 #include "i8259.h"
 #include "lib.h"
 
+
 /* Interrupt masks to determine which interrupts are enabled and disabled */
-uint8_t master_mask; /* IRQs 0-7  */
-uint8_t slave_mask;  /* IRQs 8-15 */
+uint8_t master_mask=0xFF; /* IRQs 0-7  */
+uint8_t slave_mask=0xFF;  /* IRQs 8-15 */
 
 /* Initialize the 8259 PIC */
 void i8259_init(void) {
+
   unsigned long flags;
 
-  // need to see how to set the lock
 
   outb(0xFF,0x21);
   outb(0xFF,0xA1);
@@ -30,18 +31,53 @@ void i8259_init(void) {
   outb(ICW3_SLAVE,0xA1);
   outb(ICW4,0xA1);
 
-  // dont understand how to restore / set locks
+
+  outb(master_mask,0x21);
+  outb(slave_mask,0xA1);
+
+
 }
 
 /* Enable (unmask) the specified IRQ */
 void enable_irq(uint32_t irq_num) {
+  int port=0x00;
+
+if(irq_num>=0 && irq_num<8){
+  port =0x21;
+  master_mask &= ~(1<<irq_num);
+  outb(master_mask,port);
+}
+if(irq_num>=8 && irq_num<16){
+  port=0xA1;
+  slave_mask &= ~(1<<irq_num);
+  outb(slave_mask,port);
+}
+
 
 }
 
 /* Disable (mask) the specified IRQ */
 void disable_irq(uint32_t irq_num) {
+  int port=0x00;
+if(irq_num>=0 && irq_num<8){
+  port =0x21;
+  master_mask |= 1<<irq_num;
+    outb(master_mask,port);
+}
+if(irq_num>=8 && irq_num<15){
+  port=0xA1;
+  slave_mask |= 1<<irq_num;
+  outb(slave_mask,port);
+}
+
+
 }
 
 /* Send end-of-interrupt signal for the specified IRQ */
 void send_eoi(uint32_t irq_num) {
+ int returnvl = EOI | irq_num;
+ if(irq_num>=8)
+    outb(returnvl,SLAVE_8259_PORT);
+ outb(returnvl,MASTER_8259_PORT);
+
 }

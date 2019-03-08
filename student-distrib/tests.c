@@ -42,8 +42,11 @@ int idt_test(){
 
 		}
 
-	}
 
+	}
+//i=i/0;
+//		asm volatile("int $33");
+ //
 
 	return result;
 }

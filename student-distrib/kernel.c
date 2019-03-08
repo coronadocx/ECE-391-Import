@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "tests.h"
 #include "idt.h"
+#include "keyboard.h"
 #define RUN_TESTS
 
 /* Macros. */
@@ -142,6 +143,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the
      * PIC, any other initialization stuff... */
+    init_keyboard();
 
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your
@@ -158,4 +160,5 @@ void entry(unsigned long magic, unsigned long addr) {
 
     /* Spin (nicely, so we don't chew up cycles) */
     asm volatile (".1: hlt; jmp .1;");
+
 }

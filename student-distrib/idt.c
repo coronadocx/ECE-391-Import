@@ -130,17 +130,6 @@ SET_IDT_ENTRY(idt[KEYBOARD],keyboardhandlerasm);
  SET_IDT_ENTRY(idt[RTC],rtchandlerasm);
 
 
-/* setting the RTC handler */
-idt[RTC].dpl=0;
-idt[RTC].present=1;
-idt[RTC].seg_selector=KERNEL_CS;
-idt[RTC].reserved4=0;
-idt[RTC].reserved3=1;
-idt[RTC].reserved2=1;
-idt[RTC].reserved1=1;
-idt[RTC].reserved0=0;
-idt[RTC].size=1;
-SET_IDT_ENTRY(idt[RTC],test_interrupts);
 
 
 

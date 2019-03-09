@@ -48,9 +48,13 @@ if(irq_num>=0 && irq_num<8){
   outb(master_mask,port);
 }
 if(irq_num>=8 && irq_num<16){
+  port =0x21;
+  master_mask &= ~(1<<2);
+  outb(master_mask,port);
   port=0xA1;
-  slave_mask &= ~(1<<irq_num);
+  slave_mask &= ~(1<<(irq_num-8));
   outb(slave_mask,port);
+
 }
 
 
@@ -65,8 +69,11 @@ if(irq_num>=0 && irq_num<8){
     outb(master_mask,port);
 }
 if(irq_num>=8 && irq_num<15){
+  port=0x21;
+  master_mask |= 1<<(2);
+  outb(master_mask,port);
   port=0xA1;
-  slave_mask |= 1<<irq_num;
+  slave_mask |= 1<<(irq_num-8);
   outb(slave_mask,port);
 }
 
@@ -76,8 +83,12 @@ if(irq_num>=8 && irq_num<15){
 /* Send end-of-interrupt signal for the specified IRQ */
 void send_eoi(uint32_t irq_num) {
  int returnvl = EOI | irq_num;
- if(irq_num>=8)
+ if(irq_num>=8){
+    returnvl = EOI | (irq_num-8);
     outb(returnvl,SLAVE_8259_PORT);
- outb(returnvl,MASTER_8259_PORT);
 
+  }
+  else{
+ outb(returnvl,MASTER_8259_PORT);
+}
 }

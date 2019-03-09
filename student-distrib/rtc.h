@@ -1,4 +1,4 @@
-/* header file for keyboard */
+/* header file for rtc */
 #ifndef RTC_H
 #define RTC_H
 

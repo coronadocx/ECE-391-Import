@@ -9,6 +9,10 @@ void check_input(){
  a=inb(0x60);
  putc(chararray[a]);
  send_eoi(1);
+ if(chararray[a]=='e')
+    enable_irq(8);
+ if(chararray[a]=='d')
+    disable_irq(8);
 
 
 }

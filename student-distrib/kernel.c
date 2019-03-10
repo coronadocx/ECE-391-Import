@@ -11,6 +11,7 @@
 #include "idt.h"
 #include "keyboard.h"
 #include "rtc.h"
+#include "paging.h"
 #define RUN_TESTS
 
 /* Macros. */
@@ -137,9 +138,18 @@ void entry(unsigned long magic, unsigned long addr) {
         tss.esp0 = 0x800000;
         ltr(KERNEL_TSS);
     }
+
+    //Initialize paging
+    static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
+    static uint32_t page_table_0M_4M[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
+    paging_initialize(page_directory, page_table_0M_4M);
+
+
     /*initialize the idt */
     clear();
     initialize_IDT();
+
+
     /* Init the PIC */
     i8259_init();
 

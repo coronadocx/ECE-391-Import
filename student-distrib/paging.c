@@ -19,9 +19,8 @@ void paging_initialize(uint32_t * page_directory, uint32_t * page_table_0M_4M)
 
     //Populate the first page table
     for (i=0; i<PAGE_SIZE; i++) {
-    	if (i >= 184 && i < 192){	//XXX This is really magic but basically these are the indices of the video memory FIXME could be wrong
-    		page_table_0M_4M[i] = ((VID_START_ADDR + (4*PAGE_SIZE*(i-184))) | 0x7);	//Map 8 pages to video memory
-    	}
+        if (i == 184)
+            page_table_0M_4M[i] = (VID_START_ADDR | 0x7);
     	else
     		page_table_0M_4M[i] = 0x0;	//Set every other page as "not present"
 

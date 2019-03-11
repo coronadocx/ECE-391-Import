@@ -6,54 +6,189 @@
 #include "keyboard.h"
 #include "linkage.h"
 
+// idt index for keyboard and rtc
 #define KEYBOARD  0x21
 #define RTC 0x28
-extern void keyboardhandlerasm();
+// Assembly functions that handle the stack when keyboard or rtc interuppts are generated
 
+extern void keyboardhandlerasm();
 extern void rtchandlerasm();
+/*
+ * handle0
+ *   DESCRIPTION: function exception handler for divide by zero
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle0(){
     printf("Divide by zero error");
+    while(1);
 }
-
+/*
+ * handle1
+ *   DESCRIPTION: function exception handler for debug exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle1(){
     printf("Debug exception");
+    while(1);
 }
+/*
+ * handle2
+ *   DESCRIPTION: function exception handler for NMI Interupt
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle2(){
     printf("NMI Interupt");
+      while(1);
+
 }
+/*
+ * handle3
+ *   DESCRIPTION: function exception handler for Breakpoint Exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle3(){
     printf("Breakpoint Exception");
+      while(1);
 }
+/*
+ * handle4
+ *   DESCRIPTION: function exception handler for Overflow Exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle4(){
     printf("Overflow Exception");
+      while(1);
 }
+/*
+ * handle5
+ *   DESCRIPTION: function exception handler for BOUND Range Exceeded Exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle5(){
     printf("BOUND Range Exceeded Exception");
+      while(1);
 }
+/*
+ * handle6
+ *   DESCRIPTION: function exception handler for Invalid Opcode Exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle6(){
     printf("Invalid Opcode Exception");
+      while(1);
 }
+/*
+ * handle7
+ *   DESCRIPTION: function exception handler for Device Not Available Exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle7(){
     printf("Device Not Available Exception");
+      while(1);
 }
+/*
+ * handle8
+ *   DESCRIPTION: function exception handler for Double Fault Exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle8(){
     printf("Double Fault Exception");
+      while(1);
 }
+/*
+ * handle9
+ *   DESCRIPTION: function exception handler for Coprocessor Segment Overrun
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle9(){
     printf("Coprocessor Segment Overrun");
+      while(1);
 }
+/*
+ * handle10
+ *   DESCRIPTION: function exception handler for Invalid TSS exception
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle10(){
     printf("Invalid TSS exception");
+      while(1);
 }
+/*
+ * handle14
+ *   DESCRIPTION: function exception handler for Page Fault exception"
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void handle14(){
     printf("Page Fault exception");
+      while(1);
 }
+/*
+ * commonhandler
+ *   DESCRIPTION: Temporary common function to handle all other exceptions from 1-32 for which handlers are not currently defined
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  handles exception and sqaushes program
+ */
 void commonehandler(){
   printf("exception raised");
+    while(1);
 }
+/*
+ * keyboard handler
+ *   DESCRIPTION: handles the keyboard interupt
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS:  calls check input in keyboard.c
+ */
 void keyboard_handler(){
     check_input();
 }
+/*
+ * rtc_handler
+ *   DESCRIPTION: function that handles rtc interupts
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: sets the appropriate ports and handles an rtc interupt
+ */
 void rtchandler(){
   /* referenced wiki.osdev.org/RTC#Interrupts_and_Registers_C*/
   outb(0x0C,0x70);
@@ -62,13 +197,22 @@ void rtchandler(){
   send_eoi(8);
   send_eoi(2);
 }
+/*
+ * initialize_IDT
+ *   DESCRIPTION: function that sets up the IDT
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: IDT is set up with appropriate values
+ */
+
 void initialize_IDT(){
 
    int i=0;
 
 
 
- for(i=0;i<32;i++){
+ for(i=0;i<EXCEPTION_COUNT;i++){
    idt[i].dpl=0;
    idt[i].present=1;
    idt[i].seg_selector=KERNEL_CS;
@@ -81,7 +225,7 @@ void initialize_IDT(){
 
    if(i==0)
    SET_IDT_ENTRY(idt[i],handle0);
-   else if(i==1)
+   else if(i==1)          // here the magic numbers 1,2,3,4,5,6 etc are used to determine the appropriate handler for that index in the IDT 
   SET_IDT_ENTRY(idt[i],handle1);
    else if(i==2)
    SET_IDT_ENTRY(idt[i],handle2);

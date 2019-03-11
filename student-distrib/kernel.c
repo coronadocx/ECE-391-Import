@@ -157,7 +157,8 @@ void entry(unsigned long magic, unsigned long addr) {
      * PIC, any other initialization stuff... */
     init_keyboard();
     init_rtc();
-    disable_irq(8);
+    /* Masking RTC for testing*/
+    disable_irq(RTC_IRQ_NO);
 
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your

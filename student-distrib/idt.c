@@ -5,6 +5,8 @@
 #include "lib.h"
 #include "keyboard.h"
 #include "linkage.h"
+#include "rtc.h"
+#include "i8259.h"
 
 // idt index for keyboard and rtc
 #define KEYBOARD  0x21
@@ -191,11 +193,11 @@ void keyboard_handler(){
  */
 void rtchandler(){
   /* referenced wiki.osdev.org/RTC#Interrupts_and_Registers_C*/
-  outb(0x0C,0x70);
-  inb(0x71);
+  outb(REG_C,RTC_CMD_PORT);
+  inb(RTC_DATA_PORT);
   test_interrupts();
-  send_eoi(8);
-  send_eoi(2);
+  send_eoi(RTC_IRQ_NO);
+  send_eoi(IRQ_SLAVE);
 }
 /*
  * initialize_IDT
@@ -223,9 +225,10 @@ void initialize_IDT(){
    idt[i].reserved0=0;
    idt[i].size=1;
 
+   /* Filling IDT entries with Exception Handlers */
    if(i==0)
    SET_IDT_ENTRY(idt[i],handle0);
-   else if(i==1)          // here the magic numbers 1,2,3,4,5,6 etc are used to determine the appropriate handler for that index in the IDT 
+   else if(i==1)          // here the magic numbers 1,2,3,4,5,6 etc are used to determine the appropriate handler for that index in the IDT
   SET_IDT_ENTRY(idt[i],handle1);
    else if(i==2)
    SET_IDT_ENTRY(idt[i],handle2);

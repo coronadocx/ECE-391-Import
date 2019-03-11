@@ -12,6 +12,12 @@
 #define KER_START_ADDR	0x400000			//Starting address of the Kernel (1-expage)
 #define VID_START_ADDR	0xB8000				//Starting address of the video memory (8-page)
 
+#define VMEM_PAGE       184
+
+#define VMEM_OR_MASK    0x7
+#define PTABLE_OR_MASK  0x13
+#define KMEM_OR_MASK    0x183
+
 
 typedef struct {							//Page Entry Struct
     uint32_t base_addr;
@@ -19,7 +25,7 @@ typedef struct {							//Page Entry Struct
     uint8_t g;
     uint8_t pat;
     uint8_t d;
-    uint8_t a; 
+    uint8_t a;
     uint8_t pcd;
     uint8_t pwt;
     uint8_t u_s;

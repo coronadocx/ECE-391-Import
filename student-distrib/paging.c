@@ -19,8 +19,8 @@ void paging_initialize(uint32_t * page_directory, uint32_t * page_table_0M_4M)
 
     //Populate the first page table
     for (i=0; i<PAGE_SIZE; i++) {
-        if (i == 184)
-            page_table_0M_4M[i] = (VID_START_ADDR | 0x7);
+        if (i == VMEM_PAGE)
+            page_table_0M_4M[i] = (VID_START_ADDR | VMEM_OR_MASK);
     	else
     		page_table_0M_4M[i] = 0x0;	//Set every other page as "not present"
 
@@ -30,9 +30,9 @@ void paging_initialize(uint32_t * page_directory, uint32_t * page_table_0M_4M)
     //Populate the page_directory, identity map the video memory and the kernel memory
     for (i=0; i<PAGE_SIZE; i++) {
     	if (i==0)
-    		page_directory[i] = (((uint32_t) page_table_0M_4M) | 0x13);	//Points to the first page table
+    		page_directory[i] = (((uint32_t) page_table_0M_4M) | PTABLE_OR_MASK);	//Points to the first page table
     	else if (i==1)
-    		page_directory[i] = (KER_START_ADDR | 0x183);	//Points to the kernel page
+    		page_directory[i] = (KER_START_ADDR | KMEM_OR_MASK);	//Points to the kernel page
     	else
     		page_directory[i] = 0x0;	//Set every other entry as "not present"
     }

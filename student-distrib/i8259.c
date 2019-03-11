@@ -17,12 +17,11 @@ uint8_t slave_mask=MASK_VALUE;  /* IRQs 8-15 */
  *   INPUTS: None
  *   OUTPUTS:None
  *   RETURN VALUE: none
- *   SIDE EFFECTS:  writes to slave and master ports to intialize the pic, initially masks all interupts
+ *   SIDE EFFECTS:  writes to slave and master ports to initialize the pic, initially masks all interupts
  */
 void i8259_init(void) {
 
   // unsigned long flags;
-
 
   outb(MASK_VALUE,MASTER_8259_PORT_DATA);
   outb(MASK_VALUE,SLAVE_8259_PORT_DATA);
@@ -56,18 +55,25 @@ void i8259_init(void) {
 
 
 void enable_irq(uint32_t irq_num) {
+  /* Declaring port variable */
   int port=0x00;
 
+ /* Master PIC handling */
 if(irq_num>=0 && irq_num<SLAVE_IRQ_START){
-  port =MASTER_8259_PORT_DATA;
+  port = MASTER_8259_PORT_DATA;
+  /* Unmask IRQ bit by bit shifting and negating */
   master_mask &= ~(1<<irq_num);
   outb(master_mask,port);
 }
+
+/* Slave PIC handling */
 if(irq_num>=SLAVE_IRQ_START && irq_num<SLAVE_IRQ_LAST){
-  port =MASTER_8259_PORT_DATA;
-  master_mask &= ~(1<<2);
+  port = MASTER_8259_PORT_DATA;
+  /* Unmasking Slave PIC port on Master */
+  master_mask &= ~(1<<IRQ_SLAVE);
   outb(master_mask,port);
-  port=SLAVE_8259_PORT_DATA;
+  port = SLAVE_8259_PORT_DATA;
+  /* Unmask IRQ bit by bit shifting and negating */
   slave_mask &= ~(1<<(irq_num-SLAVE_IRQ_START));
   outb(slave_mask,port);
 
@@ -86,7 +92,7 @@ if(irq_num>=SLAVE_IRQ_START && irq_num<SLAVE_IRQ_LAST){
  */
 
 void disable_irq(uint32_t irq_num) {
-  int port=0x00;  // set initially to zero and absed on irq number decide what port to write to
+  int port=0x00;  // set initially to zero and based on irq number decide what port to write to
 if(irq_num>=0 && irq_num<SLAVE_IRQ_START){  // if irq number between 0 and slave irq start (8 )  write to master port to enable the required interrupt
   port =MASTER_8259_PORT_DATA;
   master_mask |= 1<<irq_num; // construct the master mask required to enable the interupt

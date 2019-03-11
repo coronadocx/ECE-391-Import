@@ -44,12 +44,31 @@ int idt_test(){
 
 
 	}
+		return result;
+	}
+	/* page_test_null - Null pointer
+	 *
+	 * Tries to access NULL pointer, should receive a page fault
+	 * Inputs: None
+	 * Outputs: PASS/FAIL
+	 * Side Effects: None
+	 * Coverage: Accessing NULL pointer
+	 */
+int page_test_null(){
+	printf("This test tries to dereference a NULL Pointer and should page fault\n");
+	int *i = NULL;
+	int j;
+	j = 5;
+	*i = j;
+
+	return 0;
+}
+
+
 //i=i/0;
 	//	asm volatile("int $40");
  //
 
-	return result;
-}
 
 // add more tests here
 
@@ -62,5 +81,6 @@ int idt_test(){
 /* Test suite entry point */
 void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
+	TEST_OUTPUT("page_test_null", page_test_null());
 	// launch your tests here
 }

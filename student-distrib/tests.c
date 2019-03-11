@@ -132,7 +132,7 @@ int page_test(){
 /* Test suite entry point */
 void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
-	//TEST_OUTPUT("page_test_null", page_test_null());
-	TEST_OUTPUT("page_test", page_test());
+	TEST_OUTPUT("page_test_null", page_test_null());
+	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here
 }

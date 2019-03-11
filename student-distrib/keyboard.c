@@ -1,6 +1,7 @@
 /* c file for keyboard */
 #include "lib.h"
 #include "i8259.h"
+#include "keyboard.h"
 char chararray[255];
 
 
@@ -18,7 +19,7 @@ char chararray[255];
 void check_input(){
 
  uint32_t a;
- char b;
+ // char b;
  a=inb(KEYBOARD_CMD_PORT);
  putc(chararray[a]);
  send_eoi(1);

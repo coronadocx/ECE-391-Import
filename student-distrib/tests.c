@@ -129,10 +129,30 @@ int page_test(){
 /* Checkpoint 5 tests */
 
 
+/* page_fault_outside_range -
+ *
+ * Tries to access pointer outside the range, should receive a page fault
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: Accessing non existent memory address pointer
+ */
+
+
+int page_fault_outside_range(){
+	int *addr;
+	addr = (int*)0x0b9300;
+	*addr = 5;
+	return 0;
+}
+
+
 /* Test suite entry point */
 void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
-	TEST_OUTPUT("page_test_null", page_test_null());
+	// TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here
+
+	TEST_OUTPUT("test_outside_range",page_fault_outside_range());
 }

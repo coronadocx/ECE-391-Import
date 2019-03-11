@@ -44,6 +44,10 @@ void init_keyboard(){
   enable_irq(1);
 
 // The following Initializes the Numbers in the chararray
+// Each index into the char array (ie: HEX value) refers to scancodes for the Keyboard
+// This is a simpler method because we only needed the numbers and lower case
+// letters for the demo
+
   chararray[0x02]='1';
   chararray[0x03]='2';
   chararray[0x04]='3';

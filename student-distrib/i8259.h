@@ -12,6 +12,14 @@
 #define MASTER_8259_PORT    0x20
 #define SLAVE_8259_PORT     0xA0
 
+#define MASTER_8259_PORT_DATA 0x21
+#define SLAVE_8259_PORT_DATA 0xA0
+
+/* some macros for enabling and disabling irs functions */
+#define MASK_VALUE 0xFF
+
+#define SLAVE_IRQ_START 8
+#define SLAVE_IRQ_LAST 16
 /* Initialization control words to init each PIC.
  * See the Intel manuals for details on the meaning
  * of each word */

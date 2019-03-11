@@ -1,12 +1,26 @@
 /* c file for keyboard */
 #include "lib.h"
 #include "i8259.h"
+#include "keyboard.h"
 char chararray[255];
+
+
+ /*
+  * check_input
+  *   DESCRIPTION: Function that checks the keyboard input and also Temporarily
+  *               Checks the letters e and d to enable and disable the rtc for the demo.
+                  This function primarily outputs the letter that was pressed on the keyboard.
+  *   INPUTS: None
+  *   OUTPUTS:None
+  *   RETURN VALUE: None
+  *   SIDE EFFECTS:  None. on press of e and d it enables and disables the rtc
+  */
+
 void check_input(){
 
  uint32_t a;
- char b;
- a=inb(0x60);
+ // char b;
+ a=inb(KEYBOARD_CMD_PORT);
  putc(chararray[a]);
  send_eoi(1);
  if(chararray[a]=='e')
@@ -18,9 +32,18 @@ void check_input(){
 }
 
 
+/*
+ * init_keyboard
+ *   DESCRIPTION: Function which initializes the Keyboard by enabling the first IRQ
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: IRQ 1 is enabled and initializes the keycodes for the keyboard.
+ */
+
 void init_keyboard(){
   enable_irq(1);
-  chararray[0x1E]='a';
+
+// The following Initializes the Numbers in the chararray
   chararray[0x02]='1';
   chararray[0x03]='2';
   chararray[0x04]='3';
@@ -32,6 +55,7 @@ void init_keyboard(){
   chararray[0x0A]='9';
   chararray[0x0B]='0';
 
+// The following initializes all the lower case letters Temporarily for the demo
   chararray[0x1E]='a';
   chararray[0x30]='b';
   chararray[0x2E]='c';

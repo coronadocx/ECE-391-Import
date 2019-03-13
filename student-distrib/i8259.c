@@ -62,7 +62,7 @@ void enable_irq(uint32_t irq_num) {
 if(irq_num>=0 && irq_num<SLAVE_IRQ_START){
   port = MASTER_8259_PORT_DATA;
   /* Unmask IRQ bit by bit shifting and negating */
-  master_mask &= ~(1<<irq_num);
+  master_mask &= ~(1<<irq_num);   // REFERENCED THE LINUX INTIALIZATION CODE FROM BOOTLIN V5.0
   outb(master_mask,port);
 }
 
@@ -72,7 +72,7 @@ if(irq_num>=SLAVE_IRQ_START && irq_num<SLAVE_IRQ_LAST){
   /* Unmasking Slave PIC port on Master */
   master_mask &= ~(1<<IRQ_SLAVE);
   outb(master_mask,port);
-  port = SLAVE_8259_PORT_DATA;
+  port = SLAVE_8259_PORT_DATA;    // REFERENCED THE LINUX INTIALIZATION CODE FROM BOOTLIN V5.0
   /* Unmask IRQ bit by bit shifting and negating */
   slave_mask &= ~(1<<(irq_num-SLAVE_IRQ_START));
   outb(slave_mask,port);

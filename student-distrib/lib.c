@@ -24,7 +24,58 @@ void clear(void) {
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
 }
+void setposition(int x,int y){
+  screen_x=x;
+  screen_y=y;
+}
+int getpositiony(){
+  return screen_y;
+}
+int getpositionx(){
+  return screen_x;
+}
+void handlebackspace(){
+  if(screen_x-1<0){
+    if(screen_y!=0){
+    screen_y=screen_y-1;
+    screen_x=78;
+  }
+  }
+  else{
+    screen_x=screen_x-1;
+  }
 
+
+
+  int i=NUM_COLS*screen_y+screen_x;
+  *(uint8_t *)(video_mem + (i << 1))=' ';
+  *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+}
+void scroll(){
+  int x=0;
+  int y=0;
+  int i=0;
+  int j=0;
+  while(y<NUM_ROWS){
+    x=0;
+    while(x<NUM_COLS){
+    i=NUM_COLS*y+x;
+    j=NUM_COLS*(y+1)+x;
+    if(y==NUM_ROWS-1){
+        *(uint8_t *)(video_mem + (i << 1))=' ';
+    }
+    else{
+    *(uint8_t *)(video_mem + (i << 1)) =*(uint8_t *)(video_mem + (j << 1)) ;
+  }
+    *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+    x=x+1;
+    }
+    y=y+1;
+  }
+  screen_y=24;
+
+
+}
 /* Standard printf().
  * Only supports the following format strings:
  * %%  - print a literal '%' character

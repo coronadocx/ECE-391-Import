@@ -24,4 +24,6 @@ int32_t rtc_open(const uint8_t * filename);
 int32_t rtc_close(int32_t fd);
 
 
+volatile int32_t rtc_interrupt_occurred;
+
 #endif

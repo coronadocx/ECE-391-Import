@@ -24,27 +24,30 @@ enable_irq(RTC_IRQ_NO);
 }
 
 
-/* 
+/*
  * 	rtc_read
  *	DESCRIPTION: Blocks current process until next RTC interrupt
  * 	INPUT:	fd		- RTC file descriptor
  * 	OUTPUT:	buf		- UNUSED
  *			nbytes	- UNUSED
- * 	RETURN VALUE: Returns 0 once an interrupt has occurred	
+ * 	RETURN VALUE: Returns 0 once an interrupt has occurred
  * 	SIDE EFFECT: NONE
  *  NOTE: This does not read the current RTC frequency
  */
 int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes)
 {
-	volatile int32_t rtc_interrupt_occurred;
+
 
 	// Do something // Set a flag
 
-	while  (!rtc_interrupt_occurred) { 	// Wait for RTC interrupt
+  rtc_interrupt_occurred = 0;
+
+	while  (rtc_interrupt_occurred==0) { 	// Wait for RTC interrupt
 		// Do something
+    rtc_interrupt_occurred = 0;
 	}
 
-	*(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
+	// *(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
 	return 0;
 }
 
@@ -74,7 +77,7 @@ int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
 	tmp = MAX_FREQ;
 	while (tmp != *buf){
 		rate++;
-		tmp = tmp >> 1; 
+		tmp = tmp >> 1;
 	}
 
 	// Change RTC to calculated rate
@@ -94,13 +97,13 @@ int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
  * 	DESCRIPTION: Sets RTC frequency to 2Hz then returns
  * 	INPUT: filename - UNUSED
  *	OUTPUT: none
- *	RETURN VALUE: 0 always 
- *	SIDE EFFECT: Modities the 
+ *	RETURN VALUE: 0 always
+ *	SIDE EFFECT: Modities the
  */
 int32_t rtc_open(const uint8_t * filename)
 {
 	//Set the RTC to 2Hz
-	*(int*)(0)++;		//FIXME forced pagefault to make sure this breaks 
+	*(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
 	return 0;
 }
 

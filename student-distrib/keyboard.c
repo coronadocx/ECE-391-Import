@@ -2,9 +2,12 @@
 #include "lib.h"
 #include "i8259.h"
 #include "keyboard.h"
+#include"terminal.h"
 static char chararray[255]={' ','e','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
-'\n','0','a','s','d','f','g','h','j','k','l',';','\'','``','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
+'\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
 static char linebuffer[128];
+int numberofchars=0;
+
 
 
  /*
@@ -32,6 +35,7 @@ void check_input(){
    scroll();
  }
 
+
  switch(a){
    case 0x2A: chararray[0x2A]='1';break;
    case 0xAA:chararray[0x2A]='0';break;
@@ -39,7 +43,24 @@ void check_input(){
    case 0xB6:chararray[0x36]='0';break;
    case 0x1D:chararray[0x1D]='1';break;
    case 0x9D:chararray[0x1D]='0';break;
-   case 0x0E: handlebackspace();break;
+   case 0x0E:{
+     handlebackspace();
+     linebuffer[numberofchars]='\0';
+   if(numberofchars!=0)
+    numberofchars=numberofchars-1;
+
+   break;
+ }
+   case 0x1C: {
+     putc(chararray[a]);
+     linebuffer[numberofchars]='\n';
+     read(linebuffer);
+     memset(linebuffer,0,128);
+     numberofchars=0;
+
+
+     break;
+   }
    case 0x3A: if(chararray[0x3A]=='0'){
                     chararray[0x3A]='1';
                   }
@@ -50,24 +71,35 @@ void check_input(){
               {
 
                 char temp = chararray[a]-32;
-                if(temp=='L' && chararray[0x1D]=='1' && (chararray[0x2A]=='1' || chararray[0x36]=='1')){
+                if(temp=='L' && chararray[0x1D]=='1' ){
                   clear();
                   setposition(0,0);
+                    update_cursor();
+                    numberofchars=0;
+                    memset(linebuffer,0,128);
+
                 }
                 else{
-
-
+                if(numberofchars!=127){
+                linebuffer[numberofchars]=temp;
                 putc(temp);
+                  update_cursor();
+                numberofchars=numberofchars+1;
+              }
               }
                 }
             else
               {
-                if(chararray[a])
+                if(chararray[a]&& numberofchars!=127)
                 {
+                linebuffer[numberofchars]=chararray[a];
                 putc(chararray[a]);
+                numberofchars++;
+                  update_cursor();
                   }
 
               }
+
                break;
            }
 }

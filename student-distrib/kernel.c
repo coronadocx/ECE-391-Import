@@ -12,6 +12,7 @@
 #include "keyboard.h"
 #include "rtc.h"
 #include "paging.h"
+#include "terminal.h"
 #define RUN_TESTS
 
 /* Macros. */
@@ -149,7 +150,7 @@ void entry(unsigned long magic, unsigned long addr) {
     clear();
     initialize_IDT();
 
-
+    enable_cursor();
     /* Init the PIC */
     i8259_init();
 

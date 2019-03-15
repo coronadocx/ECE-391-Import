@@ -150,7 +150,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
 
     /*initialize the idt */
-    clear();
+  //  clear();
     initialize_IDT();
 
 

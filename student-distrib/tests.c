@@ -45,6 +45,7 @@ int idt_test(){
 
 	int i;
 	int result = PASS;
+	 dentry_t a;
 	for (i = 0; i < 10; ++i){
 		if ((idt[i].offset_15_00 == NULL) &&
 			(idt[i].offset_31_16 == NULL)){
@@ -52,10 +53,37 @@ int idt_test(){
 			result = FAIL;
 
 		}
- dentry_t a;
-  read_dentry_by_index(6,&a);
+
+/*
+  read_dentry_by_index(0,&a);
+		printf("%s",a.fname);
+
+	read_dentry_by_index(1,&a);
+		printf("%s",a.fname);
+  read_dentry_by_index(2,&a);
+		printf("%s",a.fname);
+  read_dentry_by_index(3,&a);
+		printf("%s",a.fname);
+	read_dentry_by_index(4,&a);
+		printf("%s",a.fname);
+	read_dentry_by_index(5,&a);
+		printf("%s",a.fname);
+	read_dentry_by_index(6,&a);
+		printf("%s",a.fname);
+	read_dentry_by_index(7,&a);
+		printf("%s",a.fname);
+	read_dentry_by_index(8,&a);
+		printf("%s",a.fname);
+	read_dentry_by_index(9,&a);
+		printf("%s",a.fname);
+	read_dentry_by_index(10,&a);
 	printf("%s",a.fname);
+*/
+
 	}
+	read_dentry_by_index(2,&a);
+
+	printf("%s",a.fname);
 
 		return result;
 	}

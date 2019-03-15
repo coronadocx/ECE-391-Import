@@ -101,7 +101,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
   /* Checking if this is the directory entry */
   /***** Should bytes being compared be i or FILE_NAME_SIZE ******/
   if(strncmp(first_directory, file_name, i) == 0){
-    strcpy(dentry->fname, file_name);
+    strncpy(dentry->fname, file_name,i);
     dentry->file_type = 1;
     dentry->inode_num = 0;
     /* Return after filling dentry */
@@ -111,10 +111,10 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
   /* We get the pointer to the first file */
   uint8_t* first_file = (first_directory + 64);
   /* Using this to keep track of the index in the boot_dir_list */
-  int j = 0;
+  int j = 2;
   while(strncmp((first_file + j*64), file_name, i) != 0){
     /* If we could not find the filename, return -1 */
-    if(j >= 62)
+    if(j >= 64)
       return -1;
 
     j++;
@@ -124,7 +124,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
   /* j has the value of the index */
   /* Filling in the values of the dentry */
 
-  strcpy(dentry->fname, file_name);
+  strncpy(dentry->fname, file_name,i);
   /* 32 + 4 since first 32 bytes are for filename */
   dentry->file_type = (32 + 4 + first_file + j*64);
   /* 32 + 8 since first 32 bytes are for filename */
@@ -150,10 +150,10 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
 
 
 /* Setting address to dentry that we want to read from */
-  uint32_t* dentry_addr = (boot_block_addr + (index * BOOT_BLOCK_SIZE));
+  uint8_t* dentry_addr = (uint8_t*) ((boot_block_addr +32+ (index * 16)));
 
 /***** Hopefully this copies over all 32 bytes *****/
- strcpy(dentry->fname, (int8_t*) dentry_addr);
+ strncpy(dentry->fname, (int8_t*) dentry_addr,strlen(dentry_addr));
 
 
 /****** Is this assignment fine or should we use offset to access data elements ****/

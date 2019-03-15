@@ -536,22 +536,7 @@ void test_interrupts(void) {
     //     video_mem[i << 1]++;
     // }
 
-
-    // *(uint8_t *)(video_mem + ((NUM_COLS * 30 + 30) << 1)) = rtcInterruptCount;
-    // *(uint8_t *)(video_mem + ((NUM_COLS * 30 + 39) << 1) + 1) = ATTRIB;
-//
-    // setposition(30,30);
-    // putc(rtcInterruptCount);
-
-    // *(uint8_t *)(video_mem + (30 << 1)) = (rtcInterruptCount%10)+48;
-    // *(uint8_t *)(video_mem + (30 << 1)+1) = ATTRIB;
-    //
     rtcInterruptCount++;
-
-
-    // printf("rtc interrupted\n");
-
-
 
 
 }

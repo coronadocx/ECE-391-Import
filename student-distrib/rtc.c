@@ -36,45 +36,12 @@ enable_irq(RTC_IRQ_NO);
  */
 int32_t rtc_read()
 {
-
-
-	// Do something // Set a flag
-  // printf("Entered RTC read function\n");
-
   rtc_interrupt_occurred = 0;
 
-	while  (rtc_interrupt_occurred==0) { 	// Wait for RTC interrupt
-		// Do something
-    //rtc_interrupt_occurred = 0;
-    //printf("Inside while rtc\n");
+	while  (rtc_interrupt_occurred==0) {
 	}
 
-  // printf("outside while rtc\n");
-	// *(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
-
-  // printf("Returning from RTC read function\n");
-
-  //disable_irq(8);
 	return 0;
-}
-
-
-int32_t rtc_write_test2(){
-char prev;
-char rate = 0x0F;
-
-// Change RTC to calculated rate
-cli();										// Disable interrupts
-outb(0x8A,RTC_CMD_PORT);			// Select A, NMI off
-prev = inb(RTC_DATA_PORT);					// Collect old state
-outb(0x8A,RTC_CMD_PORT);			// Select A again
-outb((prev & 0xF0) | 0x0F,RTC_DATA_PORT);	// Write new rate to RTC
-sti();
-
-
-
-return 0;
-
 }
 
 /*
@@ -106,8 +73,6 @@ int32_t rtc_write(int32_t fd,const int32_t * buf, int32_t nbytes)
 		rate++;
 		tmp = tmp >> 1;
 	}
-
-  // char prev;
 
 	// Change RTC to calculated rate
 	cli();										// Disable interrupts

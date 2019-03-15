@@ -129,7 +129,6 @@ int testing_rtc_driver(){
 	while(1){
 		a = rtc_read();
 		writetovideomem();
-
 	}
 
 	return 0;
@@ -150,8 +149,6 @@ void launch_tests(){
 	// TEST_OUTPUT("page_test_null", page_test_null());
 	TEST_OUTPUT("testing_rtc_driver",testing_rtc_driver());
 	printf("Do nothing for rtc read check");
-	// asm volatile("int $40");
-
 
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here

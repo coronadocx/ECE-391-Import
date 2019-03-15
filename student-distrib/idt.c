@@ -157,7 +157,15 @@ void handle10(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle14(){
-    printf("Page Fault exception");
+    int address;
+    printf("Page Fault exception\n");
+    asm volatile("                \n\
+      movl	%0, %%eax	            \n\
+      movl 	%%cr2, %%eax			    \n\
+      "
+      : "=a"(address)
+    );
+    printf("The Exception occurred at: %x",address);
       while(1);
 }
 /*

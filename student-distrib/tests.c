@@ -135,6 +135,23 @@ int testing_rtc_driver(){
 }
 
 
+/* page_fault_outside_range -
+ *
+ * Tries to access pointer outside the range, should receive a page fault
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: Accessing non existent memory address pointer
+ */
+
+
+int page_fault_outside_range(){
+	int *addr;
+	addr = (int*)0x0b9300;
+	*addr = 5;
+	return 0;
+}
+
 // add more tests here
 
 /* Checkpoint 2 tests */
@@ -152,4 +169,7 @@ void launch_tests(){
 
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here
+
+	// TEST_OUTPUT("test_outside_range",page_fault_outside_range());
+
 }

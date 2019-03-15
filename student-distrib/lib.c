@@ -13,6 +13,13 @@ static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
 
+static int rtcInterruptCount = 0;
+
+void writetovideomem(){
+  *(uint8_t *)(video_mem + (30 << 1)) = (rtcInterruptCount%10)+48;
+  *(uint8_t *)(video_mem + (30 << 1)+1) = ATTRIB;
+}
+
 /* void clear(void);
  * Inputs: void
  * Return Value: none
@@ -524,9 +531,12 @@ int8_t* strncpy(int8_t* dest, const int8_t* src, uint32_t n) {
  * Return Value: void
  * Function: increments video memory. To be used to test rtc */
 void test_interrupts(void) {
-    int32_t i;
-    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-        video_mem[i << 1]++;
-    }
+    // int32_t i;
+    // for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    //     video_mem[i << 1]++;
+    // }
+
+    rtcInterruptCount++;
+
 
 }

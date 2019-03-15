@@ -159,7 +159,10 @@ void entry(unsigned long magic, unsigned long addr) {
     init_keyboard();
     init_rtc();
     /* Masking RTC for testing*/
-    disable_irq(RTC_IRQ_NO);
+    // disable_irq(RTC_IRQ_NO);
+
+
+    // asm volatile("int $40");
 
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your

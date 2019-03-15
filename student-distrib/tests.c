@@ -1,6 +1,8 @@
 #include "tests.h"
 #include "x86_desc.h"
 #include "lib.h"
+#include "rtc.h"
+#include "i8259.h"
 
 #define PASS 1
 #define FAIL 0
@@ -120,6 +122,19 @@ int page_test(){
 	//	asm volatile("int $40");
  //
 
+int testing_rtc_driver(){
+	int a,b;
+	int32_t rate = 2;
+	b = rtc_write(0,&rate,0);
+	while(1){
+		a = rtc_read();
+		writetovideomem();
+
+	}
+
+	return 0;
+}
+
 
 // add more tests here
 
@@ -131,9 +146,13 @@ int page_test(){
 
 /* Test suite entry point */
 void launch_tests(){
-	TEST_OUTPUT("idt_test", idt_test());
-	TEST_OUTPUT("page_test_null", page_test_null());
-	
+	// TEST_OUTPUT("idt_test", idt_test());
+	// TEST_OUTPUT("page_test_null", page_test_null());
+	TEST_OUTPUT("testing_rtc_driver",testing_rtc_driver());
+	printf("Do nothing for rtc read check");
+	// asm volatile("int $40");
+
+
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here
 }

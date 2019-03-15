@@ -34,23 +34,48 @@ enable_irq(RTC_IRQ_NO);
  * 	SIDE EFFECT: NONE
  *  NOTE: This does not read the current RTC frequency
  */
-int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes)
+int32_t rtc_read()
 {
 
 
 	// Do something // Set a flag
+  // printf("Entered RTC read function\n");
 
   rtc_interrupt_occurred = 0;
 
 	while  (rtc_interrupt_occurred==0) { 	// Wait for RTC interrupt
 		// Do something
-    rtc_interrupt_occurred = 0;
+    //rtc_interrupt_occurred = 0;
+    //printf("Inside while rtc\n");
 	}
 
+  // printf("outside while rtc\n");
 	// *(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
+
+  // printf("Returning from RTC read function\n");
+
+  //disable_irq(8);
 	return 0;
 }
 
+
+int32_t rtc_write_test2(){
+char prev;
+char rate = 0x0F;
+
+// Change RTC to calculated rate
+cli();										// Disable interrupts
+outb(0x8A,RTC_CMD_PORT);			// Select A, NMI off
+prev = inb(RTC_DATA_PORT);					// Collect old state
+outb(0x8A,RTC_CMD_PORT);			// Select A again
+outb((prev & 0xF0) | 0x0F,RTC_DATA_PORT);	// Write new rate to RTC
+sti();
+
+
+
+return 0;
+
+}
 
 /*
  * 	rtc_write
@@ -61,17 +86,19 @@ int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes)
  *	RETURN VALUE: 0 on success, -1 on failure
  *	SIDE EFFECT: Modifies the RTC
  */
-int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
+int32_t rtc_write(int32_t fd,const int32_t * buf, int32_t nbytes)
 {
 	int32_t tmp;
-	int8_t rate = 6;
+	int8_t rate = 5;
 	int8_t prev;
+
 	//Make sure input is valid
-	if ( buf == NULL 		||
-		*buf & ((*buf)-1) 	||
-		*buf > MAX_FREQ) {
+	if ( buf == NULL) {
 		return -1;
 	}
+  else if(*buf & ((*buf)-1) || *buf > MAX_FREQ){
+    return -1;
+  }
 
 	// Calculate the RTC rate setting
 	tmp = MAX_FREQ;
@@ -80,12 +107,14 @@ int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
 		tmp = tmp >> 1;
 	}
 
+  // char prev;
+
 	// Change RTC to calculated rate
 	cli();										// Disable interrupts
-	outb(RTC_CMD_PORT, REG_A_NMI_OFF);			// Select A, NMI off
+	outb(REG_A_NMI_OFF,RTC_CMD_PORT);			// Select A, NMI off
 	prev = inb(RTC_DATA_PORT);					// Collect old state
-	outb(RTC_CMD_PORT, REG_A_NMI_OFF);			// Select A again
-	outb(RTC_DATA_PORT, (prev & 0xF0) | rate);	// Write new rate to RTC
+	outb(REG_A_NMI_OFF,RTC_CMD_PORT);			// Select A again
+	outb((prev & 0xF0) | rate,RTC_DATA_PORT);	// Write new rate to RTC
 	sti();										// Enable interrupts
 
 	return 0;
@@ -103,7 +132,7 @@ int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
 int32_t rtc_open(const uint8_t * filename)
 {
 	//Set the RTC to 2Hz
-	*(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
+	// *(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
 	return 0;
 }
 

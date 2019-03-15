@@ -193,15 +193,17 @@ void keyboard_handler(){
  */
 void rtchandler(){
   /* referenced wiki.osdev.org/RTC#Interrupts_and_Registers_C*/
-
+  // rtcInterruptCount++;
+  rtc_interrupt_occurred = 1;
   outb(REG_C,RTC_CMD_PORT);
   inb(RTC_DATA_PORT);
   test_interrupts();
   send_eoi(RTC_IRQ_NO);
   send_eoi(IRQ_SLAVE);
 
-  rtc_interrupt_occurred = 1;
 
+
+  // printf("Exiting rtc handler\n");
 
 }
 /*

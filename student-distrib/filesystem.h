@@ -3,14 +3,19 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#define FILE_NAME_SIZE        32
-#define DENTRY_RESERVED       6
+#define FILE_NAME_SIZE          32
+#define DENTRY_RESERVED         6
 
-#define FS_BLOCK_SIZE         4096
+#define FS_BLOCK_SIZE           4096
+#define BOOT_BLOCK_SIZE         64
+#define BOOT_BLOCK_DIR_ENTRIES  (BOOT_BLOCK_SIZE-2)
+
+#define DBLOCK_SIZE             1024
+
+#define INODE_MAX_D_BLOCKS      1023
+#define MAX_FILE_SIZE           (INODE_MAX_D_BLOCKS*FS_BLOCK_SIZE)
 
 
-
-#define
 
 
 /* Change these includes to what is necessary */
@@ -47,8 +52,8 @@ extern int32_t fs_write(void* buf, int32_t nbytes);
 /* Searches for a directory entry by name, copies over elements and returns a pointer to the directory entry */
 extern int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry);
 
-/* Searches for a directory entry by index(not inode#), copies over elements and returns a pointer to the directory entry */
-extern int32_t read_dentry_by_index(uint32_t* index, dentry_t* dentry);
+/* Searches for a directory entry by index of the directory entries in boot block(not inode#), copies over elements and returns a pointer to the directory entry */
+extern int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);
 
 /* Searches for a directory entry by inode#, copies over a number of elements from an offset into buf* */
 extern int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);

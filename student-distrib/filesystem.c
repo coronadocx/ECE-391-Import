@@ -145,11 +145,29 @@ return 0;
 
 }
 
-int32_t read_dentry_by_index(uint32_t* index, dentry_t* dentry){
+int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
 
   /* Error handling for dentry == NULL */
-  if(dentry_t == NULL)
+  if(dentry == NULL)
     return -1;
+
+  /* Error handling for index > 62); index starts at 0 for dir "." */
+  if(index > BOOT_BLOCK_DIR_ENTRIES)
+    return -1;
+
+ /* Setting boot block address */
+  uint32_t* boot_block_addr = (uint32_t* )boot_block_module->mod_start;
+
+/* Setting address to dentry that we want to read from */
+  uint32_t* dentry_addr = (boot_block_addr + (index * BOOT_BLOCK_SIZE));
+
+/***** Hopefully this copies over all 32 bytes *****/
+ strcpy(dentry->fname, (int8_t*) dentry_addr);
+
+
+/****** Is this assignment fine or should we use offset to access data elements ****/
+ dentry->file_type = ((dentry_t*)dentry_addr)->file_type;
+ dentry->inode_num = ((dentry_t*)dentry_addr)->inode_num;
 
 }
 
@@ -159,13 +177,57 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   if(buf == NULL)
     return -1;
 
-  /* Error handling for zero length; no bytes to be read */
-  if(length == 0)\
+  /* Error handling for zero length or length greater than Max_File_Size; no bytes to be read */
+  if(length == 0 || length > MAX_FILE_SIZE)
     return -1;
 
+  if(offset > MAX_FILE_SIZE || (offset + length) > MAX_FILE_SIZE)
+    return -1;
+
+  /* Error handling for boot_block_addr == NULL */
+  if((uint32_t* )boot_block_module->mod_start == NULL)
+    return -1;
+
+  /* Setting boot_block_addr for filesystem read */
+  uint32_t* boot_block_addr = (uint32_t* )boot_block_module->mod_start;
+  /* Copy over # dir_entries */
+  dir_entries = *(boot_block_addr);
+  /* Copy over # inodes */
+  /****** Should this be 4 or 1? *******/
+  num_inodes =  *(boot_block_addr + 4);
+  /* Copy over # data blocks */
+  /****** Should this be 8 or 2? *******/
+  num_dblocks = *(boot_block_addr + 8);
   /* Given inode index cannot be bigger than total number of inodes */
-  if(inode >= num_inodes)
-      return -1;
+  if(inode >= num_inodes || inode > BOOT_BLOCK_DIR_ENTRIES)
+    return -1;
+
+  /* Now that we've made sure everything is Gucci, on to
+  *  writing the actual function */
+
+
+   /* Length in Bytes */
+ uint32_t inode_file_size;
+ /* Num of data blocks in inode */
+ uint32_t inode_d_blocks;
+/* Points to 0th inode */
+ uint32_t* inode_start_addr = boot_block_addr + FS_BLOCK_SIZE;
+/* Pointer to required inode */
+ uint32_t* inode_addr = inode_start_addr + (inode * FS_BLOCK_SIZE);
+/* Pointer to data block[0] in absolute block numbers */
+/* Will be useful in indexing into data blocks */
+ uint32_t* dblock_start_addr = inode_start_addr + (num_inodes*FS_BLOCK_SIZE);
+
+
+ /* Now that we have a pointer to the inode, let the dereferencing begin */
+
+ inode_file_size = *(inode_addr);
+ inode_d_blocks = (inode_file_size)/DBLOCK_SIZE;
+ if(inode_file_size < DBLOCK_SIZE)
+  inode_d_blocks = 1;
+
+  /* Starting # of data block */
+  
 
 
 }

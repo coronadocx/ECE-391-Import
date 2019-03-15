@@ -3,29 +3,21 @@
 
 
 /* Number of Directory Entries */
-extern uint32_t dir_entries;
+static uint32_t dir_entries;
 /* Number of inodes */
-extern uint32_t num_inodes;
+static uint32_t num_inodes;
 /* Number of data blocks */
-extern uint32_t num_dblocks;
+static uint32_t num_dblocks;
 
 /* Global boot block variable for starting address of FileSystems */
-module_t* boot_block_module;
+static module_t* boot_block_module;
+  uint32_t* boot_block_addr;
 
 
-int32_t fs_open(multiboot_info_t *mbi){
-
-    /* Initially set boot_block_module to NULL */
-    boot_block_module = NULL;
-
-    /* Error handling for when mbi or mbi->mods_addr is NULL */
-    if(mbi == NULL)
-      return -1;
-    if(mbi->mods_addr == NULL)
-      return -1;
+int32_t fs_open(unsigned int mod_start){
 
     /* Assign boot_block_module for FileSystem Read functions */
-    boot_block_module = (module_t*)mbi->mods_addr;
+    boot_block_addr = mod_start;
     return 0;
 }
 
@@ -73,23 +65,22 @@ extern int32_t fs_write(void* buf, int32_t nbytes){
 int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
 
   /* Error handling for dentry == NULL */
-  if(dentry_t == NULL)
+  if(dentry == NULL)
     return -1;
   /* Error handling for fname == NULL */
   if(fname == NULL)
     return -1;
 
   /* Error handling for boot_block_addr == NULL */
-  if((uint32_t* )boot_block_module->mod_start == NULL)
+  if(boot_block_addr == NULL)
     return -1;
 
   /* Setting boot_block_addr for filesystem read */
-  uint32_t* boot_block_addr = (uint32_t* )boot_block_module->mod_start;
 
   int i = 0;
   /* Making a local copy of file name */
   /******* Do we need to make this local copy ****/
-  uint8_t file_name[FILE_NAME_SIZE];
+  char file_name[FILE_NAME_SIZE];
   while(fname[i] != '\0'){
     file_name[i] = fname[i];
     i++;
@@ -99,13 +90,13 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
   dir_entries = *(boot_block_addr);
   /* Copy over # inodes */
   /****** Should this be 4 or 1? *******/
-  num_inodes =  *(boot_block_addr + 4);
+  num_inodes =  *(boot_block_addr + 1);
   /* Copy over # data blocks */
   /****** Should this be 8 or 2? *******/
-  num_dblocks = *(boot_block_addr + 8);
+  num_dblocks = *(boot_block_addr + 2);
 
   /* We get the pointer to the first directory */
-  uint32_t* first_directory = (boot_block_addr + 64);
+  uint32_t* first_directory = (uint32_t*)(boot_block_addr + 16);
 
   /* Checking if this is the directory entry */
   /***** Should bytes being compared be i or FILE_NAME_SIZE ******/
@@ -156,7 +147,7 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
     return -1;
 
  /* Setting boot block address */
-  uint32_t* boot_block_addr = (uint32_t* )boot_block_module->mod_start;
+
 
 /* Setting address to dentry that we want to read from */
   uint32_t* dentry_addr = (boot_block_addr + (index * BOOT_BLOCK_SIZE));
@@ -185,11 +176,11 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
     return -1;
 
   /* Error handling for boot_block_addr == NULL */
-  if((uint32_t* )boot_block_module->mod_start == NULL)
+  if(boot_block_addr == NULL)
     return -1;
 
   /* Setting boot_block_addr for filesystem read */
-  uint32_t* boot_block_addr = (uint32_t* )boot_block_module->mod_start;
+
   /* Copy over # dir_entries */
   dir_entries = *(boot_block_addr);
   /* Copy over # inodes */
@@ -227,7 +218,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   inode_d_blocks = 1;
 
   /* Starting # of data block */
-  
+
 
 
 }

@@ -29,11 +29,11 @@
 #include "keyboard.h"
 #include "rtc.h"
 #include "paging.h"
-#include
+
 
 /* Struct for a Directory Entry */
 typedef struct dentry {
-    uint8_t fname[FILE_NAME_SIZE];
+    char fname[FILE_NAME_SIZE];
     uint32_t file_type;
     uint32_t inode_num;
     uint32_t reserved[DENTRY_RESERVED];
@@ -41,7 +41,7 @@ typedef struct dentry {
 
 
 /* Giving the multiboot_struct into fs_open for the boot block addr */
-extern int32_t fs_open(multiboot_info_t *mbi);
+extern int32_t fs_open(unsigned int mod_start);
 
 extern int32_t fs_close();
 

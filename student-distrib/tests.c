@@ -1,6 +1,7 @@
 #include "tests.h"
 #include "x86_desc.h"
 #include "lib.h"
+#include "filesystem.h"
 
 #define PASS 1
 #define FAIL 0
@@ -51,11 +52,14 @@ int idt_test(){
 			result = FAIL;
 
 		}
-
-
+ dentry_t a;
+  read_dentry_by_index(6,&a);
+	printf("%s",a.fname);
 	}
+
 		return result;
 	}
+
 	/* page_test_null - Null pointer
 	 *
 	 * Tries to access NULL pointer, should receive a page fault
@@ -132,7 +136,7 @@ int page_test(){
 /* Test suite entry point */
 void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
-	TEST_OUTPUT("page_test_null", page_test_null());
+	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here
 }

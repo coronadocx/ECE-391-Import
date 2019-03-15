@@ -122,6 +122,20 @@ int page_test(){
 	//	asm volatile("int $40");
  //
 
+
+ /* testing_rtc_driver -
+  *
+  * Tries to test the RTC functionality, sets the RTC frequency by the rate, which needs
+	*	to be a power of 2. Also invokes rtc read which is essentially blocking the current process
+	* until the next rtc interrupt. This functionality can be tested here, as after the read a number
+	* is written to video memory and this number is only incremented when an rtc interrupt occurs.
+
+  * Inputs: None
+  * Outputs: PASS/FAIL
+  * Side Effects: None
+  * Coverage: Tests RTC write, read and open // not yet
+  */
+
 int testing_rtc_driver(){
 	int a,b;
 	int32_t rate = 2;
@@ -144,7 +158,6 @@ int testing_rtc_driver(){
  * Coverage: Accessing non existent memory address pointer
  */
 
-
 int page_fault_outside_range(){
 	int *addr;
 	addr = (int*)0x0b9300;
@@ -165,11 +178,11 @@ void launch_tests(){
 	// TEST_OUTPUT("idt_test", idt_test());
 	// TEST_OUTPUT("page_test_null", page_test_null());
 	TEST_OUTPUT("testing_rtc_driver",testing_rtc_driver());
-	printf("Do nothing for rtc read check");
-
 	// TEST_OUTPUT("page_test", page_test());
+	// TEST_OUTPUT("test_outside_range",page_fault_outside_range());
+
 	// launch your tests here
 
-	// TEST_OUTPUT("test_outside_range",page_fault_outside_range());
+
 
 }

@@ -53,23 +53,25 @@ int32_t rtc_read()
  *	RETURN VALUE: 0 on success, -1 on failure
  *	SIDE EFFECT: Modifies the RTC
  */
-int32_t rtc_write(int32_t fd,const int32_t * buf, int32_t nbytes)
+int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
 {
 	int32_t tmp;
 	int8_t rate = 5;
 	int8_t prev;
 
+  int32_t* buf2 =(int32_t*) buf;
+
 	//Make sure input is valid
-	if ( buf == NULL) {
+	if ( buf2 == NULL) {
 		return -1;
 	}
-  else if(*buf & ((*buf)-1) || *buf > MAX_FREQ){
+  else if(*buf2 & ((*buf2)-1) || *buf2 > MAX_FREQ){
     return -1;
   }
 
 	// Calculate the RTC rate setting
 	tmp = MAX_FREQ;
-	while (tmp != *buf){
+	while (tmp != *buf2){
 		rate++;
 		tmp = tmp >> 1;
 	}

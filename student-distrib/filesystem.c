@@ -11,7 +11,7 @@ static uint32_t num_dblocks;
 
 /* Global boot block variable for starting address of FileSystems */
 static module_t* boot_block_module;
-  uint32_t* boot_block_addr;
+uint32_t* boot_block_addr;
 
 
 
@@ -150,7 +150,7 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
 /* Last entry should always be NULL */
  dentry->fname[FILE_NAME_SIZE] = '\0';
 
-/****** Is this assignment fine or should we use offset to access data elements ****/
+/* Is this assignment fine or should we use offset to access data elements */
  dentry->file_type = ((dentry_t*)dentry_addr)->file_type;
  dentry->inode_num = ((dentry_t*)dentry_addr)->inode_num;
 

@@ -111,6 +111,40 @@ int idt_test(){
 	}
 
 
+	int dir_read_test(uint32_t* boot_block_addr){
+		if(boot_block_addr == NULL)
+		return 0;
+
+		clear();
+
+		int dir_entries;
+		int num_inodes;
+		int num_dblocks;
+		int i;
+		uint32_t* inode_start_addr;
+		dentry_t d;
+		uint32_t file_size;
+
+		dir_entries = *(boot_block_addr);
+		num_inodes  = *(boot_block_addr + 1);
+		num_dblocks = *(boot_block_addr + 2);
+
+		inode_start_addr = boot_block_addr + 1024;
+
+		for(i = 0; i < dir_entries; i++){
+			if(read_dentry_by_index(i, &d) == -1){
+				return FAIL;
+			}
+			printf("File Name: %s, " , d.fname);
+			printf("File Type: %d, ", d.file_type);
+			file_size = *(inode_start_addr + (d.inode_num)*1024);
+			printf("File Size: %d\n", file_size);
+		}
+
+		return PASS;
+	}
+
+
 	int read_by_name_test(){
 
 		clear();
@@ -266,7 +300,7 @@ void launch_tests(){
 	//TEST_OUTPUT("read_by_index_test", read_by_index_test());
 	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
 
-  TEST_OUTPUT("read_data_test", read_data_test());
+  //TEST_OUTPUT("read_data_test", read_data_test());
 	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here

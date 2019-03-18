@@ -7,13 +7,18 @@
 #define DENTRY_RESERVED         6
 
 #define FS_BLOCK_SIZE           4096
+#define BYTES_IN_INT            4
+#define ABS_BLK_OFFSET        (FS_BLOCK_SIZE/BYTES_IN_INT)
+
 #define BOOT_BLOCK_SIZE         64
 #define BOOT_BLOCK_DIR_ENTRIES  (BOOT_BLOCK_SIZE-2)
+#define NUM_INODES              64
 
-#define DBLOCK_SIZE             1024
 
 #define INODE_MAX_D_BLOCKS      1023
 #define MAX_FILE_SIZE           (INODE_MAX_D_BLOCKS*FS_BLOCK_SIZE)
+
+
 
 
 

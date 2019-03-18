@@ -45,7 +45,6 @@ int idt_test(){
 
 	int i;
 	int result = PASS;
-	 dentry_t a;
 	for (i = 0; i < 10; ++i){
 		if ((idt[i].offset_15_00 == NULL) &&
 			(idt[i].offset_31_16 == NULL)){
@@ -54,38 +53,138 @@ int idt_test(){
 
 		}
 
-/*
-  read_dentry_by_index(0,&a);
-		printf("%s",a.fname);
-
-	read_dentry_by_index(1,&a);
-		printf("%s",a.fname);
-  read_dentry_by_index(2,&a);
-		printf("%s",a.fname);
-  read_dentry_by_index(3,&a);
-		printf("%s",a.fname);
-	read_dentry_by_index(4,&a);
-		printf("%s",a.fname);
-	read_dentry_by_index(5,&a);
-		printf("%s",a.fname);
-	read_dentry_by_index(6,&a);
-		printf("%s",a.fname);
-	read_dentry_by_index(7,&a);
-		printf("%s",a.fname);
-	read_dentry_by_index(8,&a);
-		printf("%s",a.fname);
-	read_dentry_by_index(9,&a);
-		printf("%s",a.fname);
-	read_dentry_by_index(10,&a);
-	printf("%s",a.fname);
-*/
-
 	}
-	read_dentry_by_index(2,&a);
-
-	printf("%s",a.fname);
 
 		return result;
+	}
+
+	/* Checkpoint 2 tests */
+
+	/* Read_By_Index_Tests - Example
+	 *
+	 * Checks all 17 entries of the filesystem
+	 * Inputs: None
+	 * Outputs: PASS/FAIL
+	 * Side Effects: None
+	 * Coverage: Load IDT, IDT definition
+	 * Files: x86_desc.h/S
+	 */
+
+	int read_by_index_test(){
+
+		clear();
+		int i;
+		dentry_t a;
+		i = 11;
+		for(i = 0; i < 17; i++){
+			if(read_dentry_by_index(i,&a) == -1){
+				printf("ERROR! Entry not found\n");
+				return FAIL;
+			}
+
+
+			printf("File Name: %s\n",a.fname);
+			printf("File Type: %d\n",a.file_type);
+			printf("Inode Num: %d\n",a.inode_num);
+
+		}
+
+		return PASS;
+	}
+
+
+	int read_data_test(){
+
+		clear();
+		int i;
+		uint8_t buf[200];
+			if(read_data(38, 0, buf,187) == -1){
+					return FAIL;
+			}
+
+		printf("Printing the first thousand contents of the buffer\n");
+		for(i = 0; i<200; i++){
+			putc(buf[i]);
+		}
+
+		return PASS;
+	}
+
+
+	int read_by_name_test(){
+
+		clear();
+		int i;
+		char* s;
+		dentry_t a;
+		for(i = 0; i < 17; i++){
+		if(i = 0){
+			s = ".";
+	}
+		else if(i = 1){
+			s = "counter";
+	}
+		else if(i = 2){
+			s = "cat";
+	}
+		else if(i = 3){
+			s = "hello";
+	}
+		else if(i = 4){
+		s = "pingpong";
+	}
+		else if(i = 5){
+			s = "frame0.txt";
+	}
+		else if(i = 6){
+			s = "frame1.txt";
+	}
+		else if(i = 7){
+		s = "verylargetextwithverylongname.tx";
+	}
+		else if(i = 8){
+		s = "shell";
+	}
+		else if(i = 9){
+			s = "ls";
+	}
+		else if(i = 10){
+			s = "rtc";
+	}
+		else if(i = 11){
+			s = "testprint";
+	}
+		else if(i = 12){
+			s = "grep";
+	}
+		else if(i = 13){
+			s = "created.txt";
+	}
+		else if(i = 14){
+			s = "fish";
+	}
+		else if(i = 15){
+			s = "sigtest";
+	}
+		else if(i = 16){
+			s = "syserr";
+	}
+
+		else return FAIL;
+
+
+		if(read_dentry_by_name(s,&a) == -1){
+			printf("ERROR! Entry not found\n");
+			return FAIL;
+		}
+
+
+		printf("File Name: %s\n",a.fname);
+		printf("File Type: %d\n",a.file_type);
+		printf("Inode Num: %d\n",a.inode_num);
+}
+
+		return PASS;
 	}
 
 	/* page_test_null - Null pointer
@@ -163,7 +262,11 @@ int page_test(){
 
 /* Test suite entry point */
 void launch_tests(){
-	TEST_OUTPUT("idt_test", idt_test());
+	//TEST_OUTPUT("idt_test", idt_test());
+	//TEST_OUTPUT("read_by_index_test", read_by_index_test());
+	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
+
+  TEST_OUTPUT("read_data_test", read_data_test());
 	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here

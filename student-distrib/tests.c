@@ -3,6 +3,7 @@
 #include "lib.h"
 #include "filesystem.h"
 
+
 #define PASS 1
 #define FAIL 0
 
@@ -22,6 +23,7 @@
 #define TEST_OUTPUT(name, result)	\
 	printf("[TEST %s] Result = %s\n", name, (result) ? "PASS" : "FAIL");
 
+unsigned int boot_block_addr;
 static inline void assertion_failure(){
 	/* Use exception #15 for assertions, otherwise
 	   reserved by Intel */
@@ -58,6 +60,72 @@ int idt_test(){
 		return result;
 	}
 
+		/* page_test_null - Null pointer
+		 *
+		 * Tries to access NULL pointer, should receive a page fault
+		 * Inputs: None
+		 * Outputs: PASS/FAIL
+		 * Side Effects: None
+		 * Coverage: Accessing NULL pointer
+		 */
+	int page_test_null(){
+		printf("This test tries to dereference a NULL Pointer and should page fault\n");
+		int *i = NULL;
+		int j;
+		j = 5; //Just a random value
+		*i = j;
+
+		return 0;
+	}
+	/* page_test_null - Null pointer
+	 *
+	 * Tries to write to and read from several kernel and video memory addresses
+	 * Inputs: None
+	 * Outputs: PASS/FAIL
+	 * Side Effects: None
+	 * Coverage: Accessing different mapped kernel and video memory addresses
+	 */
+
+	int page_test(){
+		printf("This test tries to access different addresses\n");
+		int i;
+		int* i_ptr;
+		int j;
+		j = 0;
+		int result = PASS;
+		printf("Testing Kernel Memory Addresses\n");
+		i_ptr = (int*)KMEM_START;
+		/* Testing Kernel Memory Addresses */
+		for(i=KMEM_START; i < KMEM_END; i+= KMEM_OFFSET){
+				printf("Writing %d into Memory address: %x\n", j, i);
+				*i_ptr = j;
+				if(*i_ptr != j){
+					result = FAIL;
+				}
+				i_ptr = (int*)(i+KMEM_OFFSET);
+				j++;
+		}
+		printf("Testing Video Memory Addresses\n");
+		i_ptr = (int*)VMEM_START;
+		for(i=VMEM_START; i < VMEM_END; i+= VMEM_OFFSET){
+				printf("Writing %d into Memory address: %x\n", j, i);
+				*i_ptr = j;
+				if(*i_ptr != j){
+					result = FAIL;
+				}
+				i_ptr = (int*)(i+VMEM_OFFSET);
+				j++;
+		}
+
+		return result;
+	}
+
+	//i=i/0;
+		//	asm volatile("int $40");
+	 //
+
+
+	// add more tests here
 	/* Checkpoint 2 tests */
 
 	/* Read_By_Index_Tests - Example
@@ -93,56 +161,8 @@ int idt_test(){
 	}
 
 
-	int read_data_test(){
-
-		clear();
-		int i;
-		uint8_t buf[200];
-			if(read_data(38, 0, buf,187) == -1){
-					return FAIL;
-			}
-
-		printf("Printing the first thousand contents of the buffer\n");
-		for(i = 0; i<200; i++){
-			putc(buf[i]);
-		}
-
-		return PASS;
-	}
 
 
-	int dir_read_test(uint32_t* boot_block_addr){
-		if(boot_block_addr == NULL)
-		return 0;
-
-		clear();
-
-		int dir_entries;
-		int num_inodes;
-		int num_dblocks;
-		int i;
-		uint32_t* inode_start_addr;
-		dentry_t d;
-		uint32_t file_size;
-
-		dir_entries = *(boot_block_addr);
-		num_inodes  = *(boot_block_addr + 1);
-		num_dblocks = *(boot_block_addr + 2);
-
-		inode_start_addr = boot_block_addr + 1024;
-
-		for(i = 0; i < dir_entries; i++){
-			if(read_dentry_by_index(i, &d) == -1){
-				return FAIL;
-			}
-			printf("File Name: %s, " , d.fname);
-			printf("File Type: %d, ", d.file_type);
-			file_size = *(inode_start_addr + (d.inode_num)*1024);
-			printf("File Size: %d\n", file_size);
-		}
-
-		return PASS;
-	}
 
 
 	int read_by_name_test(){
@@ -152,55 +172,55 @@ int idt_test(){
 		char* s;
 		dentry_t a;
 		for(i = 0; i < 17; i++){
-		if(i = 0){
+		if(i == 0){
 			s = ".";
 	}
-		else if(i = 1){
+		else if(i == 1){
 			s = "counter";
 	}
-		else if(i = 2){
+		else if(i == 2){
 			s = "cat";
 	}
-		else if(i = 3){
+		else if(i == 3){
 			s = "hello";
 	}
-		else if(i = 4){
+		else if(i == 4){
 		s = "pingpong";
 	}
-		else if(i = 5){
+		else if(i == 5){
 			s = "frame0.txt";
 	}
-		else if(i = 6){
+		else if(i == 6){
 			s = "frame1.txt";
 	}
-		else if(i = 7){
+		else if(i == 7){
 		s = "verylargetextwithverylongname.tx";
 	}
-		else if(i = 8){
+		else if(i == 8){
 		s = "shell";
 	}
-		else if(i = 9){
+		else if(i == 9){
 			s = "ls";
 	}
-		else if(i = 10){
+		else if(i == 10){
 			s = "rtc";
 	}
-		else if(i = 11){
+		else if(i == 11){
 			s = "testprint";
 	}
-		else if(i = 12){
+		else if(i == 12){
 			s = "grep";
 	}
-		else if(i = 13){
+		else if(i == 13){
 			s = "created.txt";
 	}
-		else if(i = 14){
+		else if(i == 14){
 			s = "fish";
 	}
-		else if(i = 15){
+		else if(i == 15){
 			s = "sigtest";
 	}
-		else if(i = 16){
+		else if(i == 16){
 			s = "syserr";
 	}
 
@@ -221,72 +241,83 @@ int idt_test(){
 		return PASS;
 	}
 
-	/* page_test_null - Null pointer
-	 *
-	 * Tries to access NULL pointer, should receive a page fault
-	 * Inputs: None
-	 * Outputs: PASS/FAIL
-	 * Side Effects: None
-	 * Coverage: Accessing NULL pointer
-	 */
-int page_test_null(){
-	printf("This test tries to dereference a NULL Pointer and should page fault\n");
-	int *i = NULL;
-	int j;
-	j = 5; //Just a random value
-	*i = j;
 
-	return 0;
-}
-/* page_test_null - Null pointer
- *
- * Tries to write to and read from several kernel and video memory addresses
- * Inputs: None
- * Outputs: PASS/FAIL
- * Side Effects: None
- * Coverage: Accessing different mapped kernel and video memory addresses
- */
 
-int page_test(){
-	printf("This test tries to access different addresses\n");
-	int i;
-	int* i_ptr;
-	int j;
-	j = 0;
-	int result = PASS;
-	printf("Testing Kernel Memory Addresses\n");
-	i_ptr = (int*)KMEM_START;
-	/* Testing Kernel Memory Addresses */
-	for(i=KMEM_START; i < KMEM_END; i+= KMEM_OFFSET){
-			printf("Writing %d into Memory address: %x\n", j, i);
-			*i_ptr = j;
-			if(*i_ptr != j){
-				result = FAIL;
+
+int read_data_test(){
+
+			clear();
+			setposition(0,0);
+			int i;
+			uint8_t buf[200];
+				if(read_data(38, 0, buf,187) == -1){
+						return FAIL;
+				}
+
+			printf("Printing the first thousand contents of the buffer\n");
+			for(i = 0; i<200; i++){
+				putc(buf[i]);
 			}
-			i_ptr = (int*)(i+KMEM_OFFSET);
-			j++;
-	}
-	printf("Testing Video Memory Addresses\n");
-	i_ptr = (int*)VMEM_START;
-	for(i=VMEM_START; i < VMEM_END; i+= VMEM_OFFSET){
-			printf("Writing %d into Memory address: %x\n", j, i);
-			*i_ptr = j;
-			if(*i_ptr != j){
-				result = FAIL;
-			}
-			i_ptr = (int*)(i+VMEM_OFFSET);
-			j++;
-	}
 
-	return result;
+			return PASS;
+		}
+
+int read_data_fromfile(char* filename){
+	  clear();
+		setposition(0,0);
+		dentry_t a;
+		int i;
+		unsigned int filesize;
+		uint32_t* inode_start_addr;
+		read_dentry_by_name(filename,&a);
+		inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
+		filesize = *(inode_start_addr + (a.inode_num)*1024);
+		char buf[filesize];
+		if(read_data(a.inode_num, 0, buf,filesize) == -1){
+				return FAIL;
+		}
+		for(i=0;i<filesize;i++){
+			putc(buf[i]);
+		}
+		printf("\n File Name: %s \n",filename);
+		return PASS;
+
 }
+int dir_read_test(uint32_t* boot_block_addr){
+			if(boot_block_addr == NULL)
+			return 0;
 
-//i=i/0;
-	//	asm volatile("int $40");
- //
+			clear();
+			setposition(0,0);
+
+			int dir_entries;
+			int num_inodes;
+			int num_dblocks;
+			int i;
+			uint32_t* inode_start_addr;
+			dentry_t d;
+			uint32_t file_size;
+
+			dir_entries = *(boot_block_addr);
+			num_inodes  = *(boot_block_addr + 1);
+			num_dblocks = *(boot_block_addr + 2);
+
+			inode_start_addr = boot_block_addr + 1024;
+
+			for(i = 0; i < dir_entries; i++){
+				if(read_dentry_by_index(i, &d) == -1){
+					return FAIL;
+				}
+				printf("File Name: %s, " , d.fname);
+				printf("File Type: %u, ", d.file_type);
+				file_size = *(inode_start_addr + (d.inode_num)*1024);
+				printf("File Size: %d\n", file_size);
+			}
+
+			return PASS;
+		}
 
 
-// add more tests here
 
 /* Checkpoint 2 tests */
 /* Checkpoint 3 tests */
@@ -295,12 +326,13 @@ int page_test(){
 
 
 /* Test suite entry point */
-void launch_tests(){
+void launch_tests(unsigned int start ){
 	//TEST_OUTPUT("idt_test", idt_test());
-	//TEST_OUTPUT("read_by_index_test", read_by_index_test());
+	// TEST_OUTPUT("dir_read_test", dir_read_test( (unsigned int*) start));
 	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
-
+  boot_block_addr=start;
   //TEST_OUTPUT("read_data_test", read_data_test());
+	  TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
 	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here

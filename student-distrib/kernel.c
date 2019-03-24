@@ -24,7 +24,7 @@
 void entry(unsigned long magic, unsigned long addr) {
 
     multiboot_info_t *mbi;
-    unsigned long temp=addr;
+
 
     /* Clear the screen. */
     clear();
@@ -141,6 +141,8 @@ void entry(unsigned long magic, unsigned long addr) {
         ltr(KERNEL_TSS);
     }
       module_t* mod = (module_t*)mbi->mods_addr;
+      unsigned int start=(unsigned int) mod->mod_start;
+      printf("%d",start);
    fs_open((unsigned int) mod->mod_start);
     //Initialize paging
     static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
@@ -173,7 +175,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
 #ifdef RUN_TESTS
     /* Run tests */
-    launch_tests();
+    launch_tests(start);
 #endif
     /* Execute the first program ("shell") ... */
 

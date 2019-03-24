@@ -241,10 +241,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 /* If all the reading is to be done from a single d_block */
   if(start_dblock == end_dblock){
     memcpy(buf, ((uint8_t*)start_dblock_addr) + (offset % FS_BLOCK_SIZE), length);
-<<<<<<< HEAD
-    printf("Same number of data blocks\n");
-=======
->>>>>>> jyerra2_fsdev
+
     return 0;
   }
 

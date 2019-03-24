@@ -332,7 +332,7 @@ void launch_tests(unsigned int start ){
 	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
   boot_block_addr=start;
   //TEST_OUTPUT("read_data_test", read_data_test());
-	  TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
+	  TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
 	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 	// launch your tests here

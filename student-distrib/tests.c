@@ -318,16 +318,22 @@ int dir_read_test(uint32_t* boot_block_addr){
 			return PASS;
 		}
 
-int testing_rtc_driver(){
+int testing_rtc_driver(int32_t rate){
 	int a,b;
-	int32_t rate = 2;
-	b = rtc_write(0,&rate,0);
+
+
+	clear();
+	setposition(0,0);
+	// int32_t rate = 2;
+	if(rtc_write(0,&rate,0)== -1){
+			return FAIL;
+	}
 	while(1){
 		a = rtc_read();
 		writetovideomem();
 	}
 
-	return 0;
+	return PASS;
 }
 
 
@@ -345,11 +351,11 @@ void launch_tests(unsigned int start ){
 	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
   boot_block_addr=start;
   //TEST_OUTPUT("read_data_test", read_data_test());
-	  TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
+	  //TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
 	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 
-	// TEST_OUTPUT("testing_rtc_driver",testing_rtc_driver());
+	TEST_OUTPUT("testing_rtc_driver",testing_rtc_driver(64));
 	// printf("Do nothing for rtc read check");
 
 	// launch your tests here

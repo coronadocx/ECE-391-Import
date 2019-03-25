@@ -55,7 +55,7 @@ extern int32_t fs_read(void* buf, int32_t nbytes);
 extern int32_t fs_write(void* buf, int32_t nbytes);
 
 /* Searches for a directory entry by name, copies over elements and returns a pointer to the directory entry */
-extern int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry);
+extern int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry);
 
 /* Searches for a directory entry by index of the directory entries in boot block(not inode#), copies over elements and returns a pointer to the directory entry */
 extern int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);

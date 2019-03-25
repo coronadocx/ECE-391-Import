@@ -18,7 +18,7 @@ uint32_t* boot_block_addr;
 int32_t fs_open(unsigned int mod_start){
 
     /* Assign boot_block_module for FileSystem Read functions */
-    boot_block_addr = mod_start;
+    boot_block_addr = (unsigned int*) mod_start;
     return 0;
 }
 
@@ -45,7 +45,7 @@ extern int32_t fs_read(void* buf, int32_t nbytes){
 
       /* Fill in the rest later */
 
-
+return 0;
 }
 
 extern int32_t fs_write(void* buf, int32_t nbytes){
@@ -63,7 +63,7 @@ extern int32_t fs_write(void* buf, int32_t nbytes){
 };
 
 
-int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
+int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
 
   /* Error handling for dentry == NULL */
   if(dentry == NULL)
@@ -88,7 +88,8 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
 
   /* Checking if this is the directory entry */
   /***** Should bytes being compared be i or FILE_NAME_SIZE ******/
-  if(strncmp(first_directory, fname, strlen(fname)) == 0){
+  //int32_t strncmp(const int8_t* s1, const int8_t* s2, uint32_t n);
+  if(strncmp((int8_t*)first_directory, fname, strlen(fname)) == 0){
     strncpy(dentry->fname, fname,strlen(fname));
     dentry->file_type = 1;
     dentry->inode_num = 0;
@@ -97,7 +98,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
   }
 
   /* We get the pointer to the first file */
-  uint8_t* first_file = (first_directory + 16);
+  int8_t* first_file = (int8_t*) (first_directory + 16);
   /* Using this to keep track of the index in the boot_dir_list */
   int j = 0;
   while(strncmp((first_file + j*64), fname, strlen(fname)) != 0){
@@ -112,7 +113,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
   /* j has the value of the index */
   /* Filling in the values of the dentry */
 
-  strncpy(dentry->fname, fname,FILE_NAME_SIZE);
+  strncpy((int8_t*) dentry->fname, fname,FILE_NAME_SIZE);
   /* 32 + 4 since first 32 bytes are for filename */
   dentry->file_type = 0;
   dentry->file_type = *(32 + first_file + j*64);

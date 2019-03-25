@@ -228,7 +228,7 @@ int idt_test(){
 		else return FAIL;
 
 
-		if(read_dentry_by_name((uint8_t*)s,&a) == -1){
+		if(read_dentry_by_name((int8_t*)s,&a) == -1){
 			printf("ERROR! Entry not found\n");
 			return FAIL;
 		}
@@ -263,7 +263,7 @@ int read_data_test(){
 			return PASS;
 		}
 
-int read_data_fromfile(uint8_t* filename){
+int read_data_fromfile(int8_t* filename){
 	  clear();
 		setposition(0,0);
 		dentry_t a;
@@ -363,7 +363,7 @@ int testing_rtc_driver(int32_t rate){
 /* Test suite entry point */
 void launch_tests(unsigned int start ){
 	//TEST_OUTPUT("idt_test", idt_test());
-	// TEST_OUTPUT("dir_read_test", dir_read_test( (unsigned int*) start));
+	 TEST_OUTPUT("dir_read_test", dir_read_test( (unsigned int*) start));
 	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
   boot_block_addr=start;
   // TEST_OUTPUT("read_data_test", read_data_test());
@@ -373,7 +373,7 @@ void launch_tests(unsigned int start ){
 
 	/*	Tests for the RTC Driver, Tests rtc write by changing frequency. And Read by accepting an interrupt.	*/
 
-	TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
+	//TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
 	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
 	// TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
 	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));

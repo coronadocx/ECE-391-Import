@@ -197,7 +197,13 @@ int read_by_index_test(int index){
 
 
 
-
+/* read_by_name_test- Example
+ *
+ * Reads the data from the file according to the given filename. tests the read_dentry_by_name function.
+ * Inputs: int8_t* filename
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
 	int read_by_name_test(int8_t* filename){
 
 		clear();
@@ -210,34 +216,22 @@ int read_by_index_test(int index){
 			return FAIL;
 		}
 
-
+        if(read_data_fromfile(filename)==-1){
+            printf("could not read file");
+            return FAIL;
+        }
 		printf("File Name: %s\n",a.fname);
 		printf("File Type: %d\n",a.file_type);
 		printf("Inode Num: %d\n",a.inode_num);
-		return read_data_fromfile(filename);
+		return PASS;
 	}
-
-
-
-
-int read_data_test(){
-
-			clear();
-			setposition(0,0);
-			int i;
-			uint8_t buf[200];
-				if(read_data(38, 0, buf,187) == -1){
-						return FAIL;
-				}
-
-			printf("Printing the first thousand contents of the buffer\n");
-			for(i = 0; i<200; i++){
-				putc(buf[i]);
-			}
-
-			return PASS;
-		}
-
+/* dir_read_test- Example
+ *
+ * Lists the directories in the filesystem
+ * Inputs: Boot block address
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
 int dir_read_test(uint32_t* boot_block_addr){
 			if(boot_block_addr == NULL)
 			return 0;
@@ -307,6 +301,13 @@ int testing_rtc_driver(int32_t rate){
 
 	return PASS;
 }
+/* testing_fs_open- Example
+ *
+ * Tests to see if fs_open works 
+ * Inputs: int8_t* filename
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
 int testing_fs_open(int8_t* filename){
 	clear();
 	setposition(0,0);
@@ -317,6 +318,13 @@ int testing_fs_open(int8_t* filename){
 	printf("FS OPEN SUCCESSFULL\n");
 	return PASS;
 }
+/* testing_fs_read
+ *
+ * Tests to see if fs_read returns the correct data based on fsopens file descriptor
+ * Inputs: uint32_t nbytes.
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
 int testing_fs_read(uint32_t nbytes){
 	int i;
 	uint8_t  buf[nbytes];

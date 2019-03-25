@@ -431,7 +431,7 @@ void launch_tests(unsigned int start ){
 
 	// TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
 	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
-	  TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
+	//  TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
 	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
 	// TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));
 

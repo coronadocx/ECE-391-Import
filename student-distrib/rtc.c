@@ -38,7 +38,7 @@ int32_t rtc_read()
 {
   rtc_interrupt_occurred = 0;
 
-	while  (rtc_interrupt_occurred==0) {
+	while  (rtc_interrupt_occurred==0) { //wait for rtc interrupt to occur
 	}
 
 	return 0;

@@ -3,7 +3,7 @@
 #include "i8259.h"
 #include "keyboard.h"
 #include"terminal.h"
-static char chararray[NUM_KEYS]={' ','e','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
+static char chararray[NUM_KEYS]={' ','\0','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
 '\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
 static char shiftarray[NUMBERSONKEYBOARD]={'~','!','@','#','$','%','^','&','*','('};  // handling if shift is pressed on any num keys on qwerty keyboard
 static char linebuffer[KEYBOARD_BUFFER_LENGTH];
@@ -118,7 +118,7 @@ void check_input(){
             }
             else
               {
-                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1)// -1 because last character is reserved for \n
+                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1&&chararray[a]!='\0')// -1 because last character is reserved for \n
                 {
                 linebuffer[numberofchars]=chararray[a];
                 putc(chararray[a]);
@@ -152,7 +152,7 @@ void init_keyboard(){
 // This is a simpler method because we only needed the numbers and lower case
 // letters for the demo
 chararray[CAPSLOCK]='0';  // intially capslock is off
-chararray[ LEFTSHIFT]='0'; // initially left shift is not pressed. 
+chararray[ LEFTSHIFT]='0'; // initially left shift is not pressed.
 
 
 }

@@ -8,7 +8,7 @@
 
 #define REG_A 				0x0A
 #define SELECT_REG_B 				0x0B
-#define REG_C 				0x0C
+#define SELECT_REG_C 				0x0C
 #define REG_E 				0x0E
 #define REG_F 				0x0F
 

@@ -32,7 +32,7 @@ int init(){
 void enable_cursor(){
   /*referenced wiki.osdev.org/Text_Mode_cursor*/
   outb(REG_A,VMEMPORT_3D4);
-  outb((inb(VMEMPORT_3D5)&REG_C)|CURSOR_START,VMEMPORT_3D5);
+  outb((inb(VMEMPORT_3D5)&SELECT_REG_C)|CURSOR_START,VMEMPORT_3D5);
   outb(SELECT_REG_B,VMEMPORT_3D4);
   outb((inb(VMEMPORT_3D5)&REG_E)|CURSOR_END,VMEMPORT_3D5);
 }

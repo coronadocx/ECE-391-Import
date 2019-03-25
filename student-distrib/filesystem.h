@@ -18,7 +18,9 @@
 #define INODE_MAX_D_BLOCKS      1023
 #define MAX_FILE_SIZE           (INODE_MAX_D_BLOCKS*FS_BLOCK_SIZE)
 
+#define MAX_FILE_NUM 62
 
+#define SKIP_TO_DIR_ENTRIES 16
 
 
 

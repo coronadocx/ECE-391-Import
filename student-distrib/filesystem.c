@@ -50,7 +50,7 @@ extern int32_t fs_open(int8_t* filename){
  *   ARGUMENTS : none
  *   OUTPUTS:None
  *   RETURN VALUE: 0 for success -1 for error
- *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints 
+ *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints
  */
 
 int32_t fs_close(){
@@ -137,7 +137,7 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   num_dblocks = *(boot_block_addr + 2);
 
   /* We get the pointer to the first directory */
-  uint32_t* first_directory = (uint32_t*)(boot_block_addr + 16);
+  uint32_t* first_directory = (uint32_t*)(boot_block_addr + SKIP_TO_DIR_ENTRIES);
 
   /* Checking if this is the directory entry */
   /***** Should bytes being compared be i or FILE_NAME_SIZE ******/
@@ -151,12 +151,12 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   }
 
   /* We get the pointer to the first file */
-  int8_t* first_file = (int8_t*) (first_directory + 16);
+  int8_t* first_file = (int8_t*) (first_directory + SKIP_TO_DIR_ENTRIES);
   /* Using this to keep track of the index in the boot_dir_list */
   int j = 0;
   while(strncmp((first_file + j*BOOT_BLOCK_SIZE ), fname, strlen(fname)) != 0){
     /* If we could not find the filename, return -1 */
-    if(j >= 62)
+    if(j >= MAX_FILE_NUM)
       return -1;
 
     j++;
@@ -169,10 +169,10 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   strncpy((int8_t*) dentry->fname, fname,FILE_NAME_SIZE);
   /* 32 + 4 since first 32 bytes are for filename */
   dentry->file_type = 0;
-  dentry->file_type = *(32 + first_file + j*BOOT_BLOCK_SIZE );
+  dentry->file_type = *(FILE_NAME_SIZE + first_file + j*BOOT_BLOCK_SIZE );
   /* 32 + 8 since first 32 bytes are for filename */
   dentry->inode_num = 0;
-  dentry->inode_num = *(32 + 4 + first_file + j*BOOT_BLOCK_SIZE );
+  dentry->inode_num = *(FILE_NAME_SIZE + BYTES_IN_INT + first_file + j*BOOT_BLOCK_SIZE );
 
 /* Return 0 on success */
 return 0;
@@ -198,15 +198,17 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
     /* Copy over # dir_entries */
     dir_entries = *(boot_block_addr);
     /* Copy over # inodes */
+    // +1 to get to number of inodes
     num_inodes =  *(boot_block_addr + 1);
     /* Copy over # data blocks */
+    // +2 to get to number of data blocks
     num_dblocks = *(boot_block_addr + 2);
   /* Error handling for index > 62); index starts at 0 for dir "." */
   if(index > BOOT_BLOCK_DIR_ENTRIES || (index >= dir_entries))
     return -1;
 
 /* Setting address to dentry that we want to read from */
-  int8_t* dentry_addr = (int8_t*) ((boot_block_addr +16+ (index * 16)));
+  int8_t* dentry_addr = (int8_t*) ((boot_block_addr +SKIP_TO_DIR_ENTRIES+ (index * SKIP_TO_DIR_ENTRIES)));
 
 /* Copy over all 32 bytes*/
 
@@ -256,8 +258,10 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   /* Copy over # dir_entries */
   dir_entries = *(boot_block_addr);
   /* Copy over # inodes */
+  // +1 to get to number of inodes from directory entries
   num_inodes =  *(boot_block_addr + 1);
   /* Copy over # data blocks */
+  // +2 to get to number of datablocks from directory entries
   num_dblocks = *(boot_block_addr + 2);
   /* Given inode index cannot be bigger than total number of inodes */
   if(inode > NUM_INODES)

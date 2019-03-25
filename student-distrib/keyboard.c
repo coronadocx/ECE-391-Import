@@ -54,7 +54,7 @@ void check_input(){
                       chararray[CAPSLOCK]='1';
                     }
                     else {
-                      chararray[CAPSLOCK]='0';  // switch off capslock 
+                      chararray[CAPSLOCK]='0';  // switch off capslock
                     }
                   }
                    break;
@@ -131,7 +131,7 @@ void check_input(){
                break;
            }
 }
- send_eoi(1);
+ send_eoi(1); // send the end of intrupt signal for keyboard interupt which is at irq 1
 
 }
 
@@ -145,14 +145,14 @@ void check_input(){
  */
 
 void init_keyboard(){
-  enable_irq(1);
+  enable_irq(1); // enable interupts for irq1
 
 // The following Initializes the Numbers in the chararray
 // Each index into the char array (ie: HEX value) refers to scancodes for the Keyboard
 // This is a simpler method because we only needed the numbers and lower case
 // letters for the demo
-chararray[CAPSLOCK]='0';
-chararray[ LEFTSHIFT]='0';
+chararray[CAPSLOCK]='0';  // intially capslock is off
+chararray[ LEFTSHIFT]='0'; // initially left shift is not pressed. 
 
 
 }

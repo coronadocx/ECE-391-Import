@@ -92,7 +92,12 @@ int read(char* buffer){
     terminalbuffer[i]=*(buffer+i);
   }
   terminalbuffer[i]='\n';
-  printf("%d bytes were read\n",i+1);
+  if(i==0){
+  printf("%d byte was read\n",i+1);
+}
+else {
+    printf("%d bytes were read\n",i+1);
+}
   write();
   putc('\n');
   update_cursor();

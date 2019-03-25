@@ -10,6 +10,7 @@ static uint32_t num_inodes;
 static uint32_t num_dblocks;
 /* global dentry struct to be set based on fs_open */
 static dentry_t a;
+static dentry_t b;
 /* the boot block address */
 uint32_t* boot_block_addr;
 
@@ -54,7 +55,7 @@ extern int32_t fs_open(int8_t* filename){
  */
 
 int32_t fs_close(){
-
+    a=b;
     return 0;
 }
 

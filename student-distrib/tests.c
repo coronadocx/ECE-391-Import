@@ -352,6 +352,21 @@ int testing_fs_open(int8_t* filename){
 	printf("FS OPEN SUCCESSFULL\n");
 	return PASS;
 }
+/* testing_fs_close- Example
+ *
+ * Tests to see if fs_close works
+ * Inputs: none
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
+int testing_fs_close(){
+	if(fs_close()==-1){
+		printf("error closing ");
+		return FAIL;
+	}
+	printf("FS close successful \n");
+	return PASS;
+}
 /* testing_fs_read
  *
  * Tests to see if fs_read returns the correct data based on fsopens file descriptor
@@ -439,8 +454,10 @@ void launch_tests(unsigned int start ){
 // testing_fs_open("verylargetextwithverylongname.txt");
 // TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
-// testing_fs_open("frame0.txt");
-// TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+ testing_fs_open("frame0.txt");
+ TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+ TEST_OUTPUT("testing_fs_close",testing_fs_close());
+ TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
 // ERROR HANDLING
 

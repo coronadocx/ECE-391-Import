@@ -2,6 +2,7 @@
 
 #include "keyboard.h"
 #include "lib.h"
+#include "terminal.h"
 static char terminalbuffer[KEYBOARD_BUFFER_LENGTH];
 
 

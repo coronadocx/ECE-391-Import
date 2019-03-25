@@ -303,7 +303,7 @@ int testing_rtc_driver(int32_t rate){
 }
 /* testing_fs_open- Example
  *
- * Tests to see if fs_open works 
+ * Tests to see if fs_open works
  * Inputs: int8_t* filename
  * Outputs: PASS/FAIL
  * Side Effects: None
@@ -359,7 +359,7 @@ void launch_tests(unsigned int start ){
 
 
 	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
-	// TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
+	TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
 
 	 // TEST CASE 2 READ FROM FILES
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
@@ -375,7 +375,7 @@ void launch_tests(unsigned int start ){
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("sigtest"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("syserr"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("testprint"));
-	 TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
+	 // TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.txt"));// returns FAIL
 
 	// TEST CASE 3 RTC DRIVER TESTS:

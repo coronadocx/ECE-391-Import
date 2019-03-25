@@ -228,7 +228,7 @@ int idt_test(){
 		else return FAIL;
 
 
-		if(read_dentry_by_name(s,&a) == -1){
+		if(read_dentry_by_name((uint8_t*)s,&a) == -1){
 			printf("ERROR! Entry not found\n");
 			return FAIL;
 		}
@@ -263,7 +263,7 @@ int read_data_test(){
 			return PASS;
 		}
 
-int read_data_fromfile(char* filename){
+int read_data_fromfile(uint8_t* filename){
 	  clear();
 		setposition(0,0);
 		dentry_t a;
@@ -273,7 +273,7 @@ int read_data_fromfile(char* filename){
 		read_dentry_by_name(filename,&a);
 		inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
 		filesize = *(inode_start_addr + (a.inode_num)*1024);
-		char buf[filesize];
+		uint8_t buf[filesize];
 		if(read_data(a.inode_num, 0, buf,filesize) == -1){
 				return FAIL;
 		}
@@ -318,19 +318,35 @@ int dir_read_test(uint32_t* boot_block_addr){
 			return PASS;
 		}
 
+
+/* testing_rtc_driver(int32_t rate)
+ *
+ *	This function or test case takes in a power of 2 as an input and sets the frequency of the RTC
+ *	to that value. It can set the frequency upto a maximum of 1024 Hz.
+ * Inputs: int32_t rate
+ * Outputs: PASS/FAIL
+ * Side Effects: Sets the frequency of the rtc
+ * Coverage: Accessing different mapped kernel and video memory addresses
+ */
+
+
 int testing_rtc_driver(int32_t rate){
-	int a,b;
-
-
+	int a;
+	int xval=0;
+	int yval=0;
 	clear();
 	setposition(0,0);
 	// int32_t rate = 2;
-	if(rtc_write(0,&rate,0)== -1){
+	if(rate==-1){
+		rtc_open(0);
+	}
+	else if (rtc_write(0,&rate,0)== -1){
 			return FAIL;
 	}
+
 	while(1){
 		a = rtc_read();
-		writetovideomem();
+		writetovideomem(xval,yval);
 	}
 
 	return PASS;
@@ -350,13 +366,18 @@ void launch_tests(unsigned int start ){
 	// TEST_OUTPUT("dir_read_test", dir_read_test( (unsigned int*) start));
 	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
   boot_block_addr=start;
-  //TEST_OUTPUT("read_data_test", read_data_test());
+  // TEST_OUTPUT("read_data_test", read_data_test());
 	  //TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
 	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 
-	TEST_OUTPUT("testing_rtc_driver",testing_rtc_driver(64));
-	// printf("Do nothing for rtc read check");
+	/*	Tests for the RTC Driver, Tests rtc write by changing frequency. And Read by accepting an interrupt.	*/
+
+	TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
+	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
+	// TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
+	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
+	// TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));
 
 	// launch your tests here
 }

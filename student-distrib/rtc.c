@@ -98,6 +98,10 @@ int32_t rtc_open(const uint8_t * filename)
 {
 	//Set the RTC to 2Hz
 	// *(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
+
+  int32_t default_freq = 2;
+  rtc_write(0,&default_freq,0);
+
 	return 0;
 }
 

@@ -269,6 +269,40 @@ int dir_read_test(uint32_t* boot_block_addr){
 		}
 
 
+/* read_data_fromfile_error_handle - Example
+ *
+ * Reads the data from the file according to the given filename. This test specifically should fail because the offset is
+ * 2048. Multiple Blocks read test
+ * Inputs: int8_t* filename
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
+
+int read_data_fromfile_error_handle(int8_t* filename){
+	  clear();
+		setposition(0,0);
+		dentry_t a;
+		int i;
+		unsigned int filesize;
+		uint32_t* inode_start_addr;
+		read_dentry_by_name(filename,&a);
+		inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
+		filesize = *(inode_start_addr + (a.inode_num)*1024);
+		uint8_t buf[filesize];
+		if(read_data(a.inode_num, 2048, buf,filesize) == -1){
+				return FAIL;
+		}
+		for(i=0;i<filesize;i++){
+				putc(buf[i]);
+
+		}
+		printf("\n File Name: %s \n",filename);
+		return PASS;
+
+}
+
+
+
 /* testing_rtc_driver(int32_t rate)
  *
  *	This function or test case takes in a power of 2 as an input and sets the frequency of the RTC
@@ -359,7 +393,7 @@ void launch_tests(unsigned int start ){
 
 
 	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
-	TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
+	// TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
 
 	 // TEST CASE 2 READ FROM FILES
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
@@ -381,36 +415,36 @@ void launch_tests(unsigned int start ){
 	// TEST CASE 3 RTC DRIVER TESTS:
 	/*	Tests for the RTC Driver, Tests rtc write by changing frequency. And Read by accepting an interrupt.	*/
 
-	//TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
+	// TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
 	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
-//	 TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
+	 // TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
 	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
 	// TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));
 
 	// TEST CASE 4
-//	TEST_OUTPUT("read_by_index_test", read_by_index_test(1));
+	// TEST_OUTPUT("read_by_index_test", read_by_index_test(1));
 
 	// TEST CASE 5
-//	TEST_OUTPUT("read_by_name_test", read_by_name_test("frame0.txt"));
+	// TEST_OUTPUT("read_by_name_test", read_by_name_test("frame0.txt"));
 
 // TEST CASE 6
 /*   testing fs_open and fs_read   */
 
-//testing_fs_open("frame0.txt");
-//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+// testing_fs_open("frame0.txt");
+// TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
-//testing_fs_open("verylargetextwithverylongname.tx");
-//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+// testing_fs_open("verylargetextwithverylongname.tx");
+// TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
-//testing_fs_open("verylargetextwithverylongname.txt");
-//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+// testing_fs_open("verylargetextwithverylongname.txt");
+// TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
-//testing_fs_open("frame0.txt");
-//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+// testing_fs_open("frame0.txt");
+// TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
+// ERROR HANDLING
 
-
-
+// TEST_OUTPUT("read_data_fromfile_error_handle", read_data_fromfile_error_handle("frame0.txt"));
 
 
 

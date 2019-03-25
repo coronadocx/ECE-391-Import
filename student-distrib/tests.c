@@ -147,8 +147,8 @@ int read_data_fromfile(int8_t* filename){
 		unsigned int filesize;
 		uint32_t* inode_start_addr;
 		read_dentry_by_name(filename,&a);
-		inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
-		filesize = *(inode_start_addr + (a.inode_num)*1024);
+		inode_start_addr = ((unsigned int *)boot_block_addr) + ABS_BLK_OFFSET_TEST;
+		filesize = *(inode_start_addr + (a.inode_num)*ABS_BLK_OFFSET_TEST);
 		uint8_t buf[filesize];
 		if(read_data(a.inode_num, 0, buf,filesize) == -1){
 				return FAIL;
@@ -251,7 +251,7 @@ int dir_read_test(uint32_t* boot_block_addr){
 			num_inodes  = *(boot_block_addr + 1);
 			num_dblocks = *(boot_block_addr + 2);
 
-			inode_start_addr = boot_block_addr + 1024;
+			inode_start_addr = boot_block_addr + ABS_BLK_OFFSET_TEST;
 
 			for(i = 0; i < dir_entries; i++){
 				if(read_dentry_by_index(i, &d) == -1){
@@ -260,7 +260,7 @@ int dir_read_test(uint32_t* boot_block_addr){
 
 				printf("File Name: %s, " , d.fname);
 				printf("File Type: %u, ", d.file_type);
-				file_size = *(inode_start_addr + (d.inode_num)*1024);
+				file_size = *(inode_start_addr + (d.inode_num)*ABS_BLK_OFFSET_TEST);
 				printf("File Size: %d\n", file_size);
 
 			}
@@ -286,10 +286,10 @@ int read_data_fromfile_error_handle(int8_t* filename){
 		unsigned int filesize;
 		uint32_t* inode_start_addr;
 		read_dentry_by_name(filename,&a);
-		inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
-		filesize = *(inode_start_addr + (a.inode_num)*1024);
+		inode_start_addr = ((unsigned int *)boot_block_addr) + ABS_BLK_OFFSET_TEST;
+		filesize = *(inode_start_addr + (a.inode_num)*ABS_BLK_OFFSET_TEST);
 		uint8_t buf[filesize];
-		if(read_data(a.inode_num, 2048, buf,filesize) == -1){
+		if(read_data(a.inode_num, LARGE_START_OFFSET, buf,filesize) == -1){
 				return FAIL;
 		}
 		for(i=0;i<filesize;i++){

@@ -58,7 +58,7 @@ void handlebackspace(){
   if(screen_x-1<0){
     if(screen_y!=0){
     screen_y=screen_y-1;
-    screen_x=78;
+    screen_x=NUM_COLS-1;
   }
   }
   else{

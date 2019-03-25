@@ -356,7 +356,7 @@ void launch_tests(unsigned int start ){
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("sigtest"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("syserr"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("testprint"));
-	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
+	 TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.txt"));// returns FAIL
 
 	// TEST CASE 3 RTC DRIVER TESTS:

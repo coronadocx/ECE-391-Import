@@ -18,9 +18,14 @@
 #define INODE_MAX_D_BLOCKS      1023
 #define MAX_FILE_SIZE           (INODE_MAX_D_BLOCKS*FS_BLOCK_SIZE)
 
-#define MAX_FILE_NUM 62
+#define BB_INODE_OFFSET         1
+#define BB_DBLOCK_OFFSET        2
 
-#define SKIP_TO_DIR_ENTRIES 16
+#define MAX_FILE_NUM            62
+
+#define SKIP_TO_DIR_ENTRIES     16
+
+#define VAL_ONE                     1
 
 
 
@@ -50,11 +55,16 @@ typedef struct dentry {
 /* Giving the multiboot_struct into fs_open for the boot block addr */
 extern int32_t set_mod_start(unsigned int mod_start);
 
+/* sets the global dentry based on filename */
 extern int32_t fs_open(int8_t* filename);
+
+/* resets the global dentry struct */
 extern int32_t fs_close();
 
+/* populates the buffer based on the file descriptor */
 extern int32_t fs_read(void* buf, int32_t nbytes);
 
+/* Read only file system. just does error checking */
 extern int32_t fs_write(void* buf, int32_t nbytes);
 
 /* Searches for a directory entry by name, copies over elements and returns a pointer to the directory entry */

@@ -108,7 +108,6 @@ extern int32_t fs_write(void* buf, int32_t nbytes){
 
 };
 
-
 /*
  * read_dentry_by_name
  *   DESCRIPTION: Function which searches for file by name
@@ -133,9 +132,9 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   /* Copy over # dir_entries */
   dir_entries = *(boot_block_addr);
   /* Copy over # inodes */
-  num_inodes =  *(boot_block_addr + 1);
+  num_inodes =  *(boot_block_addr + BB_INODE_OFFSET);
   /* Copy over # data blocks */
-  num_dblocks = *(boot_block_addr + 2);
+  num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
 
   /* We get the pointer to the first directory */
   uint32_t* first_directory = (uint32_t*)(boot_block_addr + SKIP_TO_DIR_ENTRIES);
@@ -200,10 +199,10 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
     dir_entries = *(boot_block_addr);
     /* Copy over # inodes */
     // +1 to get to number of inodes
-    num_inodes =  *(boot_block_addr + 1);
+    num_inodes =  *(boot_block_addr + BB_INODE_OFFSET);
     /* Copy over # data blocks */
     // +2 to get to number of data blocks
-    num_dblocks = *(boot_block_addr + 2);
+    num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
   /* Error handling for index > 62); index starts at 0 for dir "." */
   if(index > BOOT_BLOCK_DIR_ENTRIES || (index >= dir_entries))
     return -1;
@@ -260,10 +259,10 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   dir_entries = *(boot_block_addr);
   /* Copy over # inodes */
   // +1 to get to number of inodes from directory entries
-  num_inodes =  *(boot_block_addr + 1);
+  num_inodes =  *(boot_block_addr + BB_INODE_OFFSET);
   /* Copy over # data blocks */
   // +2 to get to number of datablocks from directory entries
-  num_dblocks = *(boot_block_addr + 2);
+  num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
   /* Given inode index cannot be bigger than total number of inodes */
   if(inode > NUM_INODES)
     return -1;
@@ -297,11 +296,11 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
  /* Now that we have a pointer to the inode, let the dereferencing begin */
 
  inode_file_size = *(inode_addr);
- inode_d_blocks = ((inode_file_size)/FS_BLOCK_SIZE) + 1;
+ inode_d_blocks = ((inode_file_size)/FS_BLOCK_SIZE) + VAL_ONE;
 
 /* If length in B < 4096, we have to read from only 1 data block */
  if(inode_file_size < FS_BLOCK_SIZE)
-  inode_d_blocks = 1;
+  inode_d_blocks = VAL_ONE;
 
   if((inode_file_size < length) || (inode_file_size < offset+length))
   return -1;
@@ -311,8 +310,8 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   end_dblock = (offset+length)/(FS_BLOCK_SIZE);
 
 /* Starting and ending indices of data blocks */
-  start_dblock_index = *(inode_addr + 1 + start_dblock);
-  end_dblock_index = *(inode_addr + 1 +  end_dblock);
+  start_dblock_index = *(inode_addr + VAL_ONE + start_dblock);
+  end_dblock_index = *(inode_addr + VAL_ONE +  end_dblock);
 
 /* Starting and ending addresses of data blocks */
   start_dblock_addr = (dblock_start_addr + (start_dblock_index * ABS_BLK_OFFSET));
@@ -338,7 +337,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
   /* Start_dblock handling */
   bytes_to_copy_in_dblock = FS_BLOCK_SIZE - offset_pos;
-  j_index = *(inode_addr + 1 + j);
+  j_index = *(inode_addr + VAL_ONE + j);
   j_addr = (dblock_start_addr + (j_index * ABS_BLK_OFFSET));
   memcpy(buf + buf_offset, ((uint8_t*)j_addr) + (offset % FS_BLOCK_SIZE), bytes_to_copy_in_dblock);
 
@@ -349,7 +348,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   while(j != end_dblock){
 
   bytes_to_copy_in_dblock = FS_BLOCK_SIZE;
-  j_index = *(inode_addr + 1 + j);
+  j_index = *(inode_addr + VAL_ONE + j);
   j_addr = (dblock_start_addr + (j_index * ABS_BLK_OFFSET));
   memcpy(buf + buf_offset, ((uint8_t*)j_addr), bytes_to_copy_in_dblock);
 
@@ -361,7 +360,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   /* End_dblock handling */
   /* We only have those many bytes remaining */
   bytes_to_copy_in_dblock = bytes_remaining;
-  j_index = *(inode_addr + 1 + j);
+  j_index = *(inode_addr + VAL_ONE + j);
   j_addr = (dblock_start_addr + (j_index * ABS_BLK_OFFSET));
   memcpy(buf + buf_offset, ((uint8_t*)j_addr), bytes_to_copy_in_dblock);
   buf_offset += bytes_to_copy_in_dblock;

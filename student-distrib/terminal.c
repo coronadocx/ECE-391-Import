@@ -69,14 +69,7 @@ int read(char* buffer){
   else{
    putc('\n');
   }
-  write();
-  y=getpositiony();
-  if(flag){
-    scroll();
-  }
-  else{
-    putc('\n');
-  }
+  //write();
     update_cursor();
 
 return 0;

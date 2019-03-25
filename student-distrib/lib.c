@@ -24,29 +24,12 @@ static int rtcInterruptCount = 0;
  * Function: Writes the value of Rtc Interrupt count at a specific location  */
 
 void writetovideomem(int xval,int yval){
-  // int xval;
-
-
-  // xval = rtcInterruptCount;
-  // xval %= NUM_COLS;
-  //
-  // yval = rtcInterruptCount/NUM_COLS;
-  //
-  // *(uint8_t *)(video_mem + ((NUM_COLS * yval + xval) << 1)) = '1';
-  // *(uint8_t *)(video_mem + ((NUM_COLS * yval + xval) << 1) + 1) = ATTRIB;
-
-
-
-
-  // screen_x++;
-  // screen_x %= NUM_COLS;
-  // screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
-
-  // *(uint8_t *)(video_mem + (30 << 1)) = (rtcInterruptCount%10)+48;
-  // *(uint8_t *)(video_mem + (30 << 1)+1) = ATTRIB;
 
   screen_x = rtcInterruptCount%NUM_COLS;
   screen_y = rtcInterruptCount/NUM_COLS;
+  if(screen_y>24){
+    scroll();
+  }
   putc('X');
 
 

@@ -144,16 +144,19 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
     return -1;
 
 /* Setting address to dentry that we want to read from */
-  uint8_t* dentry_addr = (uint8_t*) ((boot_block_addr +16+ (index * 16)));
+  int8_t* dentry_addr = (int8_t*) ((boot_block_addr +16+ (index * 16)));
 
 /* Copy over all 32 bytes*/
- strncpy(dentry->fname, (int8_t*) dentry_addr,FILE_NAME_SIZE);
+
+ strncpy(dentry->fname, ((dentry_t*)dentry_addr)->fname,FILE_NAME_SIZE);
+
 /* Last entry should always be NULL */
- dentry->fname[FILE_NAME_SIZE] = '\0';
+
 
 /* Is this assignment fine or should we use offset to access data elements */
  dentry->file_type = ((dentry_t*)dentry_addr)->file_type;
  dentry->inode_num = ((dentry_t*)dentry_addr)->inode_num;
+ dentry->fname[FILE_NAME_SIZE] = '\0';
 
  /* Return 0 on success */
  return 0;

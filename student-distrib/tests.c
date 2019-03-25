@@ -139,14 +139,12 @@ int idt_test(){
 	 * Files: x86_desc.h/S
 	 */
 
-	int read_by_index_test(){
+	int read_by_index_test(int index){
 
 		clear();
-		int i;
+		setposition(0,0);
 		dentry_t a;
-		i = 11;
-		for(i = 0; i < 17; i++){
-			if(read_dentry_by_index(i,&a) == -1){
+			if(read_dentry_by_index(index,&a) == -1){
 				printf("ERROR! Entry not found\n");
 				return FAIL;
 			}
@@ -156,7 +154,7 @@ int idt_test(){
 			printf("File Type: %d\n",a.file_type);
 			printf("Inode Num: %d\n",a.inode_num);
 
-		}
+
 
 		return PASS;
 	}
@@ -309,10 +307,12 @@ int dir_read_test(uint32_t* boot_block_addr){
 				if(read_dentry_by_index(i, &d) == -1){
 					return FAIL;
 				}
+
 				printf("File Name: %s, " , d.fname);
 				printf("File Type: %u, ", d.file_type);
 				file_size = *(inode_start_addr + (d.inode_num)*1024);
 				printf("File Size: %d\n", file_size);
+
 			}
 
 			return PASS;
@@ -363,7 +363,7 @@ int testing_rtc_driver(int32_t rate){
 /* Test suite entry point */
 void launch_tests(unsigned int start ){
 	//TEST_OUTPUT("idt_test", idt_test());
-	 TEST_OUTPUT("dir_read_test", dir_read_test( (unsigned int*) start));
+
 	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
   boot_block_addr=start;
   // TEST_OUTPUT("read_data_test", read_data_test());
@@ -371,13 +371,44 @@ void launch_tests(unsigned int start ){
 	//TEST_OUTPUT("page_test_null", page_test_null());
 	// TEST_OUTPUT("page_test", page_test());
 
+
+
+	//CHECKPOINT 2 TEST
+
+
+	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
+	 //TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
+
+	 // TEST CASE 2 READ FROM FILES
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
+	 //TEST_OUTPUT("read_data_fromfile", read_data_fromfile("cat"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("counter"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("fish"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame1.txt"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("grep"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("hello"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("ls"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("pingpong"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("shell"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("sigtest"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("syserr"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("testprint"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.txt"));// returns FAIL
+
+	// TEST CASE 3 RTC DRIVER TESTS:
 	/*	Tests for the RTC Driver, Tests rtc write by changing frequency. And Read by accepting an interrupt.	*/
 
 	//TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
 	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
-	// TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
+	 TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
 	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
 	// TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));
+
+
+
+
+
 
 	// launch your tests here
 }

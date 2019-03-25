@@ -15,7 +15,7 @@
 static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
-
+static int writetovideomemflag=0;
 static int rtcInterruptCount = 0;
 
 /* void writetovideomem();
@@ -26,10 +26,7 @@ static int rtcInterruptCount = 0;
 void writetovideomem(int xval,int yval){
 
   screen_x = rtcInterruptCount%NUM_COLS;
-  screen_y = rtcInterruptCount/NUM_COLS;
-  if(screen_y>24){
-    scroll();
-  }
+  screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
   putc('X');
 
 
@@ -245,17 +242,36 @@ int32_t puts(int8_t* s) {
  * Return Value: void
  *  Function: Output a character to the console */
 void putc(uint8_t c) {
+
     if(c == '\n' || c == '\r') {
-        screen_y++;
+      screen_y++;
+      if(!(screen_y<NUM_ROWS)){
+        scroll();
+      }
         screen_x = 0;
 
     } else {
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
-        screen_x %= NUM_COLS;
-
+        if(!(screen_x<NUM_COLS)){
+          screen_y=screen_y+1;
+          if(!(screen_y<NUM_ROWS)){
+            scroll();
+          }
+          else{
+          setposition(0,screen_y);
+         }
+        }
+        else{
+            screen_x %= NUM_COLS;
+        }
+        if(!(screen_y<NUM_ROWS)){
+          scroll();
+        }
+        else{
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+      }
     }
     update_cursor();
 }

@@ -156,7 +156,8 @@ int idt_test(){
 
 
 
-		return PASS;
+
+		return read_data_fromfile(a.fname);
 	}
 
 
@@ -164,69 +165,14 @@ int idt_test(){
 
 
 
-	int read_by_name_test(){
+	int read_by_name_test(int8_t* filename){
 
 		clear();
-		int i;
-		char* s;
+		setposition(0,0);
 		dentry_t a;
-		for(i = 0; i < 17; i++){
-		if(i == 0){
-			s = ".";
-	}
-		else if(i == 1){
-			s = "counter";
-	}
-		else if(i == 2){
-			s = "cat";
-	}
-		else if(i == 3){
-			s = "hello";
-	}
-		else if(i == 4){
-		s = "pingpong";
-	}
-		else if(i == 5){
-			s = "frame0.txt";
-	}
-		else if(i == 6){
-			s = "frame1.txt";
-	}
-		else if(i == 7){
-		s = "verylargetextwithverylongname.tx";
-	}
-		else if(i == 8){
-		s = "shell";
-	}
-		else if(i == 9){
-			s = "ls";
-	}
-		else if(i == 10){
-			s = "rtc";
-	}
-		else if(i == 11){
-			s = "testprint";
-	}
-		else if(i == 12){
-			s = "grep";
-	}
-		else if(i == 13){
-			s = "created.txt";
-	}
-		else if(i == 14){
-			s = "fish";
-	}
-		else if(i == 15){
-			s = "sigtest";
-	}
-		else if(i == 16){
-			s = "syserr";
-	}
-
-		else return FAIL;
 
 
-		if(read_dentry_by_name((int8_t*)s,&a) == -1){
+		if(read_dentry_by_name(filename,&a) == -1){
 			printf("ERROR! Entry not found\n");
 			return FAIL;
 		}
@@ -235,9 +181,7 @@ int idt_test(){
 		printf("File Name: %s\n",a.fname);
 		printf("File Type: %d\n",a.file_type);
 		printf("Inode Num: %d\n",a.inode_num);
-}
-
-		return PASS;
+		return read_data_fromfile(filename);
 	}
 
 
@@ -276,7 +220,6 @@ int read_data_fromfile(int8_t* filename){
 				return FAIL;
 		}
 		for(i=0;i<filesize;i++){
-			putc(buf[i]);
 		}
 		printf("\n File Name: %s \n",filename);
 		return PASS;
@@ -362,22 +305,15 @@ int testing_rtc_driver(int32_t rate){
 
 /* Test suite entry point */
 void launch_tests(unsigned int start ){
-	//TEST_OUTPUT("idt_test", idt_test());
-
-	//TEST_OUTPUT("read_by_name_test", read_by_name_test());
   boot_block_addr=start;
-  // TEST_OUTPUT("read_data_test", read_data_test());
-	  //TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
-	//TEST_OUTPUT("page_test_null", page_test_null());
-	// TEST_OUTPUT("page_test", page_test());
 
 
 
-	//CHECKPOINT 2 TEST
+	//CHECKPOINT 2 TESTs
 
 
 	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
-	 //TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
+//	 TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
 
 	 // TEST CASE 2 READ FROM FILES
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
@@ -393,7 +329,7 @@ void launch_tests(unsigned int start ){
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("sigtest"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("syserr"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("testprint"));
-	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
+	 TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.txt"));// returns FAIL
 
 	// TEST CASE 3 RTC DRIVER TESTS:
@@ -401,9 +337,16 @@ void launch_tests(unsigned int start ){
 
 	//TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
 	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
-	 TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
+//	 TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
 	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
 	// TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));
+
+	// TEST CASE 4
+//	TEST_OUTPUT("read_by_index_test", read_by_index_test(1));
+
+	// TEST CASE 5
+//	TEST_OUTPUT("read_by_name_test", read_by_name_test("frame0.txt"));
+
 
 
 

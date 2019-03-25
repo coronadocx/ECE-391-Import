@@ -26,14 +26,7 @@ void check_input(){
  uint32_t a;
  // char b;
  a=inb(KEYBOARD_CMD_PORT);
- int x=getpositionx();
- int y=getpositiony()+1;
- if(x>=79){
-   setposition(0,y);
- }
- if(y>25){
-   scroll();
- }
+
 
 
  switch(a){

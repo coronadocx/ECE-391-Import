@@ -5,6 +5,7 @@
 #include"terminal.h"
 static char chararray[NUM_KEYS]={' ','e','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
 '\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
+static char shiftarray[21]={'~','!','@','#','$','%','^','&','*','(',')','_','+','{','}','|',':','\"','<','>','?'};
 static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 int numberofchars=0;
 
@@ -33,7 +34,7 @@ void check_input(){
    case BACKSPACE:{  // check for backspace
      handlebackspace();
      linebuffer[numberofchars]='\0';
-   if(numberofchars!=0) // make sure characters have been written 
+   if(numberofchars!=0) // make sure characters have been written
     numberofchars=numberofchars-1;
 
    break;
@@ -41,19 +42,20 @@ void check_input(){
    case ENTER: {
      putc(chararray[a]);
      linebuffer[numberofchars]='\n';
-     read(linebuffer);
-     memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
-     numberofchars=0;
+     read(linebuffer); // call to terminal read.
+     memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH); // reset the linebuffer
+     numberofchars=0; // reset the number of chars read
 
 
      break;
    }
-   case CAPSLOCK: if(chararray[CAPSLOCK]=='0'){
+   case CAPSLOCK: if(chararray[CAPSLOCK]=='0'){  // check if capslock had been pressed. basic toggling functionality
                     chararray[CAPSLOCK]='1';
                   }
               else {
                   chararray[CAPSLOCK]='0';
                 }break;
+                /* deciding how to put the character on the screen */
    default:{ if( ( chararray[CAPSLOCK]=='1'|| chararray[ LEFTSHIFT]=='1'||chararray[RIGHTSHIFT]=='1') && chararray[a]>=ASCIILOWERCASEA && chararray[a]<=ASCIILOWERCASEZ)
               {
 
@@ -75,6 +77,40 @@ void check_input(){
               }
               }
                 }
+            else if(chararray[LEFTSHIFT]=='1' || chararray[RIGHTSHIFT]=='1')
+            {
+                char temp;
+                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1){
+                  if(chararray[a]>=49 && chararray[a]<=57){
+                    int x = chararray[a]-'0';
+                    if(shiftarray[x]){
+                      temp=shiftarray[x];
+                    }
+                  }
+                  else{
+                    switch(chararray[a]){
+                      case '-': temp='_';break;
+                      case '=':temp='+';break;
+                      case '[':temp='{';break;
+                      case ']':temp='}';break;
+                      case '`':temp='~';break;
+                      case '\\':temp='|';break;
+                      case ';':temp=':';break;
+                      case '\'':temp='\"';break;
+                      case ',':temp='<';break;
+                      case '.':temp='>';break;
+                      case '/':temp='?';break;
+                      default:break;
+                    }
+                  }
+                  linebuffer[numberofchars]=temp;
+                  putc(temp);
+                  numberofchars++;
+                    update_cursor();
+
+                }
+
+            }
             else
               {
                 if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1)

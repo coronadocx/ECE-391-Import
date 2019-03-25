@@ -419,7 +419,7 @@ void launch_tests(unsigned int start ){
 
 
 	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
-	TEST_OUTPUT("dir_read_test", dir_read_test());
+	//TEST_OUTPUT("dir_read_test", dir_read_test());
 
 	 // TEST CASE 2 READ FROM FILES
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));

@@ -3,40 +3,34 @@
 #include "i8259.h"
 #include "keyboard.h"
 #include"terminal.h"
-static char chararray[255]={' ','e','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
+static char chararray[NUM_KEYS]={' ','e','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
 '\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
-static char linebuffer[128];
+static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 int numberofchars=0;
 
 
 
  /*
   * check_input
-  *   DESCRIPTION: Function that checks the keyboard input and also Temporarily
-  *               Checks the letters e and d to enable and disable the rtc for the demo.
-                  This function primarily outputs the letter that was pressed on the keyboard.
+  *   DESCRIPTION: Function that handles keyboard inputs .
   *   INPUTS: None
   *   OUTPUTS:None
   *   RETURN VALUE: None
-  *   SIDE EFFECTS:  None. on press of e and d it enables and disables the rtc
+  *   SIDE EFFECTS:  populates the keyboard buffer and performs actions based on keyboard inputs
   */
 
 void check_input(){
 
  uint32_t a;
- // char b;
  a=inb(KEYBOARD_CMD_PORT);
-
-
-
  switch(a){
-   case 0x2A: chararray[0x2A]='1';break;
-   case 0xAA:chararray[0x2A]='0';break;
-   case 0x36:chararray[0x36]='1';break;
-   case 0xB6:chararray[0x36]='0';break;
-   case 0x1D:chararray[0x1D]='1';break;
-   case 0x9D:chararray[0x1D]='0';break;
-   case 0x0E:{
+   case  LEFTSHIFT: chararray[ LEFTSHIFT]='1';break;
+   case  LEFTSHIFTRELEASED :chararray[ LEFTSHIFT]='0';break;
+   case RIGHTSHIFT:chararray[RIGHTSHIFT]='1';break;
+   case RIGHTSHIFTRELEASED:chararray[RIGHTSHIFT]='0';break;
+   case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;
+   case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break;
+   case BACKSPACE:{
      handlebackspace();
      linebuffer[numberofchars]='\0';
    if(numberofchars!=0)
@@ -44,36 +38,36 @@ void check_input(){
 
    break;
  }
-   case 0x1C: {
+   case ENTER: {
      putc(chararray[a]);
      linebuffer[numberofchars]='\n';
      read(linebuffer);
-     memset(linebuffer,0,128);
+     memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
      numberofchars=0;
 
 
      break;
    }
-   case 0x3A: if(chararray[0x3A]=='0'){
-                    chararray[0x3A]='1';
+   case CAPSLOCK: if(chararray[CAPSLOCK]=='0'){
+                    chararray[CAPSLOCK]='1';
                   }
               else {
-                  chararray[0x3A]='0';
+                  chararray[CAPSLOCK]='0';
                 }break;
-   default:{ if( ( chararray[0x3A]=='1'|| chararray[0x2A]=='1'||chararray[0x36]=='1') && chararray[a]>=97 && chararray[a]<=122)
+   default:{ if( ( chararray[CAPSLOCK]=='1'|| chararray[ LEFTSHIFT]=='1'||chararray[RIGHTSHIFT]=='1') && chararray[a]>=ASCIILOWERCASEA && chararray[a]<=ASCIILOWERCASEZ)
               {
 
                 char temp = chararray[a]-32;
-                if(temp=='L' && chararray[0x1D]=='1' ){
+                if(temp=='L' && chararray[LEFTCONTROLPRESSED]=='1' ){
                   clear();
                   setposition(0,0);
                     update_cursor();
                     numberofchars=0;
-                    memset(linebuffer,0,128);
+                    memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
 
                 }
                 else{
-                if(numberofchars!=127){
+                if(numberofchars!=KEYBOARD_BUFFER_LENGTH-1){
                 linebuffer[numberofchars]=temp;
                 putc(temp);
                   update_cursor();
@@ -83,7 +77,7 @@ void check_input(){
                 }
             else
               {
-                if(chararray[a]&& numberofchars!=127)
+                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1)
                 {
                 linebuffer[numberofchars]=chararray[a];
                 putc(chararray[a]);
@@ -97,12 +91,6 @@ void check_input(){
            }
 }
  send_eoi(1);
-/*
- if(chararray[a]=='e')
-    enable_irq(8);
- if(chararray[a]=='d')
-    disable_irq(8);
-*/
 
 }
 
@@ -122,8 +110,8 @@ void init_keyboard(){
 // Each index into the char array (ie: HEX value) refers to scancodes for the Keyboard
 // This is a simpler method because we only needed the numbers and lower case
 // letters for the demo
-chararray[0x3A]='0';
-chararray[0x2A]='0';
+chararray[CAPSLOCK]='0';
+chararray[ LEFTSHIFT]='0';
 
 
 }

@@ -46,8 +46,9 @@ typedef struct dentry {
 
 
 /* Giving the multiboot_struct into fs_open for the boot block addr */
-extern int32_t fs_open(unsigned int mod_start);
+extern int32_t set_mod_start(unsigned int mod_start);
 
+extern int32_t fs_open(int8_t* filename);
 extern int32_t fs_close();
 
 extern int32_t fs_read(void* buf, int32_t nbytes);

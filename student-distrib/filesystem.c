@@ -8,32 +8,64 @@ static uint32_t dir_entries;
 static uint32_t num_inodes;
 /* Number of data blocks */
 static uint32_t num_dblocks;
-
-/* Global boot block variable for starting address of FileSystems */
-static module_t* boot_block_module;
+/* global dentry struct to be set based on fs_open */
+static dentry_t a;
+/* the boot block address */
 uint32_t* boot_block_addr;
 
 
 
-int32_t fs_open(unsigned int mod_start){
+/*
+ *  set_mod_start
+ *   DESCRIPTION: Function that assigns the boot_block_addr
+ *   ARGUMENTS: unsigned int boot block address
+ *   OUTPUTS:None
+ *   RETURN VALUE: 0 for success -1 for error
+ *   SIDE EFFECTS: boot_block_addr initialized
+ */
+int32_t set_mod_start(unsigned int mod_start){
 
-    /* Assign boot_block_module for FileSystem Read functions */
+    /* Assign boot_block_address for FileSystem Read functions */
     boot_block_addr = (unsigned int*) mod_start;
     return 0;
 }
+/*
+ *  fs_open
+ *   DESCRIPTION: sets the global dentry based on filename
+ *  ARGUMENTS: file descriptor
+ *   OUTPUTS:None
+ *   RETURN VALUE: 0 for success -1 for error
+ *   SIDE EFFECTS: sets global dentry_t structure based on filename
+ */
+extern int32_t fs_open(int8_t* filename){
+  if(read_dentry_by_name(filename,&a)==-1){
+    return -1;
+  }
+  return 0;
+}
+
+/*
+ * fs_close
+ *   DESCRIPTION:function that resets the global dentry struct
+ *   ARGUMENTS : none
+ *   OUTPUTS:None
+ *   RETURN VALUE: 0 for success -1 for error
+ *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints 
+ */
 
 int32_t fs_close(){
 
-  if(boot_block_module == NULL)
-    return -1;
-
-
-/****** Should we really reset this? *****/
-    /* Reset boot_block_module */
-    boot_block_module = NULL;
-
     return 0;
 }
+
+/*
+ * fs_read
+ *   DESCRIPTION: populates the buffer based on the file descriptor used in fs_open.
+*    ARGUMENTS: Buffer and number of bytes to be read from the file
+ *   OUTPUTS:None
+ *   RETURN VALUE:0 for success -1 for error
+ *   SIDE EFFECTS: populates th buffer
+ */
 
 extern int32_t fs_read(void* buf, int32_t nbytes){
   /* If <= 0 bytes to be read, invalid input */
@@ -43,11 +75,24 @@ extern int32_t fs_read(void* buf, int32_t nbytes){
   if(buf == NULL)
     return -1;
 
+   if( read_data(a.inode_num,0,(uint8_t*) buf,nbytes)==-1){
+     return -1;
+   }
+
       /* Fill in the rest later */
+
 
 return 0;
 }
 
+/*
+ * fs_write
+ *   DESCRIPTION: Read only file system. just does error checking
+*    ARGUMENTS: buffer and number of bytes to be read
+ *   OUTPUTS:None
+ *   RETURN VALUE:0 for success -1 for error
+ *   SIDE EFFECTS: none
+ */
 extern int32_t fs_write(void* buf, int32_t nbytes){
     /* If <= 0 bytes to be written, return success */
     if(nbytes <= 0)
@@ -63,6 +108,14 @@ extern int32_t fs_write(void* buf, int32_t nbytes){
 };
 
 
+/*
+ * read_dentry_by_name
+ *   DESCRIPTION: Function which searches for file by name
+  * ARGUMENTS: file name and the dentry struct to be populated
+ *   OUTPUTS:None
+ *   RETURN VALUE: 0 for success -1 for error
+ *   SIDE EFFECTS: dentry struct is populated with info about the file found by given filename
+ */
 int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
 
   /* Error handling for dentry == NULL */
@@ -101,7 +154,7 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   int8_t* first_file = (int8_t*) (first_directory + 16);
   /* Using this to keep track of the index in the boot_dir_list */
   int j = 0;
-  while(strncmp((first_file + j*64), fname, strlen(fname)) != 0){
+  while(strncmp((first_file + j*BOOT_BLOCK_SIZE ), fname, strlen(fname)) != 0){
     /* If we could not find the filename, return -1 */
     if(j >= 62)
       return -1;
@@ -116,16 +169,25 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   strncpy((int8_t*) dentry->fname, fname,FILE_NAME_SIZE);
   /* 32 + 4 since first 32 bytes are for filename */
   dentry->file_type = 0;
-  dentry->file_type = *(32 + first_file + j*64);
+  dentry->file_type = *(32 + first_file + j*BOOT_BLOCK_SIZE );
   /* 32 + 8 since first 32 bytes are for filename */
   dentry->inode_num = 0;
-  dentry->inode_num = *(32 + 4 + first_file + j*64);
+  dentry->inode_num = *(32 + 4 + first_file + j*BOOT_BLOCK_SIZE );
 
 /* Return 0 on success */
 return 0;
 
 
 }
+
+/*
+ * read_dentry_by_index
+ *   DESCRIPTION: Function which initializes the Keyboard by enabling the first IRQ
+ *    ARGUMENTS: index to read file from and dentry to populate
+ *   OUTPUTS:None
+ *   RETURN VALUE: 0 for success -1 for error
+ *   SIDE EFFECTS: dentry struct is populated with info about the file found by given index
+ */
 
 int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
 
@@ -162,6 +224,15 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
  return 0;
 
 }
+
+/*
+ * read_data
+ *   DESCRIPTION: Function which reads data from a file
+ *   ARGUMENTS: int inode number, offset to read from , buffer to fill with content and length of text to be read
+ *   OUTPUTS:None
+ *   RETURN VALUE:0 for success -1 for error
+ *   SIDE EFFECTS: fills the buffer with text required if successfull
+ */
 
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length){
 

@@ -129,6 +129,28 @@ int idt_test(){
 	// add more tests here
 	/* Checkpoint 2 tests */
 
+	int read_data_fromfile(int8_t* filename){
+		  clear();
+			setposition(0,0);
+			dentry_t a;
+			int i;
+			unsigned int filesize;
+			uint32_t* inode_start_addr;
+			read_dentry_by_name(filename,&a);
+			inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
+			filesize = *(inode_start_addr + (a.inode_num)*1024);
+			uint8_t buf[filesize];
+			if(read_data(a.inode_num, 0, buf,filesize) == -1){
+					return FAIL;
+			}
+			for(i=0;i<filesize;i++){
+					putc(buf[i]);
+
+			}
+			printf("\n File Name: %s \n",filename);
+			return PASS;
+
+	}
 	/* Read_By_Index_Tests - Example
 	 *
 	 * Checks all 17 entries of the filesystem
@@ -205,26 +227,6 @@ int read_data_test(){
 			return PASS;
 		}
 
-int read_data_fromfile(int8_t* filename){
-	  clear();
-		setposition(0,0);
-		dentry_t a;
-		int i;
-		unsigned int filesize;
-		uint32_t* inode_start_addr;
-		read_dentry_by_name(filename,&a);
-		inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
-		filesize = *(inode_start_addr + (a.inode_num)*1024);
-		uint8_t buf[filesize];
-		if(read_data(a.inode_num, 0, buf,filesize) == -1){
-				return FAIL;
-		}
-		for(i=0;i<filesize;i++){
-		}
-		printf("\n File Name: %s \n",filename);
-		return PASS;
-
-}
 int dir_read_test(uint32_t* boot_block_addr){
 			if(boot_block_addr == NULL)
 			return 0;
@@ -294,6 +296,31 @@ int testing_rtc_driver(int32_t rate){
 
 	return PASS;
 }
+int testing_fs_open(int8_t* filename){
+	clear();
+	setposition(0,0);
+	if(fs_open(filename)==-1){
+		printf("error opening");
+		return FAIL;
+	}
+	printf("FS OPEN SUCCESSFULL\n");
+	return PASS;
+}
+int testing_fs_read(uint32_t nbytes){
+	int i;
+	uint8_t  buf[nbytes];
+	if(fs_read(buf,nbytes)==-1){
+	 printf("error reading");
+	 return FAIL;
+	}
+	for(i=0;i<nbytes;i++){
+			putc(buf[i]);
+
+	}
+
+
+	return PASS;
+}
 
 
 
@@ -313,7 +340,7 @@ void launch_tests(unsigned int start ){
 
 
 	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
-//	 TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
+	 TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
 
 	 // TEST CASE 2 READ FROM FILES
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
@@ -329,7 +356,7 @@ void launch_tests(unsigned int start ){
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("sigtest"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("syserr"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("testprint"));
-	 TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
+	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.tx"));
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("verylargetextwithverylongname.txt"));// returns FAIL
 
 	// TEST CASE 3 RTC DRIVER TESTS:
@@ -346,6 +373,21 @@ void launch_tests(unsigned int start ){
 
 	// TEST CASE 5
 //	TEST_OUTPUT("read_by_name_test", read_by_name_test("frame0.txt"));
+
+// TEST CASE 6
+/*   testing fs_open and fs_read   */
+
+//testing_fs_open("frame0.txt");
+//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+
+//testing_fs_open("verylargetextwithverylongname.tx");
+//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+
+//testing_fs_open("verylargetextwithverylongname.txt");
+//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+
+//testing_fs_open("frame0.txt");
+//TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
 
 

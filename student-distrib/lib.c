@@ -15,7 +15,6 @@
 static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
-static int writetovideomemflag=0;
 static int rtcInterruptCount = 0;
 
 /* void writetovideomem();

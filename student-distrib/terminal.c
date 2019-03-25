@@ -2,9 +2,9 @@
 
 #include "keyboard.h"
 #include "lib.h"
-static char terminalbuffer[128];
+static char terminalbuffer[KEYBOARD_BUFFER_LENGTH];
 int init(){
-  memset(terminalbuffer,0,128);
+  memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);
 
   return 0;
 }

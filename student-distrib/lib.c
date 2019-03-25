@@ -44,16 +44,52 @@ void clear(void) {
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
 }
+/*
+ * setposition
+ *   DESCRIPTION: Function that sets screen x ans screen y for video mem
+ *   INPUTS: two integers x and y indicating x position and y position
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS:  set the video mem screen x and screen y
+ */
+
 void setposition(int x,int y){
   screen_x=x;
   screen_y=y;
 }
+/*
+ * getpositiony
+ *   DESCRIPTION:returns current screeny
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: Integer indicating screen y positon
+ *   SIDE EFFECTS:None
+ */
+
 int getpositiony(){
   return screen_y;
 }
+/*
+ * getpositiony
+ *   DESCRIPTION:returns current screenx
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: Integer indicating screen x positon
+ *   SIDE EFFECTS:None
+ */
+
 int getpositionx(){
   return screen_x;
 }
+/*
+ * handlebackspace
+ *   DESCRIPTION: handlesbackspace input from keyboard
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS:  sets screen_x and screen_y appropriately to handle backspace
+ */
+
 void handlebackspace(){
   if(screen_x-1<0){
     if(screen_y!=0){
@@ -71,6 +107,15 @@ void handlebackspace(){
   *(uint8_t *)(video_mem + (i << 1))=' ';
   *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
 }
+/*
+ * scroll
+ *   DESCRIPTION: handles vertical scrolling
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS:  reorientes the screen scrolls at bottom edge
+ */
+
 void scroll(){
   int x=0;
   int y=0;
@@ -92,7 +137,7 @@ void scroll(){
     }
     y=y+1;
   }
-  screen_y=24;
+  screen_y=NUM_ROWS-1;
   screen_x=0;
 
 

@@ -4,6 +4,9 @@
 #include "lib.h"
 #include "i8259.h"
 #include "linkage.h"
+#include "terminal.h"
+
+
 #define VIDEO       0xB8000
 #define NUM_COLS    80
 #define NUM_ROWS    25
@@ -15,9 +18,40 @@ static char* video_mem = (char *)VIDEO;
 
 static int rtcInterruptCount = 0;
 
-void writetovideomem(){
-  *(uint8_t *)(video_mem + (30 << 1)) = (rtcInterruptCount%10)+48;
-  *(uint8_t *)(video_mem + (30 << 1)+1) = ATTRIB;
+/* void writetovideomem();
+ * Inputs: None
+ * Return Value: None
+ * Function: Writes the value of Rtc Interrupt count at a specific location  */
+
+void writetovideomem(int xval,int yval){
+  // int xval;
+
+
+  // xval = rtcInterruptCount;
+  // xval %= NUM_COLS;
+  //
+  // yval = rtcInterruptCount/NUM_COLS;
+  //
+  // *(uint8_t *)(video_mem + ((NUM_COLS * yval + xval) << 1)) = '1';
+  // *(uint8_t *)(video_mem + ((NUM_COLS * yval + xval) << 1) + 1) = ATTRIB;
+
+
+
+
+  // screen_x++;
+  // screen_x %= NUM_COLS;
+  // screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+
+  // *(uint8_t *)(video_mem + (30 << 1)) = (rtcInterruptCount%10)+48;
+  // *(uint8_t *)(video_mem + (30 << 1)+1) = ATTRIB;
+
+  screen_x = rtcInterruptCount%NUM_COLS;
+  screen_y = rtcInterruptCount/NUM_COLS;
+  putc('X');
+
+
+
+
 }
 
 /* void clear(void);

@@ -27,6 +27,27 @@ void update_cursor(){
   outb((uint8_t) (pos & 0xFF),0x3D5);
 
 }
+
+int write(){
+  int i=0;
+  int x;
+  int y;
+  for(i=0;terminalbuffer[i]!='\n';i++){
+    x=getpositionx();
+    y=getpositiony()+1;
+    if(x>=79){
+      setposition(0,y);
+    }
+    if(y>25){
+      scroll();
+    }
+    putc(terminalbuffer[i]);
+  }
+  return 0;
+}
+
+
+
 int read(char* buffer){
   int i=0;
   int y=0;
@@ -60,23 +81,7 @@ int read(char* buffer){
 
 return 0;
 }
-int write(){
-  int i=0;
-  int x;
-  int y;
-  for(i=0;terminalbuffer[i]!='\n';i++){
-    x=getpositionx();
-    y=getpositiony()+1;
-    if(x>=79){
-      setposition(0,y);
-    }
-    if(y>25){
-      scroll();
-    }
-    putc(terminalbuffer[i]);
-  }
-  return 0;
-}
+
 
 int open(){
 return 0;

@@ -20,5 +20,8 @@ void init_keyboard();
 #define ENTER 0x1C
 #define ASCIILOWERCASEA 97
 #define ASCIILOWERCASEZ 122
+#define ASCII1 49
+#define ASCII9 57
+#define NUMBERSONKEYBOARD 10
 
 #endif

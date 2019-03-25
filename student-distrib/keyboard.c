@@ -5,7 +5,7 @@
 #include"terminal.h"
 static char chararray[NUM_KEYS]={' ','e','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
 '\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
-static char shiftarray[21]={'~','!','@','#','$','%','^','&','*','(',')','_','+','{','}','|',':','\"','<','>','?'};
+static char shiftarray[NUMBERSONKEYBOARD]={'~','!','@','#','$','%','^','&','*','('};  // handling if shift is pressed on any num keys on qwerty keyboard
 static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 int numberofchars=0;
 
@@ -20,6 +20,8 @@ int numberofchars=0;
   *   SIDE EFFECTS:  populates the keyboard buffer and performs actions based on keyboard inputs
   */
 
+
+/* 1 is used to indicate the shift,capslock, control are pressed. 0 in the chararray indicates that they are not pressed or released */
 void check_input(){
 
  uint32_t a;
@@ -32,62 +34,64 @@ void check_input(){
    case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;  // check if control is pressed
    case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break; // check is control is released
    case BACKSPACE:{  // check for backspace
-     handlebackspace();
-     linebuffer[numberofchars]='\0';
-   if(numberofchars!=0) // make sure characters have been written
-    numberofchars=numberofchars-1;
-
-   break;
- }
-   case ENTER: {
-     putc(chararray[a]);
-     linebuffer[numberofchars]='\n';
-     read(linebuffer); // call to terminal read.
-     memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH); // reset the linebuffer
-     numberofchars=0; // reset the number of chars read
-
-
-     break;
-   }
-   case CAPSLOCK: if(chararray[CAPSLOCK]=='0'){  // check if capslock had been pressed. basic toggling functionality
-                    chararray[CAPSLOCK]='1';
+                    handlebackspace();
+                    linebuffer[numberofchars]='\0';
+                    if(numberofchars!=0) // make sure characters have been written
+                    numberofchars=numberofchars-1; // backspace removes the number of chars
+                    break;
                   }
-              else {
-                  chararray[CAPSLOCK]='0';
-                }break;
+   case ENTER:    {  // adding newline to buffer. This triggers a terminal read
+                    putc(chararray[a]);
+                    linebuffer[numberofchars]='\n';
+                    read(linebuffer); // call to terminal read.
+                    memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH); // reset the linebuffer
+                    numberofchars=0; // reset the number of chars read
+                    break;
+                  }
+   case CAPSLOCK:{
+                    if(chararray[CAPSLOCK]=='0')
+                    {  // check if capslock had been pressed. basic toggling functionality
+                      chararray[CAPSLOCK]='1';
+                    }
+                    else {
+                      chararray[CAPSLOCK]='0';  // switch off capslock 
+                    }
+                  }
+                   break;
                 /* deciding how to put the character on the screen */
-   default:{ if( ( chararray[CAPSLOCK]=='1'|| chararray[ LEFTSHIFT]=='1'||chararray[RIGHTSHIFT]=='1') && chararray[a]>=ASCIILOWERCASEA && chararray[a]<=ASCIILOWERCASEZ)
+   default:{
+            if( ( chararray[CAPSLOCK]=='1'|| chararray[ LEFTSHIFT]=='1'||chararray[RIGHTSHIFT]=='1') && chararray[a]>=ASCIILOWERCASEA && chararray[a]<=ASCIILOWERCASEZ)
               {
 
                 char temp = chararray[a]-32;
                 if(temp=='L' && chararray[LEFTCONTROLPRESSED]=='1' ){
                   clear();
-                  setposition(0,0);
-                    update_cursor();
-                    numberofchars=0;
+                  setposition(0,0);  // clear the screen and set the x y position to 0,0
+                    update_cursor(); // update the position of the cursor
+                    numberofchars=0; // reset number of chars in keyboard buffer
                     memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
 
                 }
                 else{
-                if(numberofchars!=KEYBOARD_BUFFER_LENGTH-1){
+                if(numberofchars!=KEYBOARD_BUFFER_LENGTH-1){// -1 because last character is reserved for \n
                 linebuffer[numberofchars]=temp;
                 putc(temp);
-                  update_cursor();
-                numberofchars=numberofchars+1;
+                  update_cursor(); // update the position of the cursor
+                numberofchars=numberofchars+1; // add number of chars in keyboard buffer
               }
               }
                 }
             else if(chararray[LEFTSHIFT]=='1' || chararray[RIGHTSHIFT]=='1')
             {
                 char temp;
-                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1){
-                  if(chararray[a]>=49 && chararray[a]<=57){
+                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1){ // -1 because last character is reserved for \n
+                  if(chararray[a]>=ASCII1 && chararray[a]<=ASCII9){ // if the shift is for numbers 1 to 9
                     int x = chararray[a]-'0';
                     if(shiftarray[x]){
                       temp=shiftarray[x];
                     }
                   }
-                  else{
+                  else{ // handle shift for all other special characters
                     switch(chararray[a]){
                       case '-': temp='_';break;
                       case '=':temp='+';break;
@@ -100,25 +104,26 @@ void check_input(){
                       case ',':temp='<';break;
                       case '.':temp='>';break;
                       case '/':temp='?';break;
+                      case '0':temp=')';break;
                       default:break;
                     }
                   }
                   linebuffer[numberofchars]=temp;
                   putc(temp);
                   numberofchars++;
-                    update_cursor();
+                    update_cursor();  // update the position of the cursor
 
                 }
 
             }
             else
               {
-                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1)
+                if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1)// -1 because last character is reserved for \n
                 {
                 linebuffer[numberofchars]=chararray[a];
                 putc(chararray[a]);
                 numberofchars++;
-                  update_cursor();
+                  update_cursor(); // update the position of the cursor
                   }
 
               }

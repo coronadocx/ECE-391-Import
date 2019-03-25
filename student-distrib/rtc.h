@@ -15,6 +15,15 @@
 
 #define MAX_FREQ			1024
 
+#define DEFAULT_FREQ 2
+#define TEMP_ZERO 0
+
+#define INIT_RATE 5
+
+#define MASK_LOWER 0xF0
+
+
+
 void init_rtc();
 
 // System Calls for RTC

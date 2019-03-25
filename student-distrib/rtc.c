@@ -56,7 +56,7 @@ int32_t rtc_read()
 int32_t rtc_write(int32_t fd,const int32_t * buf, int32_t nbytes)
 {
 	int32_t tmp;
-	int8_t rate = 5;
+	int8_t rate = INIT_RATE;
 	int8_t prev;
 
 	//Make sure input is valid
@@ -79,7 +79,7 @@ int32_t rtc_write(int32_t fd,const int32_t * buf, int32_t nbytes)
 	outb(REG_A_NMI_OFF,RTC_CMD_PORT);			// Select A, NMI off
 	prev = inb(RTC_DATA_PORT);					// Collect old state
 	outb(REG_A_NMI_OFF,RTC_CMD_PORT);			// Select A again
-	outb((prev & 0xF0) | rate,RTC_DATA_PORT);	// Write new rate to RTC
+	outb((prev & MASK_LOWER) | rate,RTC_DATA_PORT);	// Write new rate to RTC
 	sti();										// Enable interrupts
 
 	return 0;
@@ -97,10 +97,9 @@ int32_t rtc_write(int32_t fd,const int32_t * buf, int32_t nbytes)
 int32_t rtc_open(const uint8_t * filename)
 {
 	//Set the RTC to 2Hz
-	// *(int*)(0)++;		//FIXME forced pagefault to make sure this breaks
 
-  int32_t default_freq = 2;
-  rtc_write(0,&default_freq,0);
+  int32_t default_freq = DEFAULT_FREQ;
+  rtc_write(TEMP_ZERO,&default_freq,TEMP_ZERO);
 
 	return 0;
 }

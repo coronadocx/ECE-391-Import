@@ -61,65 +61,66 @@ int idt_test(){
 		return result;
 	}
 
-		/* page_test_null - Null pointer
-		 *
-		 * Tries to access NULL pointer, should receive a page fault
-		 * Inputs: None
-		 * Outputs: PASS/FAIL
-		 * Side Effects: None
-		 * Coverage: Accessing NULL pointer
-		 */
-	int page_test_null(){
-		printf("This test tries to dereference a NULL Pointer and should page fault\n");
-		int *i = NULL;
-		int j;
-		j = 5; //Just a random value
-		*i = j;
+/* page_test_null - Null pointer
+ *
+ * Tries to access NULL pointer, should receive a page fault
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: Accessing NULL pointer
+ */
+int page_test_null(){
+	printf("This test tries to dereference a NULL Pointer and should page fault\n");
+	int *i = NULL;
+	int j;
+	j = 5; //Just a random value
+	*i = j;
 
-		return 0;
+	return 0;
+}
+
+/* page_test_null - Null pointer
+ *
+ * Tries to write to and read from several kernel and video memory addresses
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: Accessing different mapped kernel and video memory addresses
+ */
+
+int page_test(){
+	printf("This test tries to access different addresses\n");
+	int i;
+	int* i_ptr;
+	int j;
+	j = 0;
+	int result = PASS;
+	printf("Testing Kernel Memory Addresses\n");
+	i_ptr = (int*)KMEM_START;
+	/* Testing Kernel Memory Addresses */
+	for(i=KMEM_START; i < KMEM_END; i+= KMEM_OFFSET){
+			printf("Writing %d into Memory address: %x\n", j, i);
+			*i_ptr = j;
+			if(*i_ptr != j){
+				result = FAIL;
+			}
+			i_ptr = (int*)(i+KMEM_OFFSET);
+			j++;
 	}
-	/* page_test_null - Null pointer
-	 *
-	 * Tries to write to and read from several kernel and video memory addresses
-	 * Inputs: None
-	 * Outputs: PASS/FAIL
-	 * Side Effects: None
-	 * Coverage: Accessing different mapped kernel and video memory addresses
-	 */
-
-	int page_test(){
-		printf("This test tries to access different addresses\n");
-		int i;
-		int* i_ptr;
-		int j;
-		j = 0;
-		int result = PASS;
-		printf("Testing Kernel Memory Addresses\n");
-		i_ptr = (int*)KMEM_START;
-		/* Testing Kernel Memory Addresses */
-		for(i=KMEM_START; i < KMEM_END; i+= KMEM_OFFSET){
-				printf("Writing %d into Memory address: %x\n", j, i);
-				*i_ptr = j;
-				if(*i_ptr != j){
-					result = FAIL;
-				}
-				i_ptr = (int*)(i+KMEM_OFFSET);
-				j++;
-		}
-		printf("Testing Video Memory Addresses\n");
-		i_ptr = (int*)VMEM_START;
-		for(i=VMEM_START; i < VMEM_END; i+= VMEM_OFFSET){
-				printf("Writing %d into Memory address: %x\n", j, i);
-				*i_ptr = j;
-				if(*i_ptr != j){
-					result = FAIL;
-				}
-				i_ptr = (int*)(i+VMEM_OFFSET);
-				j++;
-		}
-
-		return result;
+	printf("Testing Video Memory Addresses\n");
+	i_ptr = (int*)VMEM_START;
+	for(i=VMEM_START; i < VMEM_END; i+= VMEM_OFFSET){
+			printf("Writing %d into Memory address: %x\n", j, i);
+			*i_ptr = j;
+			if(*i_ptr != j){
+				result = FAIL;
+			}
+			i_ptr = (int*)(i+VMEM_OFFSET);
+			j++;
 	}
+
+	return result;
+}
 
 	//i=i/0;
 		//	asm volatile("int $40");
@@ -129,58 +130,68 @@ int idt_test(){
 	// add more tests here
 	/* Checkpoint 2 tests */
 
-	int read_data_fromfile(int8_t* filename){
-		  clear();
-			setposition(0,0);
-			dentry_t a;
-			int i;
-			unsigned int filesize;
-			uint32_t* inode_start_addr;
-			read_dentry_by_name(filename,&a);
-			inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
-			filesize = *(inode_start_addr + (a.inode_num)*1024);
-			uint8_t buf[filesize];
-			if(read_data(a.inode_num, 0, buf,filesize) == -1){
-					return FAIL;
-			}
-			for(i=0;i<filesize;i++){
-					putc(buf[i]);
 
-			}
-			printf("\n File Name: %s \n",filename);
-			return PASS;
+/* read_data_fromfile - Example
+ *
+ * Reads the data from the file according to the given filename
+ * Inputs: int8_t* filename
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
 
-	}
-	/* Read_By_Index_Tests - Example
-	 *
-	 * Checks all 17 entries of the filesystem
-	 * Inputs: None
-	 * Outputs: PASS/FAIL
-	 * Side Effects: None
-	 * Coverage: Load IDT, IDT definition
-	 * Files: x86_desc.h/S
-	 */
-
-	int read_by_index_test(int index){
-
-		clear();
+int read_data_fromfile(int8_t* filename){
+	  clear();
 		setposition(0,0);
 		dentry_t a;
-			if(read_dentry_by_index(index,&a) == -1){
-				printf("ERROR! Entry not found\n");
+		int i;
+		unsigned int filesize;
+		uint32_t* inode_start_addr;
+		read_dentry_by_name(filename,&a);
+		inode_start_addr = ((unsigned int *)boot_block_addr) + 1024;
+		filesize = *(inode_start_addr + (a.inode_num)*1024);
+		uint8_t buf[filesize];
+		if(read_data(a.inode_num, 0, buf,filesize) == -1){
 				return FAIL;
-			}
+		}
+		for(i=0;i<filesize;i++){
+				putc(buf[i]);
+
+		}
+		printf("\n File Name: %s \n",filename);
+		return PASS;
+
+}
+
+/* Read_By_Index_Tests - Example
+ *
+ * Checks all 17 entries of the filesystem
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: Load IDT, IDT definition
+ * Files: x86_desc.h/S
+ */
+
+int read_by_index_test(int index){
+
+	clear();
+	setposition(0,0);
+	dentry_t a;
+		if(read_dentry_by_index(index,&a) == -1){
+			printf("ERROR! Entry not found\n");
+			return FAIL;
+		}
 
 
-			printf("File Name: %s\n",a.fname);
-			printf("File Type: %d\n",a.file_type);
-			printf("Inode Num: %d\n",a.inode_num);
+		printf("File Name: %s\n",a.fname);
+		printf("File Type: %d\n",a.file_type);
+		printf("Inode Num: %d\n",a.inode_num);
 
 
 
 
-		return read_data_fromfile(a.fname);
-	}
+	return read_data_fromfile(a.fname);
+}
 
 
 

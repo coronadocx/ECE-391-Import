@@ -30,7 +30,7 @@ int getpositiony();
 void scroll();
 void handlebackspace();
 
-void writetovideomem(int xval, int yval);
+void writetovideomem();
 
 
 /* Userspace address-check functions */

@@ -316,8 +316,7 @@ int read_data_fromfile_error_handle(int8_t* filename){
 
 int testing_rtc_driver(int32_t rate){
 	int a;
-	int xval=0;
-	int yval=0;
+
 	clear();
 	setposition(0,0);
 	// int32_t rate = 2;
@@ -330,7 +329,7 @@ int testing_rtc_driver(int32_t rate){
 
 	while(1){
 		a = rtc_read();
-		writetovideomem(xval,yval);
+		writetovideomem();
 	}
 
 	return PASS;
@@ -432,7 +431,7 @@ void launch_tests(unsigned int start ){
 
 	// TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
 	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
-	 // TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
+	  TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
 	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
 	// TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));
 
@@ -451,19 +450,20 @@ void launch_tests(unsigned int start ){
 // testing_fs_open("verylargetextwithverylongname.tx");
 // TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
-// testing_fs_open("verylargetextwithverylongname.txt");
+// testing_fs_open("verylargetextwithverylongname.txt"); // error handling test case
 // TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 
- testing_fs_open("frame0.txt");
- TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
- TEST_OUTPUT("testing_fs_close",testing_fs_close());
- TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+// testing_fs_open("frame0.txt");
+ //TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+// TEST_OUTPUT("testing_fs_close",testing_fs_close());
+ //testing_fs_read(187); // if you try to read after you have closed you get an error
 
 // ERROR HANDLING
 
 // TEST_OUTPUT("read_data_fromfile_error_handle", read_data_fromfile_error_handle("frame0.txt"));
-
-
-
+// testing_fs_open("verylargetextwithverylongname.txt"); // error handling test case
+// TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
+//	 TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));
+	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
 	// launch your tests here
 }

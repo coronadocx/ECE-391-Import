@@ -22,7 +22,7 @@ static int rtcInterruptCount = 0;
  * Return Value: None
  * Function: Writes the value of Rtc Interrupt count at a specific location  */
 
-void writetovideomem(int xval,int yval){
+void writetovideomem(){
 
   screen_x = rtcInterruptCount%NUM_COLS;
   screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;

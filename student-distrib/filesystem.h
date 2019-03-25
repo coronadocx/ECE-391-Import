@@ -76,4 +76,7 @@ extern int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);
 /* Searches for a directory entry by inode#, copies over a number of elements from an offset into buf* */
 extern int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
 
+/* Reads and lists the contents of the directory on the screen */
+extern int32_t dir_read();
+
 #endif

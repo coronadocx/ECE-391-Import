@@ -375,3 +375,49 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
 
 }
+
+
+/* dir_read
+ *
+ * Lists the directories in the filesystem
+ * Inputs: Boot block address
+ * Outputs: Returns 0 on success, else returns -1
+ * Side Effects: Prints the contents of the directory on the screen along with
+ *  file names, types and sizes
+ */
+int dir_read(){
+
+			if(boot_block_addr == NULL)
+			return -1;
+
+			clear();
+			setposition(0,0);
+
+			int dir_entries;
+			int num_inodes;
+			int num_dblocks;
+			int i;
+			uint32_t* inode_start_addr;
+			dentry_t d;
+			uint32_t file_size;
+
+			dir_entries = *(boot_block_addr);
+			num_inodes  = *(boot_block_addr + BB_INODE_OFFSET);
+			num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
+
+			inode_start_addr = boot_block_addr + ABS_BLK_OFFSET_TEST;
+
+			for(i = 0; i < dir_entries; i++){
+				if(read_dentry_by_index(i, &d) == -1){
+					return -1;
+				}
+
+				printf("File Name: %s, " , d.fname);
+				printf("File Type: %u, ", d.file_type);
+				file_size = *(inode_start_addr + (d.inode_num)*ABS_BLK_OFFSET_TEST);
+				printf("File Size: %d\n", file_size);
+
+			}
+
+			return 0;
+		}

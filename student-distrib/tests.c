@@ -232,7 +232,17 @@ int read_by_index_test(int index){
  * Outputs: PASS/FAIL
  * Side Effects: None
  */
-int dir_read_test(uint32_t* boot_block_addr){
+int dir_read_test(){
+
+
+	if(dir_read() == 0){
+		return PASS;
+	}
+
+	return FAIL;
+
+
+	/*
 			if(boot_block_addr == NULL)
 			return 0;
 
@@ -266,6 +276,8 @@ int dir_read_test(uint32_t* boot_block_addr){
 			}
 
 			return PASS;
+
+			*/
 		}
 
 
@@ -407,7 +419,7 @@ void launch_tests(unsigned int start ){
 
 
 	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
-	// TEST_OUTPUT("dir_read_test", dir_read_test((unsigned int *) start) );
+	TEST_OUTPUT("dir_read_test", dir_read_test());
 
 	 // TEST CASE 2 READ FROM FILES
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));
@@ -431,6 +443,8 @@ void launch_tests(unsigned int start ){
 
 	// TEST_OUTPUT("testing_rtc_driver Open Function",testing_rtc_driver(-1));
 	// TEST_OUTPUT("testing_rtc_driver Over Limit",testing_rtc_driver(2));
+	  //TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
+
 	//  TEST_OUTPUT("testing_rtc_driver Higher Frequency",testing_rtc_driver(512));
 	// TEST_OUTPUT("testing_rtc_driver Not a power of 2",testing_rtc_driver(6));
 	// TEST_OUTPUT("testing_rtc_driver More than 1024",testing_rtc_driver(2048));

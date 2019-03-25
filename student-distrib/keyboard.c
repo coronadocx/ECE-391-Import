@@ -22,18 +22,18 @@ int numberofchars=0;
 void check_input(){
 
  uint32_t a;
- a=inb(KEYBOARD_CMD_PORT);
+ a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
  switch(a){
-   case  LEFTSHIFT: chararray[ LEFTSHIFT]='1';break;
-   case  LEFTSHIFTRELEASED :chararray[ LEFTSHIFT]='0';break;
-   case RIGHTSHIFT:chararray[RIGHTSHIFT]='1';break;
-   case RIGHTSHIFTRELEASED:chararray[RIGHTSHIFT]='0';break;
-   case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;
-   case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break;
-   case BACKSPACE:{
+   case  LEFTSHIFT: chararray[ LEFTSHIFT]='1';break;    // check if left shift is pressed
+   case  LEFTSHIFTRELEASED :chararray[ LEFTSHIFT]='0';break; // check if left shift is released
+   case RIGHTSHIFT:chararray[RIGHTSHIFT]='1';break;  // check if right shift is pressed
+   case RIGHTSHIFTRELEASED:chararray[RIGHTSHIFT]='0';break;  // check if right shift is released
+   case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;  // check if control is pressed
+   case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break; // check is control is released
+   case BACKSPACE:{  // check for backspace
      handlebackspace();
      linebuffer[numberofchars]='\0';
-   if(numberofchars!=0)
+   if(numberofchars!=0) // make sure characters have been written 
     numberofchars=numberofchars-1;
 
    break;

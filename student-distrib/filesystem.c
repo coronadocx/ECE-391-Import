@@ -96,7 +96,7 @@ return 0;
  */
 extern int32_t fs_write(void* buf, int32_t nbytes){
     /* If <= 0 bytes to be written, return success */
-    if(nbytes <= 0)
+    if(nbytes == 0)
       return 0;
 
     /* Read only filesystem, but NULL ptr handling */
@@ -232,22 +232,36 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
  *   DESCRIPTION: Function which reads data from a file
  *   ARGUMENTS: int inode number, offset to read from , buffer to fill with content and length of text to be read
  *   OUTPUTS:None
- *   RETURN VALUE:0 for success -1 for error
+ *   RETURN VALUE:0 for success, -1 for error, number of bytes that could not be copied on partial copy
  *   SIDE EFFECTS: fills the buffer with text required if successfull
  */
 
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length){
 
+  /* This makes a local copy of the argument length */
+  uint32_t len;
+  len = length;
+
   /* Error handling for buf == NULL */
   if(buf == NULL)
     return -1;
 
-  /* Error handling for zero length or length greater than Max_File_Size; no bytes to be read */
-  if(length == 0 || length > MAX_FILE_SIZE)
+  /* Error handling for zero length; no bytes to be read */
+  if(length == 0)
     return -1;
 
-  if(offset > MAX_FILE_SIZE || (offset + length) > MAX_FILE_SIZE)
+/* All bytes requested cannot be copied, setting flag to 1  */
+  if(length > MAX_FILE_SIZE){
+    len = MAX_FILE_SIZE - offset;
+  }
+
+  if(offset > MAX_FILE_SIZE)
     return -1;
+
+/* All bytes requested cannot be copied, setting flag to 1  */
+  if((offset + len) > MAX_FILE_SIZE){
+    len = MAX_FILE_SIZE - offset;
+  }
 
   /* Error handling for boot_block_addr == NULL */
   if(boot_block_addr == NULL)
@@ -302,12 +316,26 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
  if(inode_file_size < FS_BLOCK_SIZE)
   inode_d_blocks = VAL_ONE;
 
-  if((inode_file_size < length) || (inode_file_size < offset+length))
-  return -1;
+/* Offset cannot be greater than the file size */
+  if(inode_file_size < offset){
+    return -1;
+  }
+
+/* If length to be copied is greater than file_size, set len and flag to 1 */
+  if(inode_file_size < len){
+    len = inode_file_size - offset;
+  }
+
+
+  if(inode_file_size < (offset+len))
+  {
+    len = inode_file_size - offset;
+  }
+
 
   /* Starting and ending# of data block */
   start_dblock = offset/(FS_BLOCK_SIZE);
-  end_dblock = (offset+length)/(FS_BLOCK_SIZE);
+  end_dblock = (offset+len)/(FS_BLOCK_SIZE);
 
 /* Starting and ending indices of data blocks */
   start_dblock_index = *(inode_addr + VAL_ONE + start_dblock);
@@ -319,9 +347,10 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
 /* If all the reading is to be done from a single d_block */
   if(start_dblock == end_dblock){
-    memcpy(buf, ((uint8_t*)start_dblock_addr) + (offset % FS_BLOCK_SIZE), length);
+    memcpy(buf, ((uint8_t*)start_dblock_addr) + (offset % FS_BLOCK_SIZE), len);
 
-    return 0;
+    /* Return all the bytes that could not be copied */
+    return (length - len);
   }
 
 /* If reading has to be done over multiple dblocks */
@@ -329,7 +358,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   uint32_t j_index;
   uint32_t* j_addr;
   uint32_t bytes_to_copy_in_dblock;
-  uint32_t bytes_remaining = length;
+  uint32_t bytes_remaining = len;
   j = start_dblock;
   uint32_t offset_pos;
   offset_pos = (offset % FS_BLOCK_SIZE);
@@ -371,7 +400,8 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
     return -1;
   }
 
-  return 0;
+  /* Return 0  on success, and number of bytes that could not be copied on failure */
+  return (length - len);
 
 
 }
@@ -421,3 +451,18 @@ int dir_read(){
 
 			return 0;
 		}
+
+
+    /*
+     * dir_close
+     *   DESCRIPTION:function that closes the directory
+     *   ARGUMENTS : none
+     *   OUTPUTS:None
+     *   RETURN VALUE: 0 for success -1 for error
+     *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints
+     */
+
+    int32_t dir_close(){
+        a=b;
+        return 0;
+    }

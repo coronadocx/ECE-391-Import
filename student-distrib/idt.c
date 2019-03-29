@@ -7,6 +7,8 @@
 #include "linkage.h"
 #include "rtc.h"
 #include "i8259.h"
+#include "filesystem.h"
+#include "pcb.h"
 
 // idt index for keyboard and rtc
 #define KEYBOARD  0x21
@@ -15,6 +17,7 @@
 
 extern void keyboardhandlerasm();
 extern void rtchandlerasm();
+extern void systemcallasm();
 /*
  * handle0
  *   DESCRIPTION: function exception handler for divide by zero
@@ -203,6 +206,8 @@ void rtchandler(){
 
 
 }
+
+
 /*
  * initialize_IDT
  *   DESCRIPTION: function that sets up the IDT
@@ -279,6 +284,20 @@ SET_IDT_ENTRY(idt[KEYBOARD],keyboardhandlerasm);
  idt[RTC].reserved0=0;
  idt[RTC].size=1;
  SET_IDT_ENTRY(idt[RTC],rtchandlerasm);
+
+idt[SYSTEMCALLNO].present=1;
+idt[SYSTEMCALLNO].dpl=3; // called from user using INT
+idt[SYSTEMCALLNO].seg_selector=KERNEL_CS;
+idt[SYSTEMCALLNO].reserved4=0;
+idt[SYSTEMCALLNO].reserved2=1;
+idt[SYSTEMCALLNO].reserved1=1;
+idt[SYSTEMCALLNO].reserved0=0;
+idt[SYSTEMCALLNO].reserved3=1;
+idt[SYSTEMCALLNO].size=1;
+SET_IDT_ENTRY(idt[SYSTEMCALLNO],systemcallasm)
+
+
+
 
 
 

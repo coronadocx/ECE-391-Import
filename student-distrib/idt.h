@@ -5,4 +5,5 @@
 extern void initialize_IDT();
 
 #define EXCEPTION_COUNT 32
+#define SYSTEMCALLNO 0x80
 #endif

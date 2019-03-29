@@ -87,7 +87,7 @@ systemcallasm:
           pushl %ecx
           pushl %ebx
 
-          addl $1,%eax
+          subl $1,%eax
 
 
           jmp  *jumptable(,%eax,4)

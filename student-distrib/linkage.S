@@ -78,10 +78,21 @@ systemcallasm:
 
           cmpl $0,%eax
           jle  DEFAULTERROR
-          cmpl $6,%eax
+          cmpl $10,%eax
           jg   DEFAULTERROR
           pushfl
-          pushal
+        #  pushal
+        # Manually push all values of registers
+
+          pushl %edx
+          pushl %ecx
+          pushl %ebx
+
+          pushl %esi
+          pushl %edi
+
+        # %eax not saved here
+
 
           pushl %edx
           pushl %ecx
@@ -93,14 +104,25 @@ systemcallasm:
           jmp  *jumptable(,%eax,4)
 
 DEFAULTERROR:
-    movl $-1,%eax
-    iret
+          movl $-1,%eax
+          iret
 
 RETURN:
-    add $12,%esp
-    popfl
-    popal
-    iret
+        # Tearing down syscall args
+          add $12,%esp
+    /* Popal first and then PopFl */
+    # popal
+    # Restoring all values except %eax
+    # We need %eax for the return value
+         popl %edi
+         popl %esi
+
+         pushl %ebx
+         pushl %ecx
+         pushl %edx
+
+         popfl
+         iret
 jumptable:
    .long halt_handlerasm,execute_handlerasm,read_handlerasm,write_handlerasm,open_handlerasm,close_handlerasm
 .end

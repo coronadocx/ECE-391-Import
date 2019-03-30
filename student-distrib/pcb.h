@@ -3,6 +3,17 @@
 
 #include "sys_call.h"
 
+
+
+
+
+
+
+
+#define FD_ARR_SIZE       8
+
+
+
 otable_t rtctable={rtc_open,rtc_read,rtc_write,rtc_close};
 otable_t filetable={fs_open,fs_red,fs_write,fs_close};
 otable_t directorytable={dir_open,dir_read,dir_write,dir_close};
@@ -12,7 +23,7 @@ otable_t stdout_table={terminal_open,NULL,terminal_write,terminal_close};
 
 
 typedef struct task_struct{
-  file_desc fd_array[8];
+  file_desc fd_array[FD_ARR_SIZE];
   int32_t current_index;
   pcb* parent;
 

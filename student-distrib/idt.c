@@ -289,10 +289,10 @@ idt[SYSTEMCALLNO].present=1;
 idt[SYSTEMCALLNO].dpl=3; // called from user using INT
 idt[SYSTEMCALLNO].seg_selector=KERNEL_CS;
 idt[SYSTEMCALLNO].reserved4=0;
+idt[SYSTEMCALLNO].reserved3=1;
 idt[SYSTEMCALLNO].reserved2=1;
 idt[SYSTEMCALLNO].reserved1=1;
 idt[SYSTEMCALLNO].reserved0=0;
-idt[SYSTEMCALLNO].reserved3=1;
 idt[SYSTEMCALLNO].size=1;
 SET_IDT_ENTRY(idt[SYSTEMCALLNO],systemcallasm)
 

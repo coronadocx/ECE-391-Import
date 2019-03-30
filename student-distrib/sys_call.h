@@ -2,7 +2,9 @@
 #define SYS_CALL_H
 
 
-
+#define PCB_MASK    0xFFE000
+#define END_KMEM    0x800000
+#define PCB_SIZE    0x008000
 
 
 
@@ -21,7 +23,7 @@ typedef struct file_descriptor{
   otable_t* operationstable;
   int32_t inode_num;
   int32_t file_pos;
-  int32_t flags[2];
+  uint8_t flags[4]; // Define file type
 }file_desc;
 
 int32_t halt(uint8_t status);

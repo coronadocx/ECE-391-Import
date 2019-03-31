@@ -78,21 +78,21 @@ void paging_initialize()
 /*
  *  paging_change_process
  *  
- *  INPUT:          p_id - ID of the destination process, (1-6)
+ *  INPUT:          pid - ID of the destination process, (1-6)
  *  OUTPUT:         none
- *  RETURN VALUE:   0 on success, -1 on bad p_id
+ *  RETURN VALUE:   0 on success, -1 on bad pid
  *  SIDE EFFECTS:   Changes physical mapping of v128MB
  *
  */
-uint32_t paging_change_process(uint32_t p_id)
+uint32_t paging_change_process(uint32_t pid)
 {
-    p_id -= 1; // Is 1-indexed (1-6), want 0-indexed (0-5)
+    pid -= 1; // Is 1-indexed (1-6), want 0-indexed (0-5)
 
-    if (p_id < 0 || p_id > 5)
+    if (pid < 0 || pid > 5)
         return -1;
 
     //Point user memory (v128MB) to given process (p8MB+)
-    page_directory[32] = ((USR_START_ADDR + (PROCESS_SIZE*p_id)) | UMEM_OR_MASK);
+    page_directory[32] = ((USR_START_ADDR + (PROCESS_SIZE*pid)) | UMEM_OR_MASK);
 
     //Flush the TLB 
     asm volatile("                      \n\

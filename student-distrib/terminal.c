@@ -67,10 +67,10 @@ void update_cursor(){
  */
 
 
-int write(){
+int write(int32_t fd,void*buf,int32_t nbytes){
   int i=0;
-  for(i=0;terminalbuffer[i]!='\n';i++){
-    putc(terminalbuffer[i]);
+  for(i=0;buf[i]!='\n';i++){
+    putc(buf[i]);
   }
   update_cursor();
   return 0;
@@ -86,17 +86,30 @@ int write(){
  */
 
 
-int read(char* buffer){
-  int i=0;
-  for(i=0;*(buffer+i)!='\n';i++){
-    terminalbuffer[i]=*(buffer+i);
+int read(int32_t fd,void* buffer,int32_t nbytes){
+  int j;
+  while(!newlineflag){
+    int sizetocopy;
+    if(nbytes<numberofchars){
+      sizetocopy=nbytes;
+    }
+    else{
+      sizetocopy=numberofchars;
+    }
+     j=0;
+    while(j<sizetocopy){
+      ((char*)buffer[j])= linebuffer[j];
+      j=j+1;
+    }
+
   }
-  terminalbuffer[i]='\n';
+  newlineflag=0;
+  buffer[j-1]='\n';
   if(i==0){
-  printf("%d byte was read\n",i+1);
+  printf("%d byte was read\n",j);
 }
 else {
-    printf("%d bytes were read\n",i+1);
+    printf("%d bytes were read\n",j);
 }
   write();
   putc('\n');
@@ -114,6 +127,10 @@ else {
  */
 
 
-int open(){
+int open(const uint8_t* filename){
 return 0;
+}
+
+int32_t close(int32_t fd){
+  return 0;
 }

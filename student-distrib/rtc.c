@@ -34,7 +34,7 @@ enable_irq(RTC_IRQ_NO);
  * 	SIDE EFFECT: NONE
  *  NOTE: This does not read the current RTC frequency
  */
-int32_t rtc_read()
+int32_t rtc_read(int32_t fd,void* buf,int32_t nbytes)
 {
   rtc_interrupt_occurred = 0;
 
@@ -53,7 +53,7 @@ int32_t rtc_read()
  *	RETURN VALUE: 0 on success, -1 on failure
  *	SIDE EFFECT: Modifies the RTC
  */
-int32_t rtc_write(int32_t fd,const int32_t * buf, int32_t nbytes)
+int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
 {
 	int32_t tmp;
 	int8_t rate = INIT_RATE;

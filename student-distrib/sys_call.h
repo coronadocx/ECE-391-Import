@@ -1,6 +1,6 @@
 #ifndef SYS_CALL_H
 #define SYS_CALL_H
-
+#include "lib.h"
 
 #define PCB_MASK    0xFFE000
 #define END_KMEM    0x800000

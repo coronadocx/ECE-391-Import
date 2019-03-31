@@ -5,12 +5,13 @@
 #include "pcb.h"
 #include "x86_desc.h"
 #include "paging.h"
-
+#include "types.h"
 extern void contextswitchasm(uint32_t eipval,pcb* current_process);
 
 
 static int8_t args[126];  // 128 characters in keyboard buffer. 1 for \n and 1 for enter  filename can take
 int8_t processes_running[2] = {0,0}
+
 int32_t open(const uint8_t* filename){
 
   if(filename == NULL){
@@ -18,7 +19,6 @@ int32_t open(const uint8_t* filename){
   }
   /* Directory Entry struct */
   dentry_t dir_entry;
-
  /* Error handling if file not found */
   if(read_dentry_by_name(filename,&dir_entry)==-1){
     return -1;
@@ -28,39 +28,94 @@ int32_t open(const uint8_t* filename){
   int inode_num;
 
 /* Copy over filetype and inode number */
-
   file_type = dir_entry.file_type;
   inode_num = dir_entry.inode_num;
 
-
-/* Here, we try to calculate which PCB this system call belongs to
- * We do this by taking the Top of Stack Pointer and ANDing it with a
-   bitmask to get the nearest 8KB aligned page
-   */
-
-  int x;
+  /* Get address of relevant PCB */
   pcb* current_pcb;
-  int curr_pid;
-
-/* Bit-Mask 0xFFE000 should give us an 8KB aligned address of the PCB */
-  curr_pcb = ((pcb*)&x) & (PCB_MASK);
-  curr_pid = (int) ((END_KMEM) - curr_pcb)/PCB_SIZE;
-
- /* Process IDs start at 0 and go till 5 */
-  curr_pid--;
+  curr_pcb = get_pcb_address();
 
 /* If file descriptor array of the PCB has no free index, return -1 */
   if(curr_pcb->current_index == -1)
     return -1;
 
-/* Should continue writing this */
-  curr_pcb->fd_array[(curr_pcb->current_index)]
+/* Traverse through the relevant file descriptor array */
+  int i;
+  for(i = 2; i < 8; i++){
 
+    /* Found an empty file descriptor spot */
+    if(curr_pcb->fd_array[i].flags[IN_USE_INDEX] == 0){
+      break;
+    }
+
+  }
+
+  /* If no file descriptor is free, return -1 */
+  if(i >= 8){
+    return -1;
+  }
+
+  /* Populating the file descriptor struct */
+  /* File operations table pointer */
+  if(file_type == 0){
+    curr_pcb->fd_array[i].operationstable = &rtctable;
+  }
+  else if(file_type == 1){
+    curr_pcb->fd_array[i].operationstable = &directorytable;
+  }
+  else if(file_type == 2){
+    curr_pcb->fd_array[i].operationstable = &filetable;
+  }
+
+  /* Inode */
+  curr_pcb->fd_array[i].inode_num = inode_num;
+
+  /* File position */
+  curr_pcb->fd_array[i].file_pos = 0;
+
+  /* Filling flags */
+  curr_pcb->fd_array[i].flags[IN_USE_INDEX] = 1;
+  curr_pcb->fd_array[i].flags[FTYPE_INDEX] = file_type;
+
+  curr_pcb->fd_array[i].operationstable[FILE_OPS_OPEN](filename);
+
+  return i;
 
 }
 
 int32_t close(int32_t fd){
 
+  /* Check for valid fd */
+    if(fd < 2 || fd > 7)
+      return -1;
+
+
+
+  /* Get address of relevant PCB */
+    pcb* current_pcb;
+    curr_pcb = get_pcb_address();
+
+    /* Check if file descriptor index not in use */
+    if(curr_pcb->fd_array[i].flags[IN_USE_INDEX] == 0)
+      return -1;
+    /* Check if operationstable* is valid */
+    if(curr_pcb->fd_array[i].operationstable == NULL)
+      return -1;
+      /* Else call the close function from the operations table */
+    if((curr_pcb->fd_array[i].operationstable[FILE_OPS_CLOSE](fd)) == -1)
+      return -1;
+
+    /* Populate and mark fd as not in use */
+    curr_pcb->fd_array[i].operationstable = NULL;
+    curr_pcb->fd_array[i].inode_num = 0;
+    curr_pcb->fd_array[i].file_pos = 0;
+    curr_pcb->fd_array[i].flags[IN_USE_INDEX] = 0;
+    curr_pcb->fd_array[i].flags[FTYPE_INDEX] = 0;
+    curr_pcb->fd_array[i].flags[RSVD_INDEX_0] = 0;
+    curr_pcb->fd_array[i].flags[RSVD_INDEX_1] = 0;
+
+    /* Return 0 on success */
+    return 0;
 
 }
 int32_t read(int32_t fd,void*buf,int32_t nbytes){

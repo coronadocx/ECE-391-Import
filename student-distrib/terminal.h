@@ -19,9 +19,10 @@
 #define MASK_LOWER_8 0xFF
 
 int init();
-int read();
-int write();
-int open();
+int read(int32_t fd,void* buffer,int32_t nbytes);
+int write(int32_t fd,void*buf,int32_t nbytes);
+int open(const uint8_t* filename);
+int32_t close(int32_t fd);
 void enable_cursor();
 void update_cursor();
 #endif

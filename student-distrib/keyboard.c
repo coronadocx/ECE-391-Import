@@ -8,6 +8,7 @@ static char chararray[NUM_KEYS]={' ','\0','1','2','3','4','5','6','7','8','9','0
 static char shiftarray[NUMBERSONKEYBOARD]={'~','!','@','#','$','%','^','&','*','('};  // handling if shift is pressed on any num keys on qwerty keyboard
 static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 int numberofchars=0;
+int newlineflag=0;
 
 
 
@@ -43,7 +44,7 @@ void check_input(){
    case ENTER:    {  // adding newline to buffer. This triggers a terminal read
                     putc(chararray[a]);
                     linebuffer[numberofchars]='\n';
-                    read(linebuffer); // call to terminal read.
+                    newlineflag=1;
                     memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH); // reset the linebuffer
                     numberofchars=0; // reset the number of chars read
                     break;

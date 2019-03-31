@@ -12,6 +12,8 @@
 
 #define FD_ARR_SIZE       8
 
+/* Function to get the address of the current pcb */
+extern pcb* get_pcb_address();
 
 
 otable_t rtctable={rtc_open,rtc_read,rtc_write,rtc_close};

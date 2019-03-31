@@ -9,14 +9,19 @@
 #define G_BYTE			(1024*M_BYTE)		//Bytes per gigabyte
 
 #define PAGE_SIZE		1024				//Bytes per page
+#define PROCESS_SIZE    0x400000            //Size of user-process memory
+
 #define KER_START_ADDR	0x400000			//Starting address of the Kernel (1-expage)
 #define VID_START_ADDR	0xB8000				//Starting address of the video memory (8-page)
+#define USR_START_ADDR  0x800000
 
 #define VMEM_PAGE       184
 
+//Masks
 #define VMEM_OR_MASK    0x7
 #define PTABLE_OR_MASK  0x13
 #define KMEM_OR_MASK    0x183
+#define UMEM_OR_MASK    0x83
 
 
 typedef struct {							//Page Entry Struct
@@ -35,7 +40,8 @@ typedef struct {							//Page Entry Struct
     uint8_t is_directory_entry;				//Used to differentiate between page table entries and page data entries
 } pe_t;
 
-extern void paging_initialize(uint32_t * page_directory, uint32_t * page_table_0M_4M);
-extern uint32_t paging_create_entry(pe_t entry);
+extern void paging_initialize();
+extern uint32_t paging_change_process(uint32_t process_id);
+// extern uint32_t paging_create_entry(pe_t entry);
 
 #endif

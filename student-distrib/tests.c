@@ -401,6 +401,47 @@ int testing_fs_read(uint32_t nbytes){
 	return PASS;
 }
 
+/* read_data_test
+ *
+ * Tests to see if read_data returns the right outputr
+ * Inputs: NONE
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ */
+
+int read_data_test(uint32_t inode, uint32_t offset, uint32_t length){
+
+			clear();
+			setposition(0,0);
+			int i;
+			uint32_t* inode_start_addr;
+			int filesize;
+			inode_start_addr = ((unsigned int *)boot_block_addr) + ABS_BLK_OFFSET_TEST;
+			filesize = *(inode_start_addr + (inode)*ABS_BLK_OFFSET_TEST);
+
+			uint8_t buf[filesize];
+			int retval;
+
+			retval = read_data(inode, offset, buf, length);
+
+			if(retval == -1){
+				return FAIL;
+			}
+
+			if(retval > 0)
+			{
+				printf("Could not copy %d bytes: Orig length: %d\n", retval, length);
+			}
+
+
+			printf("Printing the first 200 contents of the buffer\n");
+			for(i = 0; i<200; i++){
+				putc(buf[i]);
+			}
+
+			return PASS;
+		}
+
 
 
 /* Checkpoint 2 tests */
@@ -471,6 +512,48 @@ void launch_tests(unsigned int start ){
  //TEST_OUTPUT("testing_fs_read", testing_fs_read(187));
 // TEST_OUTPUT("testing_fs_close",testing_fs_close());
  //testing_fs_read(187); // if you try to read after you have closed you get an error
+
+// TEST CASE 7
+/* Testing read_data functions */
+
+/* Testing length > 4KB * 1023 */
+ //TEST_OUTPUT("read_data_test", read_data_test(40, 0, 4190209));
+ //TEST_OUTPUT("read_data_test", read_data_test(23, 0, 4190209));
+ //TEST_OUTPUT("read_data_test", read_data_test(50, 0, 4190209));
+ //TEST_OUTPUT("read_data_test", read_data_test(27, 0, 4190209));
+ //TEST_OUTPUT("read_data_test", read_data_test(55, 0, 4190209));
+ //TEST_OUTPUT("read_data_test", read_data_test(42, 0, 4190209));
+ //TEST_OUTPUT("read_data_test", read_data_test(9, 0, 4190209));
+ //TEST_OUTPUT("read_data_test", read_data_test(25, 0, 4190209));
+
+/* Testing offset+length > 4KB * 1023 */
+ //TEST_OUTPUT("read_data_test", read_data_test(40, 1000, 4190000));
+ //TEST_OUTPUT("read_data_test", read_data_test(23, 1000, 4190000));
+ //TEST_OUTPUT("read_data_test", read_data_test(50, 1000, 4190000));
+ //TEST_OUTPUT("read_data_test", read_data_test(27, 1000, 4190000));
+ //TEST_OUTPUT("read_data_test", read_data_test(55, 1000, 4190000));
+ //TEST_OUTPUT("read_data_test", read_data_test(42, 1000, 4190000));
+ //TEST_OUTPUT("read_data_test", read_data_test(9, 1000, 4190000));
+ //TEST_OUTPUT("read_data_test", read_data_test(25, 1000, 4190000));
+
+ /* Testing length > filesize */
+ //TEST_OUTPUT("read_data_test", read_data_test(40, 0, 6500));
+ //TEST_OUTPUT("read_data_test", read_data_test(23, 0, 6000));
+ //TEST_OUTPUT("read_data_test", read_data_test(50, 0, 7000));
+ //TEST_OUTPUT("read_data_test", read_data_test(27, 0, 8038));
+ //TEST_OUTPUT("read_data_test", read_data_test(55, 0, 40000));
+ //TEST_OUTPUT("read_data_test", read_data_test(42, 0, 6000));
+ //TEST_OUTPUT("read_data_test", read_data_test(9, 0, 5500));
+ //TEST_OUTPUT("read_data_test", read_data_test(25, 0, 5450));
+ //TEST_OUTPUT("read_data_test", read_data_test(38, 0, 200));
+ //TEST_OUTPUT("read_data_test", read_data_test(44, 0, 5300));
+ //TEST_OUTPUT("read_data_test", read_data_test(5, 0, 5350));
+ //TEST_OUTPUT("read_data_test", read_data_test(3, 0, 5200));
+ //TEST_OUTPUT("read_data_test", read_data_test(53, 0, 30));
+
+
+
+
 
 // ERROR HANDLING
 

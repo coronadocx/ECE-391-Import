@@ -81,4 +81,7 @@ extern int32_t dir_read();
 /* return the size of a particular file */ 
 extern int32_t get_filesize(uint32_t inode);
 
+/* Closes the directory */
+extern int32_t dir_close();
+
 #endif

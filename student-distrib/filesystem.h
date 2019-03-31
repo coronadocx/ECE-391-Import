@@ -78,5 +78,7 @@ extern int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t
 
 /* Reads and lists the contents of the directory on the screen */
 extern int32_t dir_read();
+/* return the size of a particular file */ 
+extern int32_t get_filesize(uint32_t inode);
 
 #endif

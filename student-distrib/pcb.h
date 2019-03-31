@@ -24,8 +24,9 @@ otable_t stdout_table={terminal_open,NULL,terminal_write,terminal_close};
 
 typedef struct task_struct{
   file_desc fd_array[FD_ARR_SIZE];
-  int32_t current_index;
   pcb* parent;
+  int32_t parent_esp;
+  int32_t parent_ebp;
 
 }pcb;
 

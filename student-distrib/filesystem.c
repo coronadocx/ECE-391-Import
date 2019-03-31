@@ -421,3 +421,32 @@ int dir_read(){
 
 			return 0;
 		}
+
+
+/* get_filesize
+ *
+ * Gets the filesize from the inode number
+ * Inputs: Inode number
+ * Outputs: Returns 0 on success, else returns -1
+ * Side Effects: Prints the contents of the directory on the screen along with
+ *  file names, types and sizes
+*/
+int32_t get_filesize(uint32_t inode)
+{
+
+      if(boot_block_addr == NULL)
+      return -1;
+
+      if(inode > NUM_INODES)
+        return -1;
+
+      uint32_t* inode_start_addr;
+      int filesize;
+      inode_start_addr = ((unsigned int *)boot_block_addr) + ABS_BLK_OFFSET;
+      filesize = *(inode_start_addr + (inode)*ABS_BLK_OFFSET);
+
+      return filesize;
+
+
+
+}

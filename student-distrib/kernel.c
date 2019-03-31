@@ -144,16 +144,12 @@ void entry(unsigned long magic, unsigned long addr) {
       module_t* mod = (module_t*)mbi->mods_addr;
       unsigned int start=(unsigned int) mod->mod_start;
       printf("%d",start);
-   set_mod_start((unsigned int) mod->mod_start);
+    set_mod_start((unsigned int) mod->mod_start);
+
     //Initialize paging
-    static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
-    static uint32_t page_table_0M_4M[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
-
-    paging_initialize(page_directory, page_table_0M_4M);
-
+    paging_initialize();
 
     /*initialize the idt */
-  //  clear();
     initialize_IDT();
 
     enable_cursor();

@@ -1,6 +1,10 @@
 #include "paging.h"
 #include "lib.h"
 
+static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
+static uint32_t page_table_0M_4M[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
+
+
 /*
  * 	initialize_paging
  *
@@ -12,7 +16,7 @@
  *				  Populates 1023 page tables (the last one is for the kernel)
  *
  */
-void paging_initialize(uint32_t * page_directory, uint32_t * page_table_0M_4M)
+void paging_initialize()
 {
 	uint32_t i;
 	//NOTE Only allocate ram when the system actually needs it --> Don't make 4MB of page tables, dummy
@@ -68,4 +72,37 @@ void paging_initialize(uint32_t * page_directory, uint32_t * page_table_0M_4M)
     	: "r"(page_directory)
       : "eax","memory", "cc"
     );
+}
+
+
+/*
+ *  paging_change_process
+ *  
+ *  INPUT:          p_id - ID of the destination process, (1-6)
+ *  OUTPUT:         none
+ *  RETURN VALUE:   0 on success, -1 on bad p_id
+ *  SIDE EFFECTS:   Changes physical mapping of v128MB
+ *
+ */
+uint32_t paging_change_process(uint32_t p_id)
+{
+    p_id -= 1; // Is 1-indexed (1-6), want 0-indexed (0-5)
+
+    if (p_id < 0 || p_id > 5)
+        return -1;
+
+    //Point user memory (v128MB) to given process (p8MB+)
+    page_directory[32] = ((USR_START_ADDR + (PROCESS_SIZE*p_id)) | UMEM_OR_MASK);
+
+    //Flush the TLB 
+    asm volatile("                      \n\
+        movl    %%cr3, %%eax            \n\
+        movl    %%eax, %%cr3            \n\
+        "
+        :
+        :
+        :"eax", "cc"
+    );
+
+    return 0;
 }

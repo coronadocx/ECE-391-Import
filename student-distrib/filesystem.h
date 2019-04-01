@@ -54,10 +54,10 @@ extern int32_t fs_open(int8_t* filename);
 extern int32_t fs_close();
 
 /* populates the buffer based on the file descriptor */
-extern int32_t fs_read(void* buf, int32_t nbytes);
+extern int32_t fs_read(int32_t fd, void* buf, int32_t nbytes);
 
 /* Read only file system. just does error checking */
-extern int32_t fs_write(void* buf, int32_t nbytes);
+extern int32_t fs_write(int32_t fd, void* buf, int32_t nbytes);
 
 /* Searches for a directory entry by name, copies over elements and returns a pointer to the directory entry */
 extern int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry);
@@ -69,11 +69,14 @@ extern int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);
 extern int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
 
 /* Reads and lists the contents of the directory on the screen */
-extern int32_t dir_read();
+extern int32_t dir_read(int fd, void* buf, int32_t nbytes);
+/* Closes the directory */
+extern int32_t dir_close();
+
+
+
 /* return the size of a particular file */
 extern int32_t get_filesize(uint32_t inode);
 
-/* Closes the directory */
-extern int32_t dir_close();
 
 #endif

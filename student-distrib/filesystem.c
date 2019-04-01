@@ -2,6 +2,7 @@
 #include "filesystem.h"
 #include "multiboot.h"
 #include "lib.h"
+#include "pcb.h"
 
 
 /* Number of Directory Entries */
@@ -70,22 +71,24 @@ int32_t fs_close(){
  *   SIDE EFFECTS: populates th buffer
  */
 
-extern int32_t fs_read(void* buf, int32_t nbytes){
-  /* If <= 0 bytes to be read, invalid input */
-  if(nbytes <= 0)
-    return -1;
+extern int32_t fs_read(int32_t fd, void* buf, int32_t nbytes){
+  /* If 0 bytes to be read, invalid input */
+  if(nbytes == 0)
+    return 0;
 
   if(buf == NULL)
     return -1;
 
-   if( read_data(a.inode_num,0,(uint8_t*) buf,nbytes)==-1){
-     return -1;
-   }
+  /* Getting current pcb address */
+  pcb* curr_pcb;
+  curr_pcb = get_pcb_address();
 
-      /* Fill in the rest later */
+  /* Calling the read_data function and updating file_position*/
+  int retval;
+  retval = read_data(curr_pcb->fd_array[fd].inode_num, curr_pcb->fd_array[fd].file_pos,(uint8_t*) buf,nbytes);
+  curr_pcb->fd_array[fd].file_pos += retval;
 
-
-return 0;
+  return retval;
 }
 
 /*
@@ -96,16 +99,12 @@ return 0;
  *   RETURN VALUE:0 for success -1 for error
  *   SIDE EFFECTS: none
  */
-extern int32_t fs_write(void* buf, int32_t nbytes){
+extern int32_t fs_write(int fd, void* buf, int32_t nbytes){
     /* If <= 0 bytes to be written, return success */
     if(nbytes == 0)
       return 0;
 
-    /* Read only filesystem, but NULL ptr handling */
-    if(buf == NULL)
-        return -1;
-
-    /* It is a read only filesystem */
+    /* It is a read only filesystem, handles null pointer as well */
     return -1;
 
 };
@@ -351,8 +350,8 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   if(start_dblock == end_dblock){
     memcpy(buf, ((uint8_t*)start_dblock_addr) + (offset % FS_BLOCK_SIZE), len);
 
-    /* Return all the bytes that could not be copied */
-    return (length - len);
+    /* Return all the bytes that were copied */
+    return len;
   }
 
 /* If reading has to be done over multiple dblocks */
@@ -402,8 +401,8 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
     return -1;
   }
 
-  /* Return 0  on success, and number of bytes that could not be copied on failure */
-  return (length - len);
+  /* Return 0  on success, and number of bytes that were copied, otherwise */
+  return len;
 
 
 }
@@ -417,12 +416,12 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
  * Side Effects: Prints the contents of the directory on the screen along with
  *  file names, types and sizes
  */
-int dir_read(){
+int dir_read(int fd, void* buf, int32_t nbytes){
 
 			if(boot_block_addr == NULL)
 			return -1;
 
-			clear();
+      clear();
 			setposition(0,0);
 
 			int dir_entries;

@@ -85,8 +85,8 @@ int32_t open(const uint8_t* filename){
 
 // ASK TA HOW TO CALL THE FUNCTION
  int32_t (*fun_ptr)(const uint8_t*);
- fun_ptr = (curr_pcb->fd_array[i].operationstable)[0];
-(*fun_ptr)(filename);
+ fun_ptr = (curr_pcb->fd_array[i].operationstable)[FILE_OPS_OPEN];
+ (*fun_ptr)(filename);
   //curr_pcb->fd_array[i].operationstable[FILE_OPS_OPEN](filename);
 
   return i;
@@ -111,6 +111,10 @@ int32_t close(int32_t fd){
     if(curr_pcb->fd_array[fd].operationstable == NULL)
       return -1;
       /* Else call the close function from the operations table */
+
+    int32_t (*fun_ptr)(int32_t);
+    fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_CLOSE];
+    (*fun_ptr)(fd);
     //if((curr_pcb->fd_array[fd].operationstable[FILE_OPS_CLOSE](fd)) == -1)
       //return -1;
 
@@ -127,11 +131,65 @@ int32_t close(int32_t fd){
     return 0;
 
 }
+
+
+
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
+
   terminal_read(fd,buf,nbytes);
-return 0;
+
+  if(buf == NULL)
+    return -1;
+
+  if(fd == 1)
+    return 0;
+
+  /* Get address of relevant PCB */
+  pcb* curr_pcb;
+  curr_pcb = get_pcb_address();
+
+  /* File needs to be in use for read */
+  if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == 0)
+    return -1;
+
+  /* Function pointer points to read of file operations table of fd*/
+  int32_t (*fun_ptr)(int32_t, void*, int32_t);
+  fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_READ];
+
+
+  int file_type;
+	int filesize;
+	int inode_num;
+    /* For rtc_read and terminal read */
+  if(file_type == 0 || fd == 0){
+    return (*fun_ptr)(fd, buf, nbytes);
+   }
+
+
+   /* Get filesize from the inode */
+
+	file_type = (int)curr_pcb->fd_array[fd].flags[FTYPE_INDEX];
+  inode_num = curr_pcb->fd_array[fd].inode_num;
+  filesize = get_filesize(inode_num);
+
+  /* Beyond this point, we would only need to handle reads for files
+	 * and directories
+   */
+
+	 /* If file position is greater than filesize, return 0 */
+	if(curr_pcb->fd_array[fd].file_pos >= filesize)
+	 return 0;
+
+	/* Handles file and directory reads */
+	int retval;
+	retval = (*fun_ptr)(fd, buf, nbytes);
+
+  return retval;
 
 }
+
+
+
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
   terminal_write(fd,buf,nbytes);
 return 0;

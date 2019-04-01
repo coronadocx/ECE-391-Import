@@ -235,7 +235,7 @@ int read_by_index_test(int index){
 int dir_read_test(){
 
 
-	if(dir_read() == 0){
+	if(dir_read(0, 0, 0) == 0){
 		return PASS;
 	}
 
@@ -388,7 +388,7 @@ int testing_fs_close(){
 int testing_fs_read(uint32_t nbytes){
 	int i;
 	uint8_t  buf[nbytes];
-	if(fs_read(buf,nbytes)==-1){
+	if(fs_read(3, buf,nbytes)==-1){
 	 printf("error reading");
 	 return FAIL;
 	}
@@ -430,7 +430,7 @@ int read_data_test(uint32_t inode, uint32_t offset, uint32_t length){
 
 			if(retval > 0)
 			{
-				printf("Could not copy %d bytes: Orig length: %d\n", retval, length);
+				printf("Only copied %d bytes: Orig length: %d\n", retval, length);
 			}
 
 
@@ -460,7 +460,7 @@ void launch_tests(unsigned int start ){
 
 
 	 // TEST CASE 1 LIST ALL FILES IN DIRECTORY
-	TEST_OUTPUT("dir_read_test", dir_read_test());
+	//TEST_OUTPUT("dir_read_test", dir_read_test());
 
 	 // TEST CASE 2 READ FROM FILES
 	// TEST_OUTPUT("read_data_fromfile", read_data_fromfile("frame0.txt"));

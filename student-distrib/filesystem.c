@@ -1,5 +1,7 @@
 
 #include "filesystem.h"
+#include "multiboot.h"
+#include "lib.h"
 
 
 /* Number of Directory Entries */
@@ -435,7 +437,7 @@ int dir_read(){
 			num_inodes  = *(boot_block_addr + BB_INODE_OFFSET);
 			num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
 
-			inode_start_addr = boot_block_addr + ABS_BLK_OFFSET_TEST;
+			inode_start_addr = boot_block_addr + ABS_BLK_OFFSET;
 
 			for(i = 0; i < dir_entries; i++){
 				if(read_dentry_by_index(i, &d) == -1){
@@ -444,7 +446,7 @@ int dir_read(){
 
 				printf("File Name: %s, " , d.fname);
 				printf("File Type: %u, ", d.file_type);
-				file_size = *(inode_start_addr + (d.inode_num)*ABS_BLK_OFFSET_TEST);
+				file_size = *(inode_start_addr + (d.inode_num)*ABS_BLK_OFFSET);
 				printf("File Size: %d\n", file_size);
 
 			}

@@ -2,7 +2,7 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-#include "types.h"
+#include "lib.h"
 
 #define K_BYTE			1024				//Bytes per kilobyte
 #define M_BYTE			(1024*K_BYTE)		//Bytes per megabyte
@@ -21,10 +21,10 @@
 #define VMEM_OR_MASK    0x7
 #define PTABLE_OR_MASK  0x13
 #define KMEM_OR_MASK    0x183
-#define UMEM_OR_MASK    0x83
+#define UMEM_OR_MASK    0x87
 
 
-typedef struct {							//Page Entry Struct
+typedef struct pg_struct {							//Page Entry Struct
     uint32_t base_addr;
     uint8_t avail;
     uint8_t g;

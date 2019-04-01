@@ -4,33 +4,44 @@
 *  upon encountering an interrupt
 */
 
-#include "x86_desc.h"
-#include "sys_call.h"
+.text
+
 /* Defining global keyboard and rtc handlers */
 .global keyboardhandlerasm
 .global rtchandlerasm
 .global systemcallasm
 .global contextswitchasm
 
+
 contextswitchasm:
-    pushl %ebp
-    movl %esp,%ebp
+    xorl %edx,%edx
+    movl 8(%esp),%edx
+    xorl %ecx,%ecx
+    movl %esp,%ecx
 
     /* code to save parent process stuff */
+    movl $0x002B, %eax
+    movw %ax, %ds
+    movw %ax, %es
+    movw %ax, %fs
+    movw %ax, %gs
+
     pushl %ebp
-    pushl %esp
-    pushl 12(%ebp)
+    pushl %ecx
+    pushl %edx
     call save_parent_registers
     add $12,%esp
 
+    xorl %edx,%edx
+    movl 4(%esp),%edx
 
-    pushl $USER_DS
-    pushl %esp
+    pushl $0x002B
+    pushl $0x83ffffc
     pushfl
-    pushl $USER_CS
-    pushl 8(%ebp)
+    pushl $0x0023
+    pushl %edx
 
-    leave
+
     iret
 
 
@@ -142,9 +153,9 @@ RETURN:
          popl %edi
          popl %esi
 
-         pushl %ebx
-         pushl %ecx
-         pushl %edx
+         popl %ebx
+         popl %ecx
+         popl %edx
 
          popfl
          iret

@@ -1,36 +1,51 @@
 #ifndef PCB_H
 #define PCB_H
 
-#include "sys_call.h"
+
+
+#include "types.h"
+#include "rtc.h"
+#include "filesystem.h"
+#include "terminal.h"
 
 
 
 
-
-
-
-
+#define PCB_MASK    0xFFE000
 #define FD_ARR_SIZE       8
 
 /* Function to get the address of the current pcb */
-extern pcb* get_pcb_address();
+
+typedef struct operation_table{
+ int32_t (*open)(int8_t* filename);
+ int32_t (*read)(int32_t fd,void* buf, int32_t nbytes);
+ int32_t (*write)(int32_t fd,const void* buf, int32_t nbytes);
+ int32_t (*close)(int32_t fd);
+
+}otable_t;
 
 
-otable_t rtctable={rtc_open,rtc_read,rtc_write,rtc_close};
-otable_t filetable={fs_open,fs_red,fs_write,fs_close};
-otable_t directorytable={dir_open,dir_read,dir_write,dir_close};
-otable_t stdin_table={terminal_open,terminal_read,NULL,terminal_close};
-otable_t stdout_table={terminal_open,NULL,terminal_write,terminal_close};
+/* struct for a file descriptor */
+
+typedef struct file_descriptor{
+  void** operationstable;
+  int32_t inode_num;
+  int32_t file_pos;
+  uint8_t flags[4]; // Define file type
+}file_desc;
+
+
 
 
 
 typedef struct task_struct{
   file_desc fd_array[FD_ARR_SIZE];
-  pcb* parent;
+  struct task_struct* parent;
   int32_t parent_esp;
   int32_t parent_ebp;
 
 }pcb;
+ pcb* get_pcb_address();
 
 
 

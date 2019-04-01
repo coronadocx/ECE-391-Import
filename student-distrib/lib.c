@@ -3,8 +3,9 @@
 
 #include "lib.h"
 #include "i8259.h"
-#include "linkage.h"
 #include "terminal.h"
+
+
 
 
 #define VIDEO       0xB8000

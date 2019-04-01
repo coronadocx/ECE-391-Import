@@ -340,7 +340,7 @@ int testing_rtc_driver(int32_t rate){
 	}
 
 	while(1){
-		a = rtc_read();
+	//	a = rtc_read();
 		writetovideomem();
 	}
 

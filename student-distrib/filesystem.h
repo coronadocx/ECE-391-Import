@@ -31,16 +31,8 @@
 
 
 /* Change these includes to what is necessary */
-#include "multiboot.h"
-#include "x86_desc.h"
-#include "lib.h"
-#include "i8259.h"
-#include "debug.h"
-#include "tests.h"
-#include "idt.h"
-#include "keyboard.h"
-#include "rtc.h"
-#include "paging.h"
+#include "types.h"
+
 
 
 /* Struct for a Directory Entry */
@@ -78,7 +70,7 @@ extern int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t
 
 /* Reads and lists the contents of the directory on the screen */
 extern int32_t dir_read();
-/* return the size of a particular file */ 
+/* return the size of a particular file */
 extern int32_t get_filesize(uint32_t inode);
 
 /* Closes the directory */

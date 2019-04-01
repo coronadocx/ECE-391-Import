@@ -1,5 +1,5 @@
 /* c file for rtc */
-#include "lib.h"
+
 #include "i8259.h"
 #include "rtc.h"
 
@@ -58,18 +58,19 @@ int32_t rtc_write(int32_t fd,const void * buf, int32_t nbytes)
 	int32_t tmp;
 	int8_t rate = INIT_RATE;
 	int8_t prev;
+  int32_t* buf2= (int32_t*) buf;
 
 	//Make sure input is valid
-	if ( buf == NULL) {
+	if ( buf2 == NULL) {
 		return -1;
 	}
-  else if(*buf & ((*buf)-1) || *buf > MAX_FREQ){
+  else if(*((int32_t*)buf2) & ((*buf2)-1) || *buf2 > MAX_FREQ){
     return -1;
   }
 
 	// Calculate the RTC rate setting
 	tmp = MAX_FREQ;
-	while (tmp != *buf){
+	while (tmp != *buf2){
 		rate++;
 		tmp = tmp >> 1;
 	}
@@ -117,6 +118,7 @@ int32_t rtc_close(int32_t fd)
 {
 	return 0;
 }
+
 
 
 /*

@@ -2,7 +2,7 @@
 #ifndef TERMINAL_H
 #define TERMINAL_H
 
-
+#include "types.h"
 #define CURSOR_START 0
 #define CURSOR_END 15
 
@@ -19,10 +19,10 @@
 #define MASK_LOWER_8 0xFF
 
 int init();
-int read(int32_t fd,void* buffer,int32_t nbytes);
-int write(int32_t fd,void*buf,int32_t nbytes);
-int open(const uint8_t* filename);
-int32_t close(int32_t fd);
+int terminal_read(int32_t fd,void* buffer,int32_t nbytes);
+int terminal_write(int32_t fd,void*buf,int32_t nbytes);
+int terminal_open(const uint8_t* filename);
+int32_t terminal_close(int32_t fd);
 void enable_cursor();
 void update_cursor();
 #endif

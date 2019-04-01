@@ -3,8 +3,6 @@
 #define KEYBOARD_H
 
 
-void check_input();
-void init_keyboard();
 
 #define KEYBOARD_CMD_PORT  0x60
 #define KEYBOARD_BUFFER_LENGTH 128
@@ -24,4 +22,11 @@ void init_keyboard();
 #define ASCII9 57
 #define NUMBERSONKEYBOARD 10
 
+
+void check_input();
+void init_keyboard();
+int return_newline_flag();
+int return_numberofchars();
+char* returnkeyboardbufferaddress();
+void set_newline_flag(int a );
 #endif

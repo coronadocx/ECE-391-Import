@@ -1,8 +1,8 @@
 /*.c file for the terminal */
 
 #include "keyboard.h"
-#include "lib.h"
 #include "terminal.h"
+#include "lib.h"
 static char terminalbuffer[KEYBOARD_BUFFER_LENGTH];
 
 
@@ -67,10 +67,11 @@ void update_cursor(){
  */
 
 
-int write(int32_t fd,void*buf,int32_t nbytes){
+int terminal_write(int32_t fd,void*buf,int32_t nbytes){
   int i=0;
-  for(i=0;buf[i]!='\n';i++){
-    putc(buf[i]);
+  int8_t* buf2= (int8_t*)buf;
+  for(i=0;buf2[i]!='\0';i++){
+    putc(buf2[i]);
   }
   update_cursor();
   return 0;
@@ -86,33 +87,40 @@ int write(int32_t fd,void*buf,int32_t nbytes){
  */
 
 
-int read(int32_t fd,void* buffer,int32_t nbytes){
+int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
   int j;
+    int8_t* buf2= (int8_t*)buffer;
+    int newlineflag=return_newline_flag();
+    char* linebuffer = returnkeyboardbufferaddress();
+      int sizetocopy;
   while(!newlineflag){
-    int sizetocopy;
-    if(nbytes<numberofchars){
+    newlineflag=return_newline_flag();
+    linebuffer =returnkeyboardbufferaddress();
+
+    if(nbytes<return_numberofchars()){
       sizetocopy=nbytes;
     }
     else{
-      sizetocopy=numberofchars;
+      sizetocopy=return_numberofchars();
     }
-     j=0;
+    j=0;
     while(j<sizetocopy){
-      ((char*)buffer[j])= linebuffer[j];
+      (buf2[j])= *(linebuffer+j);
       j=j+1;
     }
 
   }
+    //memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
+  set_newline_flag(0);
   newlineflag=0;
-  buffer[j-1]='\n';
-  if(i==0){
-  printf("%d byte was read\n",j);
+  buf2[j++]='\n';
+  if(sizetocopy==1){
+  printf("%d byte was read\n",sizetocopy);
 }
 else {
-    printf("%d bytes were read\n",j);
+    printf("%d bytes were read\n",sizetocopy);
 }
-  write();
-  putc('\n');
+  terminal_write(1,buf2,j);
   update_cursor();
 
   return 0;
@@ -127,10 +135,10 @@ else {
  */
 
 
-int open(const uint8_t* filename){
+int terminal_open(const uint8_t* filename){
 return 0;
 }
 
-int32_t close(int32_t fd){
+int32_t terminal_close(int32_t fd){
   return 0;
 }

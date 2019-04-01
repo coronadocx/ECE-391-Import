@@ -1,5 +1,5 @@
 #include "paging.h"
-#include "lib.h"
+
 
 static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
 static uint32_t page_table_0M_4M[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
@@ -77,7 +77,7 @@ void paging_initialize()
 
 /*
  *  paging_change_process
- *  
+ *
  *  INPUT:          pid - ID of the destination process, (1-6)
  *  OUTPUT:         none
  *  RETURN VALUE:   0 on success, -1 on bad pid
@@ -94,7 +94,7 @@ uint32_t paging_change_process(uint32_t pid)
     //Point user memory (v128MB) to given process (p8MB+)
     page_directory[32] = ((USR_START_ADDR + (PROCESS_SIZE*pid)) | UMEM_OR_MASK);
 
-    //Flush the TLB 
+    //Flush the TLB
     asm volatile("                      \n\
         movl    %%cr3, %%eax            \n\
         movl    %%eax, %%cr3            \n\

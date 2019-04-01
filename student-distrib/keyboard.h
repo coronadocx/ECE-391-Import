@@ -25,8 +25,5 @@
 
 void check_input();
 void init_keyboard();
-int return_newline_flag();
-int return_numberofchars();
-char* returnkeyboardbufferaddress();
-void set_newline_flag(int a );
+
 #endif

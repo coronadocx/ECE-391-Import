@@ -135,8 +135,10 @@ int32_t close(int32_t fd){
 
 
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
-
-  terminal_read(fd,buf,nbytes);
+ if(fd==0){
+  return terminal_read(fd,buf,nbytes);
+}
+else {
 
   if(buf == NULL)
     return -1;
@@ -185,7 +187,7 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 	retval = (*fun_ptr)(fd, buf, nbytes);
 
   return retval;
-
+}
 }
 
 
@@ -210,6 +212,7 @@ for(;command[i]!=' ' && command[i]!='\n' && command[i]!='\0';i++)
 {
 buf[i]=command[i];
 }
+buf[i]='\0';
 i=i+1; // accounting for the space
 /*
 for(;command[i]!='\n';i++){

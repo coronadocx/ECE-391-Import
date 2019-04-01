@@ -25,4 +25,5 @@ int terminal_open(const uint8_t* filename);
 int32_t terminal_close(int32_t fd);
 void enable_cursor();
 void update_cursor();
+void set_terminal_buffer(uint8_t* buf,uint32_t nchars);
 #endif

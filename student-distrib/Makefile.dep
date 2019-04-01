@@ -1,7 +1,8 @@
 boot.o: boot.S multiboot.h x86_desc.h types.h
 linkage.o: linkage.S
 x86_desc.o: x86_desc.S x86_desc.h types.h
-filesystem.o: filesystem.c filesystem.h types.h multiboot.h lib.h
+filesystem.o: filesystem.c filesystem.h types.h multiboot.h lib.h pcb.h \
+  rtc.h terminal.h
 i8259.o: i8259.c i8259.h lib.h types.h
 idt.o: idt.c idt.h x86_desc.h types.h lib.h keyboard.h linkage.h pcb.h \
   rtc.h filesystem.h terminal.h i8259.h

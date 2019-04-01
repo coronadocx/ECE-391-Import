@@ -4,7 +4,7 @@
 
 #define PCB_MASK    0xFFE000
 #define END_KMEM    0x800000
-#define PCB_SIZE    0x008000
+#define PCB_SIZE    0x002000
 #define KERNEL_MEM_SIZE 0x2000
 
 #define IN_USE_INDEX  0

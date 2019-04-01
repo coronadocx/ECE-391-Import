@@ -279,9 +279,9 @@ paging_change_process(current_pid);
 read_data(dir_entry.inode_num,0,(uint8_t*) 0x8048000,0x400000);
 /* Bit-Mask 0xFFE000 should give us an 8KB aligned address of the PCB */
 parent_pcb = get_pcb_address();
-parent_pid = (int) ((END_KMEM) - (int) parent_pcb)/PCB_SIZE;
+parent_pid = (END_KMEM - (unsigned int) parent_pcb)/(PCB_SIZE) - 1;
 /* this part is to create the pcb */
-pcb* current_process=(pcb*) END_KMEM-(current_pid+1)*KERNEL_MEM_SIZE; // start at 8MB-2*8kb
+pcb* current_process=(pcb*)((int)END_KMEM-(current_pid+1)*PCB_SIZE); // start at 8MB-2*8kb
 
 if(current_pid!=1){
   current_process->parent =parent_pcb ;

@@ -41,8 +41,10 @@ typedef struct file_descriptor{
 typedef struct task_struct{
   file_desc fd_array[FD_ARR_SIZE];
   struct task_struct* parent;
+  int32_t process_id;
   int32_t parent_esp;
   int32_t parent_ebp;
+  int32_t parent_process_id;
 
 }pcb;
  pcb* get_pcb_address();

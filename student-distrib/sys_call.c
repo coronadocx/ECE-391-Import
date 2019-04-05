@@ -18,7 +18,7 @@ void* filetable[4]={&fs_open,&fs_read,&fs_write,&fs_close};
 void* directorytable[4]={&dir_open,&dir_read,&dir_write,&dir_close};
 void* stdin_table[4]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[4]={&terminal_open,NULL,&terminal_write,&terminal_close};
-int8_t processes_running[2] = {0,0};
+int8_t processes_running[6] = {0,0,0,0,0,0};
 
 int32_t open(const uint8_t* filename){
 
@@ -259,7 +259,7 @@ int eip_val = 0;
 /* create pcb and set parent pcb */
 i=1;
 uint32_t current_pid=-1;
-while(i<3){
+while(i<7){
   if(processes_running[i-1]==0){
      current_pid=i;
      processes_running[i-1]=1;
@@ -287,6 +287,7 @@ pcb* current_process=(pcb*)((int)END_KMEM-(current_pid+1)*PCB_SIZE); // start at
 
 if(current_pid!=1){
   current_process->parent =parent_pcb ;
+  current_process->parent_process_id=parent_pid;
 }
 else{
   current_process->parent=NULL;
@@ -303,6 +304,8 @@ current_process->fd_array[1].operationstable=stdout_table;
 current_process->fd_array[1].inode_num=-1;
 current_process->fd_array[1].file_pos=0;
 current_process->fd_array[1].flags[0]=1;
+
+current_process->process_id=current_pid;
 
 i=2;
 /* sets the other file descriptors to not be in use */
@@ -326,6 +329,28 @@ return 0;
 }
 
 int32_t halt(uint8_t status){
+  /* get the address of the process to halt */
+  pcb* curr_pcb;
+  curr_pcb = get_pcb_address();
+  processes_running[curr_pcb->process_id-1]=0;
+  uint32_t parentid=curr_pcb->parent_process_id;
+  int i=0;
+  while(i<8){
+    if(curr_pcb->fd_array[i].flags[0]==1){
+      close(i);
+    }
+    i=i+1;
+  }
+
+  paging_change_process(parentid);
+  tss.ss0=KERNEL_DS; // not sure
+  tss.esp0= END_KMEM - (parentid)*KERNEL_MEM_SIZE;
+
+  restoreparent(curr_pcb->parent_ebp,curr_pcb->parent_esp);
+
+
+
+
  return 0;
 }
 

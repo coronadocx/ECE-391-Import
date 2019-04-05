@@ -11,7 +11,7 @@
 .global rtchandlerasm
 .global systemcallasm
 .global contextswitchasm
-
+.global restoreparent
 
 contextswitchasm:
     xorl %edx,%edx
@@ -44,7 +44,13 @@ contextswitchasm:
 
     iret
 
+    ret
 
+restoreparent:
+     movl 4(%esp),%ebp
+     movl 8(%esp),%esp
+
+     ret
 
 /* keyboardhandlerasm
 * INPUTS -- none

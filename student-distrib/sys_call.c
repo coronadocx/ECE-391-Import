@@ -15,7 +15,7 @@ static int8_t args[126];  // 128 characters in keyboard buffer. 1 for \n and 1 f
 // rtctable.(*open)("hello") = 0;
 void* rtctable[4]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
 void* filetable[4]={&fs_open,&fs_read,&fs_write,&fs_close};
-void* directorytable[4]={NULL,&dir_read,NULL,&dir_close};
+void* directorytable[4]={&dir_open,&dir_read,&dir_write,&dir_close};
 void* stdin_table[4]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[4]={&terminal_open,NULL,&terminal_write,&terminal_close};
 int8_t processes_running[2] = {0,0};
@@ -179,7 +179,7 @@ else {
    */
 
 	 /* If file position is greater than filesize, return 0 */
-	if(curr_pcb->fd_array[fd].file_pos >= filesize)
+	if(file_type==2 && curr_pcb->fd_array[fd].file_pos >= filesize)
 	 return 0;
 
 	/* Handles file and directory reads */
@@ -193,7 +193,9 @@ else {
 
 
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
+  if(fd==1){
   terminal_write(fd,buf,nbytes);
+}
 return 0;
 }
 

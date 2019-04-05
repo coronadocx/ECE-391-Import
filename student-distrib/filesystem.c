@@ -41,7 +41,7 @@ int32_t set_mod_start(unsigned int mod_start){
  *   RETURN VALUE: 0 for success -1 for error
  *   SIDE EFFECTS: sets global dentry_t structure based on filename
  */
-extern int32_t fs_open(int8_t* filename){
+extern int32_t fs_open(const int8_t* filename){
   if(read_dentry_by_name(filename,&a)==-1){
     return -1;
   }
@@ -416,13 +416,10 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
  * Side Effects: Prints the contents of the directory on the screen along with
  *  file names, types and sizes
  */
-int dir_read(int fd, void* buf, int32_t nbytes){
+extern int dir_read(int fd, void* buf, int32_t nbytes){
 
 			if(boot_block_addr == NULL)
 			return -1;
-
-      clear();
-			setposition(0,0);
 
 			int dir_entries;
 			int num_inodes;
@@ -492,7 +489,14 @@ int32_t get_filesize(uint32_t inode)
      *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints
      */
 
-    int32_t dir_close(){
+extern  int32_t dir_close(){
         a=b;
         return 0;
     }
+
+extern int32_t dir_open(const int8_t* filename){
+  return 0;
+}
+extern int32_t dir_write(int32_t fd,const void* buf,int32_t nbytes){
+  return 0;
+}

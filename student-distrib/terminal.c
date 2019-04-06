@@ -4,7 +4,7 @@
 #include "terminal.h"
 #include "lib.h"
  char terminalbuffer[KEYBOARD_BUFFER_LENGTH];
-volatile flag=0;
+volatile int flag=0;
 volatile int numberofchars=0;
 
 /* int init()
@@ -89,7 +89,6 @@ int terminal_write(int32_t fd,void*buf,int32_t nbytes){
 
 
 int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
-  int j;
 
 
   int sizetocopy;
@@ -113,11 +112,12 @@ int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
   *((int8_t*)buffer+i)='\n';
   putc('\n');
   update_cursor();
+  int retvalue = numberofchars;
   memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);
   numberofchars=0;
   flag=0;
 
-  return sizetocopy;
+  return retvalue+1;
 }
 
 /* int open()

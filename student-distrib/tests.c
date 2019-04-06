@@ -327,7 +327,6 @@ int read_data_fromfile_error_handle(int8_t* filename){
 
 
 int testing_rtc_driver(int32_t rate){
-	int a;
 
 	clear();
 	setposition(0,0);

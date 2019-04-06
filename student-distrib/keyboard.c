@@ -48,7 +48,7 @@ void check_input(){
                     linebuffer[numberofchars]='\n';
 
                    // reset the linebuffer
-                   set_terminal_buffer(linebuffer,numberofchars);
+                   set_terminal_buffer((uint8_t*)linebuffer,numberofchars);
                    memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
                     numberofchars=0; // reset the number of chars read
                     break;

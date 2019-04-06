@@ -10,7 +10,7 @@
 // extern void contextswitchasm(uint32_t eipval,pcb* current_process);
 
 
-static int8_t args[126];  // 128 characters in keyboard buffer. 1 for \n and 1 for enter  filename can take
+//static int8_t args[126];  // 128 characters in keyboard buffer. 1 for \n and 1 for enter  filename can take
 // otable_t rtctable,filetable,directorytable,stdin_table,stdout_table;
 // rtctable.(*open)("hello") = 0;
 void* rtctable[4]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
@@ -191,8 +191,8 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 	 if(buf == NULL)
     return -1;
- if(fd == 0 )
-    return 0;
+ if(fd==0)
+      return -1;
   
 	  /* Get address of relevant PCB */
   pcb* curr_pcb;
@@ -206,21 +206,7 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
   if(fd==1 || file_type==0){
   int32_t (*fun_ptr)(int32_t, void*, int32_t);
   fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_WRITE];
-   return (*fun_ptr)(fd, buf, nbytes);
-  }
-
-
-  if(fd==1){
-    terminal_write(fd,buf,nbytes);
-  }
-  else{
-    if(buf==NULL)
-      return -1;
-
-    if(fd==0)
-      return -1;
-    
-
+   return (*fun_ptr)(fd, (void*) buf, nbytes);
   }
 
 return 0;
@@ -274,13 +260,11 @@ if( read_data(dir_entry.inode_num,0,(uint8_t*) check_buf,40)==-1){
 if(check_buf[0]!=0x7f || check_buf[1]!=0x45||check_buf[2]!=0x4C||check_buf[3]!=0x46){
   return -1 ;
 }
-/* set up paging */
-int q;
 
 /* set the bytes 24 to 27 */
 read_data(dir_entry.inode_num, 24, (uint8_t*) executablebytes,4);
 
-int eip_val = 0;
+
 
 
 /* create pcb and set parent pcb */

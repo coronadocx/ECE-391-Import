@@ -208,6 +208,21 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
   fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_WRITE];
    return (*fun_ptr)(fd, buf, nbytes);
   }
+
+
+  if(fd==1){
+    terminal_write(fd,buf,nbytes);
+  }
+  else{
+    if(buf==NULL)
+      return -1;
+
+    if(fd==0)
+      return -1;
+    
+
+  }
+
 return 0;
 }
 

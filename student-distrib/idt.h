@@ -2,7 +2,8 @@
 
 #ifndef IDT_H
 #define IDT_H
-extern void initialize_IDT();
 
 #define EXCEPTION_COUNT 32
+#define SYSTEMCALLNO 0x80
+void initialize_IDT();
 #endif

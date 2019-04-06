@@ -31,16 +31,8 @@
 
 
 /* Change these includes to what is necessary */
-#include "multiboot.h"
-#include "x86_desc.h"
-#include "lib.h"
-#include "i8259.h"
-#include "debug.h"
-#include "tests.h"
-#include "idt.h"
-#include "keyboard.h"
-#include "rtc.h"
-#include "paging.h"
+#include "types.h"
+
 
 
 /* Struct for a Directory Entry */
@@ -56,16 +48,16 @@ typedef struct dentry {
 extern int32_t set_mod_start(unsigned int mod_start);
 
 /* sets the global dentry based on filename */
-extern int32_t fs_open(int8_t* filename);
+extern int32_t fs_open(const int8_t* filename);
 
 /* resets the global dentry struct */
 extern int32_t fs_close();
 
 /* populates the buffer based on the file descriptor */
-extern int32_t fs_read(void* buf, int32_t nbytes);
+extern int32_t fs_read(int32_t fd, void* buf, int32_t nbytes);
 
 /* Read only file system. just does error checking */
-extern int32_t fs_write(void* buf, int32_t nbytes);
+extern int32_t fs_write(int32_t fd, void* buf, int32_t nbytes);
 
 /* Searches for a directory entry by name, copies over elements and returns a pointer to the directory entry */
 extern int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry);
@@ -77,9 +69,16 @@ extern int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);
 extern int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
 
 /* Reads and lists the contents of the directory on the screen */
-extern int32_t dir_read();
-
+extern int32_t dir_read(int fd, void* buf, int32_t nbytes);
 /* Closes the directory */
 extern int32_t dir_close();
+/* opens the directory */
+extern int32_t dir_open(const int8_t* filename);
+
+
+
+/* return the size of a particular file */
+extern int32_t get_filesize(uint32_t inode);
+extern int32_t dir_write(int32_t fd,const void* buf,int32_t nbytes);
 
 #endif

@@ -7,7 +7,8 @@ static char chararray[NUM_KEYS]={' ','\0','1','2','3','4','5','6','7','8','9','0
 '\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
 static char shiftarray[NUMBERSONKEYBOARD]={'~','!','@','#','$','%','^','&','*','('};  // handling if shift is pressed on any num keys on qwerty keyboard
 static char linebuffer[KEYBOARD_BUFFER_LENGTH];
-int numberofchars=0;
+static int numberofchars=0;
+
 
 
 
@@ -34,17 +35,21 @@ void check_input(){
    case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;  // check if control is pressed
    case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break; // check is control is released
    case BACKSPACE:{  // check for backspace
+                    if(numberofchars!=0){
                     handlebackspace();
                     linebuffer[numberofchars]='\0';
-                    if(numberofchars!=0) // make sure characters have been written
+               
                     numberofchars=numberofchars-1; // backspace removes the number of chars
+					}
                     break;
                   }
    case ENTER:    {  // adding newline to buffer. This triggers a terminal read
                     putc(chararray[a]);
                     linebuffer[numberofchars]='\n';
-                    read(linebuffer); // call to terminal read.
-                    memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH); // reset the linebuffer
+
+                   // reset the linebuffer
+                   set_terminal_buffer((uint8_t*)linebuffer,numberofchars);
+                   memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
                     numberofchars=0; // reset the number of chars read
                     break;
                   }

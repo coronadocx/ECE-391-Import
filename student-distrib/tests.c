@@ -235,7 +235,7 @@ int read_by_index_test(int index){
 int dir_read_test(){
 
 
-	if(dir_read() == 0){
+	if(dir_read(0, 0, 0) == 0){
 		return PASS;
 	}
 
@@ -327,7 +327,6 @@ int read_data_fromfile_error_handle(int8_t* filename){
 
 
 int testing_rtc_driver(int32_t rate){
-	int a;
 
 	clear();
 	setposition(0,0);
@@ -340,7 +339,7 @@ int testing_rtc_driver(int32_t rate){
 	}
 
 	while(1){
-		a = rtc_read();
+	//	a = rtc_read();
 		writetovideomem();
 	}
 
@@ -388,7 +387,7 @@ int testing_fs_close(){
 int testing_fs_read(uint32_t nbytes){
 	int i;
 	uint8_t  buf[nbytes];
-	if(fs_read(buf,nbytes)==-1){
+	if(fs_read(3, buf,nbytes)==-1){
 	 printf("error reading");
 	 return FAIL;
 	}
@@ -430,7 +429,7 @@ int read_data_test(uint32_t inode, uint32_t offset, uint32_t length){
 
 			if(retval > 0)
 			{
-				printf("Could not copy %d bytes: Orig length: %d\n", retval, length);
+				printf("Only copied %d bytes: Orig length: %d\n", retval, length);
 			}
 
 

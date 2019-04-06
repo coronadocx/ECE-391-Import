@@ -5,16 +5,14 @@
 #include "lib.h"
 #include "keyboard.h"
 #include "linkage.h"
-#include "rtc.h"
 #include "i8259.h"
+#include "rtc.h"
 
 // idt index for keyboard and rtc
 #define KEYBOARD  0x21
 #define RTC 0x28
 // Assembly functions that handle the stack when keyboard or rtc interuppts are generated
 
-extern void keyboardhandlerasm();
-extern void rtchandlerasm();
 /*
  * handle0
  *   DESCRIPTION: function exception handler for divide by zero
@@ -24,7 +22,7 @@ extern void rtchandlerasm();
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle0(){
-    printf("Divide by zero error");
+    printf("general Protection exception");
     while(1);
 }
 /*
@@ -203,6 +201,8 @@ void rtchandler(){
 
 
 }
+
+
 /*
  * initialize_IDT
  *   DESCRIPTION: function that sets up the IDT
@@ -252,6 +252,8 @@ void initialize_IDT(){
     SET_IDT_ENTRY(idt[i],handle14);
     else if(i==9)
     SET_IDT_ENTRY(idt[i],handle9);
+   else if(i == 13)
+     SET_IDT_ENTRY(idt[i],handle0);
    else
      SET_IDT_ENTRY(idt[i],commonehandler);
 
@@ -279,6 +281,20 @@ SET_IDT_ENTRY(idt[KEYBOARD],keyboardhandlerasm);
  idt[RTC].reserved0=0;
  idt[RTC].size=1;
  SET_IDT_ENTRY(idt[RTC],rtchandlerasm);
+
+idt[SYSTEMCALLNO].present=1;
+idt[SYSTEMCALLNO].dpl=3; // called from user using INT
+idt[SYSTEMCALLNO].seg_selector=KERNEL_CS;
+idt[SYSTEMCALLNO].reserved4=0;
+idt[SYSTEMCALLNO].reserved3=1;
+idt[SYSTEMCALLNO].reserved2=1;
+idt[SYSTEMCALLNO].reserved1=1;
+idt[SYSTEMCALLNO].reserved0=0;
+idt[SYSTEMCALLNO].size=1;
+SET_IDT_ENTRY(idt[SYSTEMCALLNO],systemcallasm);
+
+
+
 
 
 

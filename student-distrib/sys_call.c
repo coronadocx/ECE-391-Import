@@ -19,7 +19,14 @@ void* directorytable[4]={&dir_open,&dir_read,&dir_write,&dir_close};
 void* stdin_table[4]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[4]={&terminal_open,NULL,&terminal_write,&terminal_close};
 int8_t processes_running[6] = {0,0,0,0,0,0};
-
+/*
+ * open
+ *   DESCRIPTION: open system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t open(const uint8_t* filename){
 
   if(filename == NULL){
@@ -92,7 +99,14 @@ int32_t open(const uint8_t* filename){
   return i;
 
 }
-
+/*
+ * close 
+ *   DESCRIPTION: close  system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t close(int32_t fd){
 
   /* Check for valid fd */
@@ -133,7 +147,14 @@ int32_t close(int32_t fd){
 }
 
 
-
+/*
+ * read
+ *   DESCRIPTION: read system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
 
   if(buf == NULL)
@@ -186,7 +207,14 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 
 }
 
-
+/*
+ * write 
+ *   DESCRIPTION: write  system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 	 if(buf == NULL)
@@ -211,7 +239,14 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 
 return 0;
 }
-
+/*
+ * execute 
+ *   DESCRIPTION: halt system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t execute(const uint8_t* command){
 int i=0;
 int8_t buf[32];
@@ -302,6 +337,7 @@ if(current_pid!=1){
 }
 else{
   current_process->parent=NULL;
+  current_process->parent_process_id=0;
 }
 
 // SETS UP STD IN

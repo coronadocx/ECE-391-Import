@@ -20,11 +20,58 @@
 
 
 
-
+/*
+ * halt
+ *   DESCRIPTION: halt system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t halt(uint8_t status);
+/*
+ * execute 
+ *   DESCRIPTION: halt system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t execute(const uint8_t* command);
+/*
+ * write 
+ *   DESCRIPTION: write  system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t write(int32_t fd, const void*buf,int32_t nbytes);
+/*
+ * read
+ *   DESCRIPTION: read system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t read(int32_t fd,void*buf,int32_t nbytes);
+/*
+ * close 
+ *   DESCRIPTION: close  system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t close(int32_t fd);
+/*
+ * open
+ *   DESCRIPTION: open system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character 
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure 
+ *   SIDE EFFECTS:  
+ */
 int32_t open(const uint8_t* filename);
 #endif

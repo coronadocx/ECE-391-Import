@@ -3,7 +3,14 @@
 void init_pcb(){
 
 }
-
+/*
+ * get_pcb_address
+ *   DESCRIPTION: returns the address of the current process's pcb 
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: pointer to pcb of current process  
+ *   SIDE EFFECTS:  
+ */
 pcb* get_pcb_address(){
 
   /* Here, we try to calculate which PCB this system call belongs to

@@ -35,10 +35,12 @@ void check_input(){
    case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;  // check if control is pressed
    case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break; // check is control is released
    case BACKSPACE:{  // check for backspace
+                    if(numberofchars!=0){
                     handlebackspace();
                     linebuffer[numberofchars]='\0';
-                    if(numberofchars!=0) // make sure characters have been written
+               
                     numberofchars=numberofchars-1; // backspace removes the number of chars
+					}
                     break;
                   }
    case ENTER:    {  // adding newline to buffer. This triggers a terminal read

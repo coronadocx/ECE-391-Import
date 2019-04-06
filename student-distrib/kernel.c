@@ -14,6 +14,9 @@
 #include "paging.h"
 #include "filesystem.h"
 #include "terminal.h"
+//#include "../syscalls/ece391syscall.h"
+#include "sys_call.h"
+
 #define RUN_TESTS
 
 /* Macros. */
@@ -173,7 +176,9 @@ void entry(unsigned long magic, unsigned long addr) {
     printf("Enabling Interrupts\n");
     sti();
 	while(1){
-        execute("shell\n");
+		uint8_t command[7]={'s','h','e','l','l','\n','\0'};
+		const uint8_t* a=command;
+        execute(a);
 	}
 
 #ifdef RUN_TESTS

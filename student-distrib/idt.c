@@ -223,7 +223,7 @@ void initialize_IDT(){
    idt[i].present=1;
    idt[i].seg_selector=KERNEL_CS;
    idt[i].reserved4=0;
-   idt[i].reserved3=1;
+   idt[i].reserved3=0; //Changed this bit to make it an interrupt gate
    idt[i].reserved2=1;
    idt[i].reserved1=1;
    idt[i].reserved0=0;

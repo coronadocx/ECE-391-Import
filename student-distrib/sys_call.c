@@ -191,25 +191,25 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 	 if(buf == NULL)
     return -1;
- if(fd==0)
+   if(fd==0)
       return -1;
-  
+
 	  /* Get address of relevant PCB */
   pcb* curr_pcb;
   curr_pcb = get_pcb_address();
 
-  /* File needs to be in use for read */
+  /* File needs to be in use for write */
   if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == 0)
     return -1;
-	int file_type = (int)curr_pcb->fd_array[fd].flags[FTYPE_INDEX];
+	//int file_type = (int)curr_pcb->fd_array[fd].flags[FTYPE_INDEX];
   /* Function pointer points to read of file operations table of fd*/
-  if(fd==1 || file_type==0){
+  //if(fd==1 || file_type==0){
   int32_t (*fun_ptr)(int32_t, void*, int32_t);
   fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_WRITE];
    return (*fun_ptr)(fd, (void*) buf, nbytes);
-  }
+  //}
 
-return 0;
+//return 0;
 }
 
 int32_t execute(const uint8_t* command){

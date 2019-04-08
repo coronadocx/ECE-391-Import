@@ -13,12 +13,12 @@
 //static int8_t args[126];  // 128 characters in keyboard buffer. 1 for \n and 1 for enter  filename can take
 // otable_t rtctable,filetable,directorytable,stdin_table,stdout_table;
 // rtctable.(*open)("hello") = 0;
-void* rtctable[4]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
-void* filetable[4]={&fs_open,&fs_read,&fs_write,&fs_close};
-void* directorytable[4]={&dir_open,&dir_read,&dir_write,&dir_close};
-void* stdin_table[4]={&terminal_open,&terminal_read,NULL,&terminal_close};
-void* stdout_table[4]={&terminal_open,NULL,&terminal_write,&terminal_close};
-int8_t processes_running[6] = {0,0,0,0,0,0};
+void* rtctable[SIZEOFOPERATIONSTABLE]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
+void* filetable[SIZEOFOPERATIONSTABLE]={&fs_open,&fs_read,&fs_write,&fs_close};
+void* directorytable[SIZEOFOPERATIONSTABLE]={&dir_open,&dir_read,&dir_write,&dir_close};
+void* stdin_table[SIZEOFOPERATIONSTABLE]={&terminal_open,&terminal_read,NULL,&terminal_close};
+void* stdout_table[SIZEOFOPERATIONSTABLE]={&terminal_open,NULL,&terminal_write,&terminal_close};
+int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE};
 
 
 /*
@@ -57,17 +57,17 @@ int32_t open(const uint8_t* filename){
 
 /* Traverse through the relevant file descriptor array */
   int i;
-  for(i = 2; i < 8; i++){
+  for(i = 2; i < ENTRIESINFDARRAY; i++){
 
     /* Found an empty file descriptor spot */
-    if(curr_pcb->fd_array[i].flags[IN_USE_INDEX] == 0){
+    if(curr_pcb->fd_array[i].flags[IN_USE_INDEX] == NOTINUSE){
       break;
     }
 
   }
 
   /* If no file descriptor is free, return -1 */
-  if(i >= 8){
+  if(i >= ENTRIESINFDARRAY){
     return -1;
   }
 
@@ -90,7 +90,7 @@ int32_t open(const uint8_t* filename){
   curr_pcb->fd_array[i].file_pos = 0;
 
   /* Filling flags */
-  curr_pcb->fd_array[i].flags[IN_USE_INDEX] = 1;
+  curr_pcb->fd_array[i].flags[IN_USE_INDEX] = INUSE;
   curr_pcb->fd_array[i].flags[FTYPE_INDEX] = file_type;
 
 // ASK TA HOW TO CALL THE FUNCTION
@@ -126,7 +126,7 @@ int32_t close(int32_t fd){
     curr_pcb = get_pcb_address();
 
     /* Check if file descriptor index not in use */
-    if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == 0)
+    if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == NOTINUSE)
       return -1;
     /* Check if operationstable* is valid */
     if(curr_pcb->fd_array[fd].operationstable == NULL)
@@ -143,7 +143,7 @@ int32_t close(int32_t fd){
     curr_pcb->fd_array[fd].operationstable = NULL;
     curr_pcb->fd_array[fd].inode_num = 0;
     curr_pcb->fd_array[fd].file_pos = 0;
-    curr_pcb->fd_array[fd].flags[IN_USE_INDEX] = 0;
+    curr_pcb->fd_array[fd].flags[IN_USE_INDEX] = NOTINUSE;
     curr_pcb->fd_array[fd].flags[FTYPE_INDEX] = 0;
     curr_pcb->fd_array[fd].flags[RSVD_INDEX_0] = 0;
     curr_pcb->fd_array[fd].flags[RSVD_INDEX_1] = 0;
@@ -178,7 +178,7 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
   curr_pcb = get_pcb_address();
 
   /* File needs to be in use for read */
-  if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == 0)
+  if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == NOTINUSE)
     return -1;
 
   /* Function pointer points to read of file operations table of fd*/
@@ -240,7 +240,7 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
   curr_pcb = get_pcb_address();
 
   /* File needs to be in use for write */
-  if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == 0)
+  if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == NOTINUSE)
     return -1;
 	//int file_type = (int)curr_pcb->fd_array[fd].flags[FTYPE_INDEX];
   /* Function pointer points to read of file operations table of fd*/
@@ -266,11 +266,11 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 int32_t execute(const uint8_t* command){
   int32_t i=0;
   int32_t j;
-  int8_t buf[128];
+  int8_t buf[MAXBUFSIZEEXECUTE];
   dentry_t dir_entry;
 
   //Make sure buffer isn't too thicc
-  if (strlen((int8_t*)command) > 128){
+  if (strlen((int8_t*)command) > MAXBUFSIZEEXECUTE){
     printf("Bad Length\n" );
     return -1;
   }
@@ -286,8 +286,8 @@ int32_t execute(const uint8_t* command){
   }
 
   // Set the last character to sentinal
-  if (j == 128)
-    j = 127;
+  if (j == MAXBUFSIZEEXECUTE)
+    j = MAXBUFSIZEEXECUTE-1;
   buf[j]='\0';
 
 
@@ -299,18 +299,18 @@ int32_t execute(const uint8_t* command){
 
   /* checks if you can read data */
   int8_t check_buf[40];
-  uint8_t executablebytes[4];
+  uint8_t executablebytes[SIZEOFOPERATIONSTABLE];
   if( read_data(dir_entry.inode_num,0,(uint8_t*) check_buf,40)==-1){
     return -1;
   }
 
-  /* check if the file is an executable */
-  if(check_buf[0]!=0x7f || check_buf[1]!=0x45||check_buf[2]!=0x4C||check_buf[3]!=0x46){
+  /* check if the file is an executable. these four magic numbers are used to check if a fine is an executable  */
+  if(check_buf[0]!=0x7f || check_buf[1]!=0x45||check_buf[2]!=0x4C||check_buf[3]!=0x46){  // we use these magic numbers only once and hence they are not macros
     return -1 ;
   }
 
   /* set the bytes 24 to 27 */
-  read_data(dir_entry.inode_num, 24, (uint8_t*) executablebytes,4);
+  read_data(dir_entry.inode_num, STARTOFEIPINEXECUTABLE, (uint8_t*) executablebytes,SIZEOFOPERATIONSTABLE);
 
 
 
@@ -321,7 +321,7 @@ int32_t execute(const uint8_t* command){
   while(i<7){
     if(processes_running[i-1]==0){
        current_pid=i;
-       processes_running[i-1]=1;
+       processes_running[i-1]=INUSE;
        break;
     }
     i=i+1;
@@ -337,7 +337,7 @@ int32_t execute(const uint8_t* command){
   y=&x;
   paging_change_process(current_pid);
   /*  read data into virtual address 128 MB */
-  read_data(dir_entry.inode_num,0,(uint8_t*) 0x8048000,0x400000);
+  read_data(dir_entry.inode_num,0,(uint8_t*) VIRTUALADDRESSFOREXECUTABLEDATA,EXTENDEDPAGESIZE);
   /* Bit-Mask 0xFFE000 should give us an 8KB aligned address of the PCB */
   parent_pcb = get_pcb_address();
   parent_pid = (END_KMEM - (unsigned int) parent_pcb)/(PCB_SIZE) - 1;
@@ -356,21 +356,21 @@ int32_t execute(const uint8_t* command){
   current_process->fd_array[0].operationstable=stdin_table;
   current_process->fd_array[0].inode_num=-1;
   current_process->fd_array[0].file_pos=0;
-  current_process->fd_array[0].flags[0]=1;
+  current_process->fd_array[0].flags[0]=INUSE;
 
   // SETS UP STD OUT
   current_process->fd_array[1].operationstable=stdout_table;
   current_process->fd_array[1].inode_num=-1;
   current_process->fd_array[1].file_pos=0;
-  current_process->fd_array[1].flags[0]=1;
+  current_process->fd_array[1].flags[0]=INUSE;
 
   current_process->process_id=current_pid;
 
   i=2;
   /* sets the other file descriptors to not be in use */
-  while(i<8){
+  while(i<ENTRIESINFDARRAY){
   current_process->fd_array[i].file_pos=0;
-  current_process->fd_array[i].flags[0]=0;
+  current_process->fd_array[i].flags[0]=NOTINUSE;
   i=i+1;
   }
 
@@ -401,11 +401,11 @@ int32_t halt(uint8_t status){
   /* get the address of the process to halt */
   pcb* curr_pcb;
   curr_pcb = get_pcb_address();
-  processes_running[curr_pcb->process_id-1]=0;
+  processes_running[curr_pcb->process_id-1]=NOTINUSE;
   uint32_t parentid=curr_pcb->parent_process_id;
   int i=0;
-  while(i<8){
-    if(curr_pcb->fd_array[i].flags[0]==1){
+  while(i<ENTRIESINFDARRAY){
+    if(curr_pcb->fd_array[i].flags[0]==INUSE){
       close(i);
     }
     i=i+1;

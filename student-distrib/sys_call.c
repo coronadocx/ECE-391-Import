@@ -33,13 +33,13 @@ int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE,NOTINU
 int32_t open(const uint8_t* filename){
 
   if(filename == NULL){
-    return -1;
+    return INVALIDORFAIL;
   }
   /* Directory Entry struct */
   dentry_t dir_entry;
  /* Error handling if file not found */
   if(read_dentry_by_name((int8_t*)filename,&dir_entry)==-1){
-    return -1;
+    return INVALIDORFAIL;
   }
 
   int file_type;
@@ -57,6 +57,7 @@ int32_t open(const uint8_t* filename){
 
 /* Traverse through the relevant file descriptor array */
   int i;
+  /* i starts at 2 because 0 and 1 are occupied by stdin and stdout */
   for(i = 2; i < ENTRIESINFDARRAY; i++){
 
     /* Found an empty file descriptor spot */
@@ -68,18 +69,18 @@ int32_t open(const uint8_t* filename){
 
   /* If no file descriptor is free, return -1 */
   if(i >= ENTRIESINFDARRAY){
-    return -1;
+    return INVALIDORFAIL;
   }
 
   /* Populating the file descriptor struct */
   /* File operations table pointer */
-  if(file_type == 0){
+  if(file_type == FILETYPEDEVICE){ // file type 0 is rtc device type
     curr_pcb->fd_array[i].operationstable = (rtctable);
   }
-  else if(file_type == 1){
+  else if(file_type == FILETYPEDIRECTORY){ // file type 1 is directoy
     curr_pcb->fd_array[i].operationstable = (directorytable);
   }
-  else if(file_type == 2){
+  else if(file_type == FILETYPEGENERAL){
     curr_pcb->fd_array[i].operationstable =  (filetable);
   }
 
@@ -87,7 +88,7 @@ int32_t open(const uint8_t* filename){
   curr_pcb->fd_array[i].inode_num = inode_num;
 
   /* File position */
-  curr_pcb->fd_array[i].file_pos = 0;
+  curr_pcb->fd_array[i].file_pos = DEFAULTFILEOFFSET;
 
   /* Filling flags */
   curr_pcb->fd_array[i].flags[IN_USE_INDEX] = INUSE;
@@ -142,7 +143,7 @@ int32_t close(int32_t fd){
     /* Populate and mark fd as not in use */
     curr_pcb->fd_array[fd].operationstable = NULL;
     curr_pcb->fd_array[fd].inode_num = 0;
-    curr_pcb->fd_array[fd].file_pos = 0;
+    curr_pcb->fd_array[fd].file_pos = DEFAULTFILEOFFSET;
     curr_pcb->fd_array[fd].flags[IN_USE_INDEX] = NOTINUSE;
     curr_pcb->fd_array[fd].flags[FTYPE_INDEX] = 0;
     curr_pcb->fd_array[fd].flags[RSVD_INDEX_0] = 0;
@@ -168,10 +169,10 @@ int32_t close(int32_t fd){
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
 
   if(buf == NULL)
-    return -1;
+    return INVALIDORFAIL;
 
   if(fd == 1)
-    return 0;
+    return 0; // success ;
 
   /* Get address of relevant PCB */
   pcb* curr_pcb;
@@ -179,7 +180,7 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 
   /* File needs to be in use for read */
   if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == NOTINUSE)
-    return -1;
+    return INVALIDORFAIL;
 
   /* Function pointer points to read of file operations table of fd*/
   int32_t (*fun_ptr)(int32_t, void*, int32_t);
@@ -190,7 +191,7 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 	int filesize;
 	int inode_num;
     /* For rtc_read and terminal read */
-  if(file_type == 0 || fd == 0){
+  if(file_type == FILETYPEDEVICE || fd == 0){
     return (*fun_ptr)(fd, buf, nbytes);
    }
 
@@ -206,8 +207,8 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
    */
 
 	 /* If file position is greater than filesize, return 0 */
-	if(file_type==2 && curr_pcb->fd_array[fd].file_pos >= filesize)
-	 return 0;
+	if(file_type==FILETYPEGENERAL && curr_pcb->fd_array[fd].file_pos >= filesize)
+	 return 0; // success ;
 
 	/* Handles file and directory reads */
 	int retval;
@@ -231,9 +232,9 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 	 if(buf == NULL)
-    return -1;
-   if(fd==0)
-      return -1;
+    return INVALIDORFAIL;
+   if(fd==0) // is that of stdin. stdin cant write !
+      return INVALIDORFAIL;
 
 	  /* Get address of relevant PCB */
   pcb* curr_pcb;
@@ -241,7 +242,7 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 
   /* File needs to be in use for write */
   if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == NOTINUSE)
-    return -1;
+    return INVALIDORFAIL;
 	//int file_type = (int)curr_pcb->fd_array[fd].flags[FTYPE_INDEX];
   /* Function pointer points to read of file operations table of fd*/
   //if(fd==1 || file_type==0){
@@ -272,7 +273,7 @@ int32_t execute(const uint8_t* command){
   //Make sure buffer isn't too thicc
   if (strlen((int8_t*)command) > MAXBUFSIZEEXECUTE){
     printf("Bad Length\n" );
-    return -1;
+    return INVALIDORFAIL;
   }
 
   //leading spaces
@@ -294,19 +295,19 @@ int32_t execute(const uint8_t* command){
   // check if program exists
 
   if(read_dentry_by_name(buf,&dir_entry)==-1){
-    return -1 ;
+    return INVALIDORFAIL ;
   }
 
   /* checks if you can read data */
-  int8_t check_buf[40];
+  int8_t check_buf[METADATAEXECUTESIZE];
   uint8_t executablebytes[SIZEOFOPERATIONSTABLE];
-  if( read_data(dir_entry.inode_num,0,(uint8_t*) check_buf,40)==-1){
-    return -1;
+  if( read_data(dir_entry.inode_num,0,(uint8_t*) check_buf,METADATAEXECUTESIZE)==INVALIDORFAIL){
+    return INVALIDORFAIL;
   }
 
   /* check if the file is an executable. these four magic numbers are used to check if a fine is an executable  */
   if(check_buf[0]!=0x7f || check_buf[1]!=0x45||check_buf[2]!=0x4C||check_buf[3]!=0x46){  // we use these magic numbers only once and hence they are not macros
-    return -1 ;
+    return INVALIDORFAIL ;
   }
 
   /* set the bytes 24 to 27 */
@@ -318,7 +319,7 @@ int32_t execute(const uint8_t* command){
   /* create pcb and set parent pcb */
   i=1;
   uint32_t current_pid=-1;
-  while(i<7){
+  while(i<(NUMBEROFPROCESSESSUPPORTED+1)){
     if(processes_running[i-1]==0){
        current_pid=i;
        processes_running[i-1]=INUSE;
@@ -327,7 +328,7 @@ int32_t execute(const uint8_t* command){
     i=i+1;
   }
   if(current_pid==-1){
-    return -1;
+    return INVALIDORFAIL;
   }
 
   pcb* parent_pcb;
@@ -354,14 +355,14 @@ int32_t execute(const uint8_t* command){
 
   // SETS UP STD IN
   current_process->fd_array[0].operationstable=stdin_table;
-  current_process->fd_array[0].inode_num=-1;
-  current_process->fd_array[0].file_pos=0;
+  current_process->fd_array[0].inode_num=INVALIDORFAIL;
+  current_process->fd_array[0].file_pos=DEFAULTFILEOFFSET;
   current_process->fd_array[0].flags[0]=INUSE;
 
   // SETS UP STD OUT
   current_process->fd_array[1].operationstable=stdout_table;
-  current_process->fd_array[1].inode_num=-1;
-  current_process->fd_array[1].file_pos=0;
+  current_process->fd_array[1].inode_num=INVALIDORFAIL;
+  current_process->fd_array[1].file_pos=DEFAULTFILEOFFSET;
   current_process->fd_array[1].flags[0]=INUSE;
 
   current_process->process_id=current_pid;
@@ -369,7 +370,7 @@ int32_t execute(const uint8_t* command){
   i=2;
   /* sets the other file descriptors to not be in use */
   while(i<ENTRIESINFDARRAY){
-  current_process->fd_array[i].file_pos=0;
+  current_process->fd_array[i].file_pos=DEFAULTFILEOFFSET;
   current_process->fd_array[i].flags[0]=NOTINUSE;
   i=i+1;
   }
@@ -384,7 +385,7 @@ int32_t execute(const uint8_t* command){
 
 
 
-  return 0;
+  return 0; // success ; // success
 }
 
 
@@ -404,18 +405,19 @@ int32_t halt(uint8_t status){
   processes_running[curr_pcb->process_id-1]=NOTINUSE;
   uint32_t parentid=curr_pcb->parent_process_id;
   int i=0;
+  // close all the open files
   while(i<ENTRIESINFDARRAY){
     if(curr_pcb->fd_array[i].flags[0]==INUSE){
       close(i);
     }
     i=i+1;
   }
-
+ // restore paging
   paging_change_process(parentid);
-  tss.ss0=KERNEL_DS; // not sure
+  tss.ss0=KERNEL_DS; // switch back to parent stack
   tss.esp0= END_KMEM - (parentid)*KERNEL_MEM_SIZE;
 
-  return restoreparent(curr_pcb->parent_ebp,curr_pcb->parent_esp,(uint32_t) status);
+  return restoreparent(curr_pcb->parent_ebp,curr_pcb->parent_esp,(uint32_t) status); // assembly function to restor ebp and esp
 
 
 

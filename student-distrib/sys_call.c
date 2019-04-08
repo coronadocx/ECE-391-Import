@@ -20,6 +20,16 @@ void* stdin_table[4]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[4]={&terminal_open,NULL,&terminal_write,&terminal_close};
 int8_t processes_running[6] = {0,0,0,0,0,0};
 
+
+/*
+ * open
+ *   DESCRIPTION: open system call. opens a file in the fd array
+ *   INPUTS: filename
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t fd -> file descriptor index of opened file
+ *   SIDE EFFECTS:
+ */
+
 int32_t open(const uint8_t* filename){
 
   if(filename == NULL){
@@ -93,6 +103,17 @@ int32_t open(const uint8_t* filename){
 
 }
 
+
+/*
+ * close
+ *   DESCRIPTION: close  system call. tearsdown stack and closes the file in the fd array
+ *   INPUTS: fd -> FD index to be closed
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure
+ *   SIDE EFFECTS:
+ */
+
+
 int32_t close(int32_t fd){
 
   /* Check for valid fd */
@@ -132,6 +153,16 @@ int32_t close(int32_t fd){
 
 }
 
+/*
+ * read
+ *   DESCRIPTION: read system call. Calls the appropriate read function from file ops table
+ *   INPUTS: fd -> File descriptor index
+ *           buf -> buffer to read into
+ *           nbytes -> number of bytes to read
+ *   OUTPUTS:None
+ *   RETURN VALUE: Returns the number of bytes read, or -1 on failure
+ *   SIDE EFFECTS:
+ */
 
 
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
@@ -187,6 +218,16 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
 }
 
 
+/*
+ * write
+ *   DESCRIPTION: Write system call. Calls the appropriate write function from file ops table
+ *   INPUTS: fd -> File descriptor index
+ *           buf -> buffer to write from
+ *           nbytes -> number of bytes to write
+ *   OUTPUTS:None
+ *   RETURN VALUE: Returns 0 on success, -1 on failure
+ *   SIDE EFFECTS:
+ */
 
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 	 if(buf == NULL)
@@ -211,6 +252,16 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
 
 //return 0;
 }
+
+
+/*
+ * execute
+ *   DESCRIPTION: execute system call. Starts a process and runs it
+ *   INPUTS: command -> Executable to run
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure
+ *   SIDE EFFECTS:
+ */
 
 int32_t execute(const uint8_t* command){
   int32_t i=0;
@@ -336,6 +387,16 @@ int32_t execute(const uint8_t* command){
   return 0;
 }
 
+
+/*
+ * halt
+ *   DESCRIPTION: halt system call. tearsdown stack and restores to parent process
+ *   INPUTS: status -> character
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t indicating success or failure
+ *   SIDE EFFECTS:
+ */
+
 int32_t halt(uint8_t status){
   /* get the address of the process to halt */
   pcb* curr_pcb;
@@ -363,6 +424,17 @@ int32_t halt(uint8_t status){
 }
 
 //helper function
+/*
+ * save_parent_registers
+ *   DESCRIPTION: Saves the parent registers %esp and %ebp before running a new process
+ *   INPUTS: pcb* a -> Address of the pcb structure
+ *          int32_t esp -> esp value
+ *          int32_t ebp -> ebp value
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS: Saves the %ebp and %esp registers in the pcb struct
+ */
+
 void save_parent_registers(pcb* a,int32_t esp,int32_t ebp){
 a->parent_esp=esp;
 a->parent_ebp=ebp;

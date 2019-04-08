@@ -4,7 +4,7 @@
 #include "types.h"
 #include "pcb.h"
 #include "x86_desc.h"
-
+#define USER_DS     0x002B
 /*
  *	keyboardhandlerasm
  * 	DESCRIPTION: Assembly linkage function for keyboard.
@@ -48,15 +48,12 @@ void contextswitchasm(uint32_t eipval,pcb* current_process);
 
 /*
  * 	restoreparent
- *	DESCRIPTION: Assembly linkage function to return to parent process	
+ *	DESCRIPTION: Assembly linkage function to return to parent process
  *	INPUT: 	ebp		-	stack base pointer
  * 			esp		-	stack pointer
- *	
+ *
  * 	OUTPUT: status	- 	return argument to be sent to parent
- *	RETURN: none
+ *	RETURN: uint32_t 
  */
 uint32_t restoreparent(uint32_t ebp,uint32_t esp,uint32_t status);
 #endif
-
-
-

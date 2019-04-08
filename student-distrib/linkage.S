@@ -4,7 +4,7 @@
 *  upon encountering an interrupt
 */
 .data
-  /* some data allocations */ 
+  /* some data allocations */
   USER_DS =0x002B
   ARGSIZE = 12
   USER_CS =0x0023
@@ -20,7 +20,14 @@
 .global systemcallasm
 .global contextswitchasm
 .global restoreparent
-
+/*
+ * 	contextswitchasm
+ *	DESCRIPTION: Assembly linkage function for context switches
+ *	INPUT: 	eipval			- address to be returned to
+ *			current_process	- number for the current process (1-5)
+ *	OUTPUT: none
+ *	RETURN: none
+ */
 contextswitchasm:
     xorl %edx,%edx
     movl 8(%esp),%edx
@@ -54,6 +61,16 @@ contextswitchasm:
 
     ret
 
+
+/*
+ * 	restoreparent
+ *	DESCRIPTION: Assembly linkage function to return to parent process
+ *	INPUT: 	ebp		-	stack base pointer
+ * 			esp		-	stack pointer
+ *
+ * 	OUTPUT: status	- 	return argument to be sent to parent
+ *	RETURN: uint32_t
+*/
 restoreparent:
      /* extract args and restore the parents */
      movl 4(%esp),%ebp  // move first arg
@@ -94,9 +111,23 @@ rtchandlerasm:
 
       iret
 
+
+
+/* halt_handlerasm
+ * linkage function to call halt
+ */
+
+
+
 halt_handlerasm:
    call halt
    jmp RETURN
+
+
+/* execute_handlerasm
+    * linkage function to call execute
+*/
+
 execute_handlerasm:
    call execute
 
@@ -104,28 +135,46 @@ execute_handlerasm:
 
 
 
-
+/* read_handlerasm
+ * linkage function to call read
+*/
 read_handlerasm:
   call read
-
   jmp RETURN
 
 
+
+
+  /* write_handlerasm
+   * linkage function to call write
+   */
 write_handlerasm:
   call write
-
   jmp RETURN
 
+
+
+/* open_handlerasm
+ * linkage function to call open
+*/
 open_handlerasm:
   call open
-
   jmp RETURN
 
+/* close_handlerasm
+ * linkage function to call close
+ */
 close_handlerasm:
     call close
-
     jmp RETURN
 
+/*
+ * 	systemcallasm
+ *	DESCRIPTION: Assembly linkage function for systemcalls.
+ *	INPUT: 	none
+ *	OUTPUT: none
+ *	RETURN: none
+*/
 systemcallasm:
 
           cmpl $MIN_SYS_CALL,%eax

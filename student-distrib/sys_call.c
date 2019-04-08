@@ -32,7 +32,7 @@ int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE,NOTINU
 
 int32_t open(const uint8_t* filename){
 
-  if(filename == NULL){
+  if(filename == NULL || strlen((int8_t*)filename)==0){
     return INVALIDORFAIL;
   }
   /* Directory Entry struct */
@@ -116,7 +116,9 @@ int32_t open(const uint8_t* filename){
 
 
 int32_t close(int32_t fd){
-
+  if(fd<0){
+    return INVALIDORFAIL;
+  }
   /* Check for valid fd */
     if(fd < 2 || fd > 7)
       return -1;
@@ -167,12 +169,14 @@ int32_t close(int32_t fd){
 
 
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
-
+  if(fd<0){
+    return INVALIDORFAIL;
+  }
   if(buf == NULL)
     return INVALIDORFAIL;
 
   if(fd == 1)
-    return 0; // success ;
+    return -1; // success ;
 
   /* Get address of relevant PCB */
   pcb* curr_pcb;
@@ -231,6 +235,9 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
  */
 
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
+    if(fd<0){
+      return INVALIDORFAIL;
+    }
 	 if(buf == NULL)
     return INVALIDORFAIL;
    if(fd==0) // is that of stdin. stdin cant write !

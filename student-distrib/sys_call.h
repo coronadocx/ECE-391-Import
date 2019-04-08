@@ -34,6 +34,8 @@
 #define FILETYPEGENERAL 2
 #define DEFAULTFILEOFFSET 0
 #define METADATAEXECUTESIZE 40
+#define FDSTART 2
+#define FDEND 7
 
 int32_t halt(uint8_t status);
 int32_t execute(const uint8_t* command);

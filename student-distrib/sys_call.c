@@ -120,8 +120,8 @@ int32_t close(int32_t fd){
     return INVALIDORFAIL;
   }
   /* Check for valid fd */
-    if(fd < 2 || fd > 7)
-      return -1;
+    if(fd < FDSTART || fd > FDEND)
+      return INVALIDORFAIL;
 
 
   /* Get address of relevant PCB */

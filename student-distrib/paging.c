@@ -88,11 +88,11 @@ uint32_t paging_change_process(uint32_t pid)
 {
     pid -= 1; // Is 1-indexed (1-6), want 0-indexed (0-5)
 
-    if (pid < 0 || pid > 5)
+    if (pid < PIDMIN || pid > PIDMAX)
         return -1;
 
     //Point user memory (v128MB) to given process (p8MB+)
-    page_directory[32] = ((USR_START_ADDR + (PROCESS_SIZE*pid)) | UMEM_OR_MASK);
+    page_directory[USER_MEM_LOCATION] = ((USR_START_ADDR + (PROCESS_SIZE*pid)) | UMEM_OR_MASK);
 
     //Flush the TLB
     asm volatile("                      \n\

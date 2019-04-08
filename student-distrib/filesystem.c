@@ -61,7 +61,7 @@ int32_t fs_open(const int8_t* filename)
 
 int32_t fs_close()
 {
-    a=b;
+    a=b; // a and b are global dentry structs 
     return 0;
 }
 
@@ -151,7 +151,7 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry)
   //int32_t strncmp(const int8_t* s1, const int8_t* s2, uint32_t n);
   if(strncmp((int8_t*)first_directory, fname, strlen(fname)) == 0){
     strncpy(dentry->fname, fname,strlen(fname));
-    dentry->file_type = 1;
+    dentry->file_type = 1; // directory file type
     dentry->inode_num = 0;
     /* Return after filling dentry */
     return 0;
@@ -504,7 +504,7 @@ int32_t dir_close()
 
 /*
  *  dir_open
- *  INPUT: filename - unused 
+ *  INPUT: filename - unused
  *  OUTPUT: none
  *  RETURN VALUE: 0 always
  *  SIDE EFFECTS: none

@@ -23,6 +23,10 @@
 #define KMEM_OR_MASK    0x183
 #define UMEM_OR_MASK    0x87
 
+#define PIDMIN 0
+#define PIDMAX 5
+
+#define USER_MEM_LOCATION 32
 
 typedef struct pg_struct {							//Page Entry Struct
     uint32_t base_addr;

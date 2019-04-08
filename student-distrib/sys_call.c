@@ -13,6 +13,8 @@
 //static int8_t args[126];  // 128 characters in keyboard buffer. 1 for \n and 1 for enter  filename can take
 // otable_t rtctable,filetable,directorytable,stdin_table,stdout_table;
 // rtctable.(*open)("hello") = 0;
+
+/* Tables of function pointers */
 void* rtctable[SIZEOFOPERATIONSTABLE]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
 void* filetable[SIZEOFOPERATIONSTABLE]={&fs_open,&fs_read,&fs_write,&fs_close};
 void* directorytable[SIZEOFOPERATIONSTABLE]={&dir_open,&dir_read,&dir_write,&dir_close};

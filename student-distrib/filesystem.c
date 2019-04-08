@@ -27,7 +27,8 @@ uint32_t* boot_block_addr;
  *   RETURN VALUE: 0 for success -1 for error
  *   SIDE EFFECTS: boot_block_addr initialized
  */
-int32_t set_mod_start(unsigned int mod_start){
+int32_t set_mod_start(unsigned int mod_start)
+{
 
     /* Assign boot_block_address for FileSystem Read functions */
     boot_block_addr = (unsigned int*) mod_start;
@@ -41,7 +42,8 @@ int32_t set_mod_start(unsigned int mod_start){
  *   RETURN VALUE: 0 for success -1 for error
  *   SIDE EFFECTS: sets global dentry_t structure based on filename
  */
-extern int32_t fs_open(const int8_t* filename){
+int32_t fs_open(const int8_t* filename)
+{
   if(read_dentry_by_name(filename,&a)==-1){
     return -1;
   }
@@ -57,7 +59,8 @@ extern int32_t fs_open(const int8_t* filename){
  *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints
  */
 
-int32_t fs_close(){
+int32_t fs_close()
+{
     a=b;
     return 0;
 }
@@ -71,7 +74,8 @@ int32_t fs_close(){
  *   SIDE EFFECTS: populates th buffer
  */
 
-extern int32_t fs_read(int32_t fd, void* buf, int32_t nbytes){
+int32_t fs_read(int32_t fd, void* buf, int32_t nbytes)
+{
   /* If 0 bytes to be read, invalid input */
   if(nbytes == 0)
     return 0;
@@ -94,12 +98,13 @@ extern int32_t fs_read(int32_t fd, void* buf, int32_t nbytes){
 /*
  * fs_write
  *   DESCRIPTION: Read only file system. just does error checking
-*    ARGUMENTS: buffer and number of bytes to be read
+ *   ARGUMENTS: buffer and number of bytes to be read
  *   OUTPUTS:None
  *   RETURN VALUE:0 for success -1 for error
  *   SIDE EFFECTS: none
  */
-extern int32_t fs_write(int fd, void* buf, int32_t nbytes){
+int32_t fs_write(int fd, void* buf, int32_t nbytes)
+{
     /* If <= 0 bytes to be written, return success */
     if(nbytes == 0)
       return 0;
@@ -112,12 +117,13 @@ extern int32_t fs_write(int fd, void* buf, int32_t nbytes){
 /*
  * read_dentry_by_name
  *   DESCRIPTION: Function which searches for file by name
-  * ARGUMENTS: file name and the dentry struct to be populated
+ *   ARGUMENTS: file name and the dentry struct to be populated
  *   OUTPUTS:None
  *   RETURN VALUE: 0 for success -1 for error
  *   SIDE EFFECTS: dentry struct is populated with info about the file found by given filename
  */
-int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
+int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry)
+{
 
   /* Error handling for dentry == NULL */
   if(dentry == NULL)
@@ -179,8 +185,8 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   dentry->inode_num = 0;
   dentry->inode_num = *(FILE_NAME_SIZE + BYTES_IN_INT + first_file + j*BOOT_BLOCK_SIZE );
 
-/* Return 0 on success */
-return 0;
+  /* Return 0 on success */
+  return 0;
 
 
 }
@@ -194,43 +200,44 @@ return 0;
  *   SIDE EFFECTS: dentry struct is populated with info about the file found by given index
  */
 
-int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
+int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry)
+{
 
   /* Error handling for dentry == NULL */
   if(dentry == NULL)
     return -1;
 
-    /* Copy over # dir_entries */
-    dir_entries = *(boot_block_addr);
-    /* Copy over # inodes */
-    // +1 to get to number of inodes
-    num_inodes =  *(boot_block_addr + BB_INODE_OFFSET);
-    /* Copy over # data blocks */
-    // +2 to get to number of data blocks
-    num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
+  /* Copy over # dir_entries */
+  dir_entries = *(boot_block_addr);
+  /* Copy over # inodes */
+  // +1 to get to number of inodes
+  num_inodes =  *(boot_block_addr + BB_INODE_OFFSET);
+  /* Copy over # data blocks */
+  // +2 to get to number of data blocks
+  num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
   /* Error handling for index > 62); index starts at 0 for dir "." */
   if(index > BOOT_BLOCK_DIR_ENTRIES || (index >= dir_entries))
     return -1;
 
-/* Setting address to dentry that we want to read from */
+  /* Setting address to dentry that we want to read from */
   int8_t* dentry_addr = (int8_t*) ((boot_block_addr +SKIP_TO_DIR_ENTRIES+ (index * SKIP_TO_DIR_ENTRIES)));
 
-/* Copy over all 32 bytes*/
+  /* Copy over all 32 bytes*/
 
  strncpy(dentry->fname, ((dentry_t*)dentry_addr)->fname,FILE_NAME_SIZE);
 
-/* Last entry should always be NULL */
+  /* Last entry should always be NULL */
 
 
-/* Is this assignment fine or should we use offset to access data elements */
- dentry->file_type = ((dentry_t*)dentry_addr)->file_type;
- dentry->inode_num = ((dentry_t*)dentry_addr)->inode_num;
- dentry->fname[FILE_NAME_SIZE] = '\0';
+  /* Is this assignment fine or should we use offset to access data elements */
+  dentry->file_type = ((dentry_t*)dentry_addr)->file_type;
+  dentry->inode_num = ((dentry_t*)dentry_addr)->inode_num;
+  dentry->fname[FILE_NAME_SIZE] = '\0';
 
- /* Return 0 on success */
- return 0;
-
+  /* Return 0 on success */
+  return 0;
 }
+
 
 /*
  * read_data
@@ -241,7 +248,8 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
  *   SIDE EFFECTS: fills the buffer with text required if successfull
  */
 
-int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length){
+int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)
+{
 
   /* This makes a local copy of the argument length */
   uint32_t len;
@@ -255,7 +263,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   if(length == 0)
     return -1;
 
-/* All bytes requested cannot be copied, setting flag to 1  */
+  /* All bytes requested cannot be copied, setting flag to 1  */
   if(length > MAX_FILE_SIZE){
     len = MAX_FILE_SIZE - offset;
   }
@@ -263,7 +271,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   if(offset > MAX_FILE_SIZE)
     return -1;
 
-/* All bytes requested cannot be copied, setting flag to 1  */
+  /* All bytes requested cannot be copied, setting flag to 1  */
   if((offset + len) > MAX_FILE_SIZE){
     len = MAX_FILE_SIZE - offset;
   }
@@ -287,46 +295,47 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
     return -1;
 
   /* Now that we've made sure everything is Gucci, on to
-  *  writing the actual function */
+   * writing the actual function
+   */
 
 
-   /* Length in Bytes */
- uint32_t inode_file_size;
- /* Num of data blocks in inode */
- uint32_t inode_d_blocks;
-/* Points to 0th inode */
- uint32_t* inode_start_addr = boot_block_addr + ABS_BLK_OFFSET;
-/* Pointer to required inode */
- uint32_t* inode_addr = inode_start_addr + (inode * ABS_BLK_OFFSET);
-/* Pointer to data block[0] in absolute block numbers */
-/* Will be useful in indexing into data blocks */
- uint32_t* dblock_start_addr = inode_start_addr + (num_inodes*ABS_BLK_OFFSET);
+  /* Length in Bytes */
+  uint32_t inode_file_size;
+  /* Num of data blocks in inode */
+  uint32_t inode_d_blocks;
+  /* Points to 0th inode */
+   uint32_t* inode_start_addr = boot_block_addr + ABS_BLK_OFFSET;
+  /* Pointer to required inode */
+  uint32_t* inode_addr = inode_start_addr + (inode * ABS_BLK_OFFSET);
+  /* Pointer to data block[0] in absolute block numbers */
+  /* Will be useful in indexing into data blocks */
+  uint32_t* dblock_start_addr = inode_start_addr + (num_inodes*ABS_BLK_OFFSET);
 
- uint32_t start_dblock;
- uint32_t end_dblock;
+  uint32_t start_dblock;
+  uint32_t end_dblock;
 
- uint32_t start_dblock_index;
- uint32_t end_dblock_index;
+  uint32_t start_dblock_index;
+  uint32_t end_dblock_index;
 
- uint32_t* start_dblock_addr;
- uint32_t* end_dblock_addr;
+  uint32_t* start_dblock_addr;
+  uint32_t* end_dblock_addr;
 
 
- /* Now that we have a pointer to the inode, let the dereferencing begin */
+  /* Now that we have a pointer to the inode, let the dereferencing begin */
 
- inode_file_size = *(inode_addr);
- inode_d_blocks = ((inode_file_size)/FS_BLOCK_SIZE) + VAL_ONE;
+  inode_file_size = *(inode_addr);
+  inode_d_blocks = ((inode_file_size)/FS_BLOCK_SIZE) + VAL_ONE;
 
-/* If length in B < 4096, we have to read from only 1 data block */
- if(inode_file_size < FS_BLOCK_SIZE)
-  inode_d_blocks = VAL_ONE;
+  /* If length in B < 4096, we have to read from only 1 data block */
+  if(inode_file_size < FS_BLOCK_SIZE)
+    inode_d_blocks = VAL_ONE;
 
-/* Offset cannot be greater than the file size */
+  /* Offset cannot be greater than the file size */
   if(inode_file_size < offset){
     return -1;
   }
 
-/* If length to be copied is greater than file_size, set len and flag to 1 */
+  /* If length to be copied is greater than file_size, set len and flag to 1 */
   if(inode_file_size < len){
     len = inode_file_size - offset;
   }
@@ -342,15 +351,15 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
   start_dblock = offset/(FS_BLOCK_SIZE);
   end_dblock = (offset+len)/(FS_BLOCK_SIZE);
 
-/* Starting and ending indices of data blocks */
+  /* Starting and ending indices of data blocks */
   start_dblock_index = *(inode_addr + VAL_ONE + start_dblock);
   end_dblock_index = *(inode_addr + VAL_ONE +  end_dblock);
 
-/* Starting and ending addresses of data blocks */
+  /* Starting and ending addresses of data blocks */
   start_dblock_addr = (dblock_start_addr + (start_dblock_index * ABS_BLK_OFFSET));
   end_dblock_addr = (dblock_start_addr + (end_dblock_index * ABS_BLK_OFFSET));
 
-/* If all the reading is to be done from a single d_block */
+  /* If all the reading is to be done from a single d_block */
   if(start_dblock == end_dblock){
     memcpy(buf, ((uint8_t*)start_dblock_addr) + (offset % FS_BLOCK_SIZE), len);
 
@@ -358,7 +367,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
     return len;
   }
 
-/* If reading has to be done over multiple dblocks */
+  /* If reading has to be done over multiple dblocks */
   uint32_t j;
   uint32_t j_index;
   uint32_t* j_addr;
@@ -407,8 +416,6 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
   /* Return 0  on success, and number of bytes that were copied, otherwise */
   return len;
-
-
 }
 
 
@@ -420,39 +427,40 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
  * Side Effects: Prints the contents of the directory on the screen along with
  *  file names, types and sizes
  */
-extern int dir_read(int fd, void* buf, int32_t nbytes){
+int dir_read(int fd, void* buf, int32_t nbytes)
+{
 
-			if(boot_block_addr == NULL)
+	if(boot_block_addr == NULL)
+	return -1;
+
+	int dir_entries;
+	int num_inodes;
+	int num_dblocks;
+	int i;
+	uint32_t* inode_start_addr;
+	dentry_t d;
+	uint32_t file_size;
+
+	dir_entries = *(boot_block_addr);
+	num_inodes  = *(boot_block_addr + BB_INODE_OFFSET);
+	num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
+
+	inode_start_addr = boot_block_addr + ABS_BLK_OFFSET;
+
+	for(i = 0; i < dir_entries; i++){
+		if(read_dentry_by_index(i, &d) == -1){
 			return -1;
-
-			int dir_entries;
-			int num_inodes;
-			int num_dblocks;
-			int i;
-			uint32_t* inode_start_addr;
-			dentry_t d;
-			uint32_t file_size;
-
-			dir_entries = *(boot_block_addr);
-			num_inodes  = *(boot_block_addr + BB_INODE_OFFSET);
-			num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
-
-			inode_start_addr = boot_block_addr + ABS_BLK_OFFSET;
-
-			for(i = 0; i < dir_entries; i++){
-				if(read_dentry_by_index(i, &d) == -1){
-					return -1;
-				}
-
-				printf("File Name: %s, " , d.fname);
-				printf("File Type: %u, ", d.file_type);
-				file_size = *(inode_start_addr + (d.inode_num)*ABS_BLK_OFFSET);
-				printf("File Size: %d\n", file_size);
-
-			}
-
-			return 0;
 		}
+
+		printf("File Name: %s, " , d.fname);
+		printf("File Type: %u, ", d.file_type);
+		file_size = *(inode_start_addr + (d.inode_num)*ABS_BLK_OFFSET);
+		printf("File Size: %d\n", file_size);
+
+	}
+
+	return 0;
+}
 
 
 /* get_filesize
@@ -465,43 +473,57 @@ extern int dir_read(int fd, void* buf, int32_t nbytes){
 */
 int32_t get_filesize(uint32_t inode)
 {
+  if(boot_block_addr == NULL)
+  return -1;
 
-      if(boot_block_addr == NULL)
-      return -1;
+  if(inode > NUM_INODES)
+    return -1;
 
-      if(inode > NUM_INODES)
-        return -1;
+  uint32_t* inode_start_addr;
+  int filesize;
+  inode_start_addr = ((unsigned int *)boot_block_addr) + ABS_BLK_OFFSET;
+  filesize = *(inode_start_addr + (inode)*ABS_BLK_OFFSET);
 
-      uint32_t* inode_start_addr;
-      int filesize;
-      inode_start_addr = ((unsigned int *)boot_block_addr) + ABS_BLK_OFFSET;
-      filesize = *(inode_start_addr + (inode)*ABS_BLK_OFFSET);
-
-      return filesize;
-
-
-
+  return filesize;
 }
 
 
-    /*
-     * dir_close
-     *   DESCRIPTION:function that closes the directory
-     *   ARGUMENTS : none
-     *   OUTPUTS:None
-     *   RETURN VALUE: 0 for success -1 for error
-     *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints
-     */
-
-extern  int32_t dir_close(){
+/*
+ * dir_close
+ *   DESCRIPTION:function that closes the directory
+ *   ARGUMENTS : none
+ *   OUTPUTS:None
+ *   RETURN VALUE: 0 for success -1 for error
+ *   SIDE EFFECTS: returns 0 for now may have to populate for future checkpoints
+ */
+int32_t dir_close()
+{
         a=b;
         return 0;
-    }
+}
 
-extern int32_t dir_open(const int8_t* filename){
+/*
+ *  dir_open
+ *  INPUT: filename - unused 
+ *  OUTPUT: none
+ *  RETURN VALUE: 0 always
+ *  SIDE EFFECTS: none
+ */
+int32_t dir_open(const int8_t* filename)
+{
   return 0;
 }
 
-extern int32_t dir_write(int32_t fd,const void* buf,int32_t nbytes){
+/*
+ *  dir_write
+ *  INPUT:  fd      - unused
+ *          buf     - unused
+ *          nbytes  - unused
+ *  OUTPUT: none
+ *  RETURN VALUE: 0 always
+ *  SIDE EFFECTS: none
+ */
+int32_t dir_write(int32_t fd,const void* buf,int32_t nbytes)
+{
   return 0;
 }

@@ -1,9 +1,13 @@
 #include "pcb.h"
 #include "lib.h"
-void init_pcb(){
 
-}
 
+/*
+ *	get_pcb_address
+ *	INPUT: none
+ *	OUTPUT: none
+ *	RETURN VALUE: address to the current stack's PCB
+ */
 pcb* get_pcb_address(){
 
   /* Here, we try to calculate which PCB this system call belongs to

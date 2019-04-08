@@ -78,16 +78,13 @@ int terminal_write(int32_t fd,void*buf,int32_t nbytes){
   return 0;
 }
 
-/* int read(char* buffer)
- *
+/* int read
  * Writes characters from the buffer to the terminal buffer and appends a
  *  new line character at the end. Prints the number of bytes which were read
  * Inputs: char* buffer
  * Outputs: 0 always
  * Side Effects: None
  */
-
-
 int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
 
 
@@ -120,22 +117,39 @@ int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
   return retvalue+1;
 }
 
-/* int open()
+/* terminal_open
  *
  * Does nothing
  * Inputs: None
  * Outputs: Returns 0
  * Side Effects: None
  */
-
-
 int terminal_open(const uint8_t* filename){
-return 0;
+  return 0;
 }
 
+
+/*
+ *  terminal_close
+ *  INPUT: fd
+ *  OUTPUT: none
+ *  RETURN VALUE: 0 always
+ *  SIDE EFFECT: none
+ */
 int32_t terminal_close(int32_t fd){
   return 0;
 }
+
+
+/*
+ *  set_terminal_buffer
+ *  INPUT:  buf     - destination buffer
+ *          nchars  - number of characters to copy
+ *  OUTPUT: none
+ *  RETURN VALUE: none
+ *  SIDE EFFECTS: Helper function which copies contents 
+ *                of buf into the terminal buffer.
+ */
 void set_terminal_buffer(uint8_t* buf,uint32_t nchars){
   int i=0;
   memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);

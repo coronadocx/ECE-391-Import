@@ -3,6 +3,14 @@
 /* This is explicitly done to save FLAGS and registers on the stack
 *  upon encountering an interrupt
 */
+.data
+  /* some data allocations */ 
+  USER_DS =0x002B
+  ARGSIZE = 12
+  USER_CS =0x0023
+  ESPARG = 0x83ffffc
+  MAX_SYS_CALL=10
+  MIN_SYS_CALL=0
 
 .text
 
@@ -20,7 +28,7 @@ contextswitchasm:
     movl %esp,%ecx
 
     /* code to save parent process stuff */
-    movl $0x002B, %eax
+    movl $USER_DS, %eax
     movw %ax, %ds
     movw %ax, %es
     movw %ax, %fs
@@ -30,15 +38,15 @@ contextswitchasm:
     pushl %ecx
     pushl %edx
     call save_parent_registers
-    add $12,%esp
+    add $ARGSIZE,%esp
 
     xorl %edx,%edx
     movl 4(%esp),%edx
 
-    pushl $0x002B
-    pushl $0x83ffffc
+    pushl $USER_DS
+    pushl $ESPARG
     pushfl
-    pushl $0x0023
+    pushl $USER_CS
     pushl %edx
 
 
@@ -47,9 +55,10 @@ contextswitchasm:
     ret
 
 restoreparent:
-     movl 4(%esp),%ebp
-     movl 8(%esp),%esp
-     movl 12(%esp),%eax
+     /* extract args and restore the parents */
+     movl 4(%esp),%ebp  // move first arg
+     movl 8(%esp),%esp // move second arg
+     movl 12(%esp),%eax // move third arg
 
      ret
 
@@ -119,9 +128,9 @@ close_handlerasm:
 
 systemcallasm:
 
-          cmpl $0,%eax
+          cmpl $MIN_SYS_CALL,%eax
           jle  DEFAULTERROR
-          cmpl $10,%eax
+          cmpl $MAX_SYS_CALL,%eax
           jg   DEFAULTERROR
           pushfl
         #  pushal
@@ -144,7 +153,7 @@ systemcallasm:
           subl $1,%eax
 
 
-          jmp  *jumptable(,%eax,4)
+          jmp  *jumptable(,%eax,4) // magic number 4 is just the number of bytes
 
 DEFAULTERROR:
           movl $-1,%eax
@@ -152,7 +161,7 @@ DEFAULTERROR:
 
 RETURN:
         # Tearing down syscall args
-          add $12,%esp
+          add $ARGSIZE,%esp
     /* Popal first and then PopFl */
     # popal
     # Restoring all values except %eax

@@ -155,14 +155,6 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry){
   int8_t* first_file = (int8_t*) (first_directory + SKIP_TO_DIR_ENTRIES);
   /* Using this to keep track of the index in the boot_dir_list */
   int j = 0;
-  // while((strlen(first_file + j*BOOT_BLOCK_SIZE) != strlen(fname)) && \
-  //       (strncmp((first_file + j*BOOT_BLOCK_SIZE ), fname, strlen(first_file + j*BOOT_BLOCK_SIZE )) != 0)){ //changed from strlen(fname)
-  //   /* If we could not find the filename, return -1 */
-  //   if(j >= MAX_FILE_NUM)
-  //     return -1;
-  //
-  //   j++;
-  // }
 
   for (j=0; j<MAX_FILE_NUM; j++) {
     if (strlen(first_file + j*BOOT_BLOCK_SIZE) == strlen(fname)){

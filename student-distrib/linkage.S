@@ -49,6 +49,7 @@ contextswitchasm:
 restoreparent:
      movl 4(%esp),%ebp
      movl 8(%esp),%esp
+     movl 12(%esp),%eax
 
      ret
 

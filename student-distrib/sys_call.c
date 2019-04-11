@@ -459,7 +459,57 @@ int32_t getargs(uint8_t * buf, int32_t nbytes)
   //TODO
 }
 
-int32_t vidmap(uint8_t ** screen start)
+
+
+/*
+ * vidmap
+ *   DESCRIPTION: Maps the text mode video memory into user space at a pre-set
+ *                virtal address
+ *   INPUTS: uint8_t screen_start Location where the virtual address must be stored
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS: None
+ */
+
+int32_t vidmap(uint8_t ** screen_start)
 {
   //TODO
+
+
+
+
+
+
+
+}
+
+
+/*
+ * set_handler
+ *   DESCRIPTION: Set_handler system call which currently only
+ *                returns -1. Will be done for EC
+ *   INPUTS: int32_t signum,void* handler_address
+ *   OUTPUTS:-1
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS: None
+*/
+
+int32_t set_handler(int32_t signum,void* handler_address){
+
+  return -1;
+
+}
+
+/*
+ * sigreturn
+ *   DESCRIPTION: sigreturn system call which currently
+ *                only returns -1. Will be done for EC
+ *   INPUTS: void
+ *   OUTPUTS:-1
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS: None
+*/
+
+int32_t sigreturn(void){
+  return -1;
 }

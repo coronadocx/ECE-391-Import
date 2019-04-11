@@ -451,3 +451,10 @@ a->parent_esp=esp;
 a->parent_ebp=ebp;
 return ;
 }
+
+////////////////////////////////CP4/////////////////////////////////
+
+int32_t getargs(uint8_t * buf, int32_t nbytes)
+{
+  //TODO
+}

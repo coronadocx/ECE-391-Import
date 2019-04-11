@@ -458,3 +458,8 @@ int32_t getargs(uint8_t * buf, int32_t nbytes)
 {
   //TODO
 }
+
+int32_t vidmap(uint8_t ** screen start)
+{
+  //TODO
+}

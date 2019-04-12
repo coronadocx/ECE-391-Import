@@ -168,6 +168,40 @@ close_handlerasm:
     call close
     jmp RETURN
 
+
+/* getargs_handlerasm
+ * linkage function to call close
+ */
+getargs_handlerasm:
+    call getargs
+    jmp RETURN
+
+
+
+/* vidmap_handlerasm
+ * linkage function to call close
+ */
+vidmap_handlerasm:
+    call vidmap
+    jmp RETURN
+
+/* set_handlerasm
+* linkage function to call close
+*/
+set_handlerasm:
+  call set_handler
+  jmp RETURN
+
+
+/* sigreturn_handlerasm
+* linkage function to call close
+*/
+sigreturn_handlerasm:
+  call sigreturn
+  jmp RETURN
+
+
+
 /*
  * 	systemcallasm
  *	DESCRIPTION: Assembly linkage function for systemcalls.
@@ -225,5 +259,5 @@ RETURN:
          popfl
          iret
 jumptable:
-   .long halt_handlerasm,execute_handlerasm,read_handlerasm,write_handlerasm,open_handlerasm,close_handlerasm
+   .long halt_handlerasm,execute_handlerasm,read_handlerasm,write_handlerasm,open_handlerasm,close_handlerasm,getargs_handlerasm,vidmap_handlerasm,set_handlerasm,sigreturn_handlerasm
 .end

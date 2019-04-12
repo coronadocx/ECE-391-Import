@@ -3,6 +3,7 @@
 
 static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
 static uint32_t page_table_0M_4M[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
+static uint32_t new_page_table[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
 
 
 /*
@@ -105,4 +106,25 @@ uint32_t paging_change_process(uint32_t pid)
     );
 
     return 0;
+}
+
+
+/*
+ *  mapvirtualtovideomemory
+ *
+ *  INPUT:          None
+ *  OUTPUT:         None
+ *  RETURN VALUE:   0
+ *  SIDE EFFECTS:   Maps Virtual Memory 133MB to video memory by creating a new page table
+ *
+ */
+
+
+uint32_t mapvirtualtovideomemory(){
+
+page_directory[VMEM_33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK_USER);
+
+new_page_table[ONEMB_PAGETABLE] = (VID_START_ADDR | UMEM_OR_MASK);
+
+return 0;
 }

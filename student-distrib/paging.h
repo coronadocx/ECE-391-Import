@@ -20,6 +20,7 @@
 //Masks
 #define VMEM_OR_MASK    0x7
 #define PTABLE_OR_MASK  0x13
+#define PTABLE_OR_MASK_USER  0x17
 #define KMEM_OR_MASK    0x183
 #define UMEM_OR_MASK    0x87
 
@@ -27,6 +28,10 @@
 #define PIDMAX 5
 
 #define USER_MEM_LOCATION 32
+#define VMEM_33 33
+#define ONEMB_PAGETABLE 256
+
+
 
 typedef struct pg_struct {							//Page Entry Struct
     uint32_t base_addr;
@@ -46,6 +51,7 @@ typedef struct pg_struct {							//Page Entry Struct
 
 extern void paging_initialize();
 extern uint32_t paging_change_process(uint32_t process_id);
+extern uint32_t mapvirtualtovideomemory();
 // extern uint32_t paging_create_entry(pe_t entry);
 
 #endif

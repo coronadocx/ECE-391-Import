@@ -451,3 +451,84 @@ a->parent_esp=esp;
 a->parent_ebp=ebp;
 return ;
 }
+
+////////////////////////////////CP4/////////////////////////////////
+
+int32_t getargs(uint8_t * buf, int32_t nbytes)
+{
+  //TODO
+
+//temp
+  return -1;
+}
+
+
+
+/*
+ * vidmap
+ *   DESCRIPTION: Maps the text mode video memory into user space at a pre-set
+ *                virtal address
+ *   INPUTS: uint8_t screen_start Location where the virtual address must be stored
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS: None
+ */
+
+int32_t vidmap(uint8_t ** screen_start)
+{
+  //TODO
+
+// checks if the pointer passed is a valid user level pointer
+// does this by checking if its between 128 MB and 132 MB in virtual user memory
+// this checking is very wrong. Need to check specific parameters. AAh will do.
+
+if(screen_start==NULL){
+  return -1;
+}
+
+uint32_t page_dir_idx = ((MASK_FOR_PAGEDIRIDX) & (uint32_t)screen_start) >> SHIFT_FOR_PAGEDIRIDX;
+// uint32_t page_dir_idx = (uint32_t) screen_start >> 22;
+// Basically if its not 32 then return
+if(page_dir_idx !=CHECK_USER_VMEM ){
+  return -1;
+}
+
+mapvirtualtovideomemory();
+
+uint32_t vmemlocation = VMEM_133MB;
+
+memcpy(screen_start,&vmemlocation,4);
+
+return 0;
+}
+
+
+/*
+ * set_handler
+ *   DESCRIPTION: Set_handler system call which currently only
+ *                returns -1. Will be done for EC
+ *   INPUTS: int32_t signum,void* handler_address
+ *   OUTPUTS:-1
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS: None
+*/
+
+int32_t set_handler(int32_t signum,void* handler_address){
+
+  return -1;
+
+}
+
+/*
+ * sigreturn
+ *   DESCRIPTION: sigreturn system call which currently
+ *                only returns -1. Will be done for EC
+ *   INPUTS: void
+ *   OUTPUTS:-1
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS: None
+*/
+
+int32_t sigreturn(void){
+  return -1;
+}

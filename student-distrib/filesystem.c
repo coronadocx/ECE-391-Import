@@ -136,6 +136,8 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry)
   if(boot_block_addr == NULL)
     return -1;
 
+  uint32_t fname_length;
+
   /* Copy over # dir_entries */
   dir_entries = *(boot_block_addr);
   /* Copy over # inodes */
@@ -163,7 +165,10 @@ int32_t read_dentry_by_name(const int8_t* fname, dentry_t* dentry)
   int j = 0;
 
   for (j=0; j<MAX_FILE_NUM; j++) {
-    if (strlen(first_file + j*BOOT_BLOCK_SIZE) == strlen(fname)){
+    fname_length = strlen(first_file + j*BOOT_BLOCK_SIZE);
+    if(fname_length > FILE_NAME_SIZE)
+      fname_length = FILE_NAME_SIZE;
+    if (fname_length == strlen(fname)){
       if (strncmp((first_file + j*BOOT_BLOCK_SIZE ), fname, strlen(fname)) == 0){
         break;
       }

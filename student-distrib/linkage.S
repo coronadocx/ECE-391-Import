@@ -168,6 +168,14 @@ close_handlerasm:
     call close
     jmp RETURN
 
+
+/* getargs_handlerasm
+ * linkage function to call getargs
+ */
+getargs_handlerasm:
+    call getargs
+    jmp RETURN
+
 /*
  * 	systemcallasm
  *	DESCRIPTION: Assembly linkage function for systemcalls.
@@ -225,5 +233,5 @@ RETURN:
          popfl
          iret
 jumptable:
-   .long halt_handlerasm,execute_handlerasm,read_handlerasm,write_handlerasm,open_handlerasm,close_handlerasm
+   .long halt_handlerasm,execute_handlerasm,read_handlerasm,write_handlerasm,open_handlerasm,close_handlerasm, getargs_handlerasm
 .end

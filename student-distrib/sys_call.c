@@ -7,6 +7,7 @@
 #include "paging.h"
 #include "types.h"
 #include "rtc.h"
+#include "lib.h"
 // extern void contextswitchasm(uint32_t eipval,pcb* current_process);
 
 
@@ -274,11 +275,29 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
  */
 
 int32_t execute(const uint8_t* command){
-  int32_t i=0;
+  int32_t i;
   int32_t j;
   int8_t buf[MAXBUFSIZEEXECUTE];
   dentry_t dir_entry;
+  int32_t arg_size; // XXX tmp var to hold array size
+  int32_t arg_idx;  // XXX tmp var to hold command starting idx
+  int8_t arg_arr[MAXBUFSIZEEXECUTE]; // XXX tmp var to hold cmd
 
+  for (i=0; i<MAXBUFSIZEEXECUTE; i++)
+    arg_arr[i] = '\0';
+
+  // XXX save the command buffer locally
+  arg_size = 0; 
+  while(command[arg_size] != '\n' && command[arg_size] != '\0') {
+    arg_arr[arg_size] = command[arg_size];
+    arg_size++;
+  }
+
+  arg_arr[arg_size+1] = '\0';
+
+
+
+  i=0;
   //Make sure buffer isn't too thicc
   if (strlen((int8_t*)command) > MAXBUFSIZEEXECUTE){
     printf("Bad Length\n" );
@@ -290,7 +309,7 @@ int32_t execute(const uint8_t* command){
     i=i+1;
   }
 
-  // parse the filename form the command
+  // parse the filename from the command
   for(j=0; command[i]!=' ' && command[i]!='\n' && command[i]!='\0';i++, j++){
     buf[j]=command[i];
   }
@@ -299,10 +318,9 @@ int32_t execute(const uint8_t* command){
   if (j == MAXBUFSIZEEXECUTE)
     j = MAXBUFSIZEEXECUTE-1;
   buf[j]='\0';
-
+  arg_idx = j+1;
 
   // check if program exists
-
   if(read_dentry_by_name(buf,&dir_entry)==-1){
     return INVALIDORFAIL ;
   }
@@ -384,6 +402,16 @@ int32_t execute(const uint8_t* command){
   i=i+1;
   }
 
+  // Clean the old buffer because we do not create new structures
+  for (i=0; i< PCB_MAX_ARGS; i++) {
+    current_process->arg_arr[i] = '\0';
+  }
+
+  // Store the rest of the command as args in the current process
+  current_process->arg_size = arg_size;
+  for (i=0, j=arg_idx+W_SPACE; j < arg_size && arg_arr[j] != '\0'; i++,j++) {
+    current_process->arg_arr[i] = arg_arr[j];
+  }
 
   /* this part alters the TSS */
   tss.ss0 = KERNEL_DS;
@@ -454,7 +482,28 @@ return ;
 
 ////////////////////////////////CP4/////////////////////////////////
 
+/*
+ *  getargs
+ *  INPUT:  nbytes  - number of bytes/chars to read into the buffer
+ *
+ *  OUTPUT: buf     - buffer that args will be stored into 
+ *
+ *  RETURN: 0   - success
+ *          -1  - buffer is too small or noarg or NULL buffer
+ *
+ *  EFFECT: Reads the program's command line arguments into a buffer
+ */
 int32_t getargs(uint8_t * buf, int32_t nbytes)
 {
-  //TODO
+  pcb * curr_pcb = get_pcb_address();
+
+  // NOTE: need the last element in buf for sentinel
+  if (buf == NULL || nbytes < 0 || (nbytes-1) < curr_pcb->arg_size)
+    return INVALIDORFAIL;
+
+  strncpy((int8_t*)buf, (int8_t*)curr_pcb->arg_arr, nbytes); // Copy args into buf
+  buf[nbytes] = '\0'; // Insert nullbyte sentinel
+
+  return 0;
 }
+

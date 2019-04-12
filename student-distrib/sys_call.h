@@ -38,6 +38,14 @@
 #define FDEND 7
 
 
+#define VMEM_133MB 0x8500000
+#define SHIFT_FOR_PAGEDIRIDX 22
+#define MASK_FOR_PAGEDIRIDX 0xFFC00000
+#define CHECK_USER_VMEM 32
+
+
+
+
 int32_t halt(uint8_t status);
 int32_t execute(const uint8_t* command);
 int32_t write(int32_t fd, const void*buf,int32_t nbytes);

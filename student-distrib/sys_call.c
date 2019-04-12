@@ -486,19 +486,16 @@ if(screen_start==NULL){
   return -1;
 }
 
-
-uint32_t page_dir_idx = (0xFFC00000 & (uint32_t)screen_start) >> 22;
+uint32_t page_dir_idx = ((MASK_FOR_PAGEDIRIDX) & (uint32_t)screen_start) >> SHIFT_FOR_PAGEDIRIDX;
 // uint32_t page_dir_idx = (uint32_t) screen_start >> 22;
 // Basically if its not 32 then return
-if(page_dir_idx < 32 || page_dir_idx > 33 ){
+if(page_dir_idx !=CHECK_USER_VMEM ){
   return -1;
 }
 
-// need to add page mapping here.
+mapvirtualtovideomemory();
 
-mapvideomemory();
-
-uint32_t vmemlocation = 0x8500000;
+uint32_t vmemlocation = VMEM_133MB;
 
 memcpy(screen_start,&vmemlocation,4);
 

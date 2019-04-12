@@ -282,12 +282,20 @@ int32_t execute(const uint8_t* command){
   int32_t arg_size; // XXX tmp var to hold array size
   int32_t arg_idx;  // XXX tmp var to hold command starting idx
   int8_t arg_arr[MAXBUFSIZEEXECUTE]; // XXX tmp var to hold cmd
+  if(command==NULL){
+    return -1;
+  }
+  //Make sure buffer isn't too thicc
+  if (strlen((int8_t*)command) > MAXBUFSIZEEXECUTE){
+    printf("Bad Length\n" );
+    return INVALIDORFAIL;
+  }
 
   for (i=0; i<MAXBUFSIZEEXECUTE; i++)
     arg_arr[i] = '\0';
 
-  // XXX save the command buffer locally
-  arg_size = 0; 
+  // XXX save the command buffer locally copies the entire command
+  arg_size = 0;
   while(command[arg_size] != '\n' && command[arg_size] != '\0') {
     arg_arr[arg_size] = command[arg_size];
     arg_size++;
@@ -298,11 +306,7 @@ int32_t execute(const uint8_t* command){
 
 
   i=0;
-  //Make sure buffer isn't too thicc
-  if (strlen((int8_t*)command) > MAXBUFSIZEEXECUTE){
-    printf("Bad Length\n" );
-    return INVALIDORFAIL;
-  }
+
 
   //leading spaces
   while(command[i]==' '){
@@ -409,7 +413,7 @@ int32_t execute(const uint8_t* command){
 
   // Store the rest of the command as args in the current process
   current_process->arg_size = arg_size;
-  for (i=0, j=arg_idx+W_SPACE; j < arg_size && arg_arr[j] != '\0'; i++,j++) {
+  for (i=0, j=arg_idx; j < arg_size && arg_arr[j] != '\0'; i++,j++) { // W_SPACE ? it was zero anyways
     current_process->arg_arr[i] = arg_arr[j];
   }
 
@@ -486,7 +490,7 @@ return ;
  *  getargs
  *  INPUT:  nbytes  - number of bytes/chars to read into the buffer
  *
- *  OUTPUT: buf     - buffer that args will be stored into 
+ *  OUTPUT: buf     - buffer that args will be stored into
  *
  *  RETURN: 0   - success
  *          -1  - buffer is too small or noarg or NULL buffer
@@ -495,15 +499,16 @@ return ;
  */
 int32_t getargs(uint8_t * buf, int32_t nbytes)
 {
-  pcb * curr_pcb = get_pcb_address();
-
+    pcb * curr_pcb = get_pcb_address();
   // NOTE: need the last element in buf for sentinel
   if (buf == NULL || nbytes < 0 || (nbytes-1) < curr_pcb->arg_size)
     return INVALIDORFAIL;
 
+
+
+
   strncpy((int8_t*)buf, (int8_t*)curr_pcb->arg_arr, nbytes); // Copy args into buf
-  buf[nbytes] = '\0'; // Insert nullbyte sentinel
+//  buf[nbytes] = '\0'; // Insert nullbyte sentinel
 
   return 0;
 }
-

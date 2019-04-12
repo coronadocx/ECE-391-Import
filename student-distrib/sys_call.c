@@ -482,8 +482,10 @@ int32_t vidmap(uint8_t ** screen_start)
 // does this by checking if its between 128 MB and 132 MB in virtual user memory
 // this checking is very wrong. Need to check specific parameters. AAh will do.
 
-uint32_t vmem_directory_idx = (33 << 22) & 0xFFC00000;
-uint32_t vmem_page_idx = (256 << 12) & 0xFFC00000;
+if(screen_start==NULL){
+  return -1;
+}
+
 
 uint32_t page_dir_idx = (0xFFC00000 & (uint32_t)screen_start) >> 22;
 // uint32_t page_dir_idx = (uint32_t) screen_start >> 22;
@@ -492,14 +494,13 @@ if(page_dir_idx < 32 || page_dir_idx > 33 ){
   return -1;
 }
 
-
 // need to add page mapping here.
 
 mapvideomemory();
 
+uint32_t vmemlocation = 0x8500000;
 
-*screen_start = (uint8_t*)(vmem_directory_idx | vmem_page_idx);
-
+memcpy(screen_start,&vmemlocation,4);
 
 return 0;
 }

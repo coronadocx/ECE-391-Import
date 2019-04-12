@@ -113,9 +113,9 @@ uint32_t paging_change_process(uint32_t pid)
 
 uint32_t mapvideomemory(){
 
-page_directory[33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK);
+page_directory[VMEM_33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK_USER);
 
-new_page_table[256] = (VID_START_ADDR | VMEM_OR_MASK);
+new_page_table[ONEMB_PAGETABLE] = (VID_START_ADDR | UMEM_OR_MASK);
 
 return 0;
 }

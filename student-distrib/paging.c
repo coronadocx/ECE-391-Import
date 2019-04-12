@@ -117,5 +117,5 @@ page_directory[33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK);
 
 new_page_table[256] = (VID_START_ADDR | VMEM_OR_MASK);
 
-
+return 0;
 }

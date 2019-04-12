@@ -169,6 +169,14 @@ close_handlerasm:
     jmp RETURN
 
 
+/* getargs_handlerasm
+ * linkage function to call close
+ */
+getargs_handlerasm:
+    call getargs
+    jmp RETURN
+
+
 
 /* vidmap_handlerasm
  * linkage function to call close

@@ -485,8 +485,8 @@ int32_t vidmap(uint8_t ** screen_start)
 uint32_t vmem_directory_idx = (33 << 22) & 0xFFC00000;
 uint32_t vmem_page_idx = (256 << 12) & 0xFFC00000;
 
-// uint32_t page_dir_idx = (0xFFC00000 & (uint32_t)screen_start) >> 22;
-uint32_t page_dir_idx = ((uint32_t) screen_start) >> 22;
+uint32_t page_dir_idx = (0xFFC00000 & (uint32_t)screen_start) >> 22;
+// uint32_t page_dir_idx = (uint32_t) screen_start >> 22;
 // Basically if its not 32 then return
 if(page_dir_idx < 32 || page_dir_idx > 33 ){
   return -1;
@@ -498,7 +498,7 @@ if(page_dir_idx < 32 || page_dir_idx > 33 ){
 mapvideomemory();
 
 
-*screen_start = vmem_directory_idx | vmem_page_idx;
+*screen_start = (uint8_t*)(vmem_directory_idx | vmem_page_idx);
 
 
 return 0;

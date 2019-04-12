@@ -36,6 +36,9 @@
 #define METADATAEXECUTESIZE 40
 #define FDSTART 2
 #define FDEND 7
+#define 128MB_VMEM 134217728
+#define 132MB_VMEM 138412032
+
 
 int32_t halt(uint8_t status);
 int32_t execute(const uint8_t* command);

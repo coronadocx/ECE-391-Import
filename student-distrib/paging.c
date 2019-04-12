@@ -3,6 +3,7 @@
 
 static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
 static uint32_t page_table_0M_4M[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
+static uint32_t new_page_table[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
 
 
 /*
@@ -105,4 +106,16 @@ uint32_t paging_change_process(uint32_t pid)
     );
 
     return 0;
+}
+
+
+
+
+uint32_t mapvideomemory(){
+
+page_directory[33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK);
+
+new_page_table[256] = (VID_START_ADDR | VMEM_OR_MASK);
+
+
 }

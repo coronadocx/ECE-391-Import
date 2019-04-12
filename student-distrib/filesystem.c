@@ -61,7 +61,7 @@ int32_t fs_open(const int8_t* filename)
 
 int32_t fs_close()
 {
-    a=b; // a and b are global dentry structs 
+    a=b; // a and b are global dentry structs
     return 0;
 }
 
@@ -437,29 +437,39 @@ int dir_read(int fd, void* buf, int32_t nbytes)
 	int num_inodes;
 	int num_dblocks;
 	int i;
+  int j;
 	uint32_t* inode_start_addr;
 	dentry_t d;
 	uint32_t file_size;
-
+  int bytes_read=nbytes;
 	dir_entries = *(boot_block_addr);
 	num_inodes  = *(boot_block_addr + BB_INODE_OFFSET);
 	num_dblocks = *(boot_block_addr + BB_DBLOCK_OFFSET);
 
 	inode_start_addr = boot_block_addr + ABS_BLK_OFFSET;
+  pcb* curr_pcb;
+  curr_pcb = get_pcb_address();
 
-	for(i = 0; i < dir_entries; i++){
-		if(read_dentry_by_index(i, &d) == -1){
-			return -1;
+
+		if(read_dentry_by_index(curr_pcb->fd_array[fd].file_pos, &d) == -1){
+			return 0;
 		}
+    j=0;
+    file_size = strlen(d.fname);
+    while(j<bytes_read){
+      *((int8_t*)buf+j)=d.fname[j];
+      j=j+1;
+      if(j>=file_size){
+        bytes_read=file_size;
+        break;
+      }
+    }
 
-		printf("File Name: %s, " , d.fname);
-		printf("File Type: %u, ", d.file_type);
-		file_size = *(inode_start_addr + (d.inode_num)*ABS_BLK_OFFSET);
-		printf("File Size: %d\n", file_size);
 
-	}
+    curr_pcb->fd_array[fd].file_pos += 1;
 
-	return 0;
+
+	return bytes_read;
 }
 
 

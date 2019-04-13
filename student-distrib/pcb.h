@@ -6,8 +6,9 @@
 #include "filesystem.h"
 #include "terminal.h"
 
-#define PCB_MASK    0xFFE000
+#define PCB_MASK          0xFFE000
 #define FD_ARR_SIZE       8
+#define PCB_MAX_ARGS          128
 
 /* Operation Jumptable Struct */
 typedef struct operation_table{
@@ -33,6 +34,9 @@ typedef struct task_struct{
   int32_t parent_esp;
   int32_t parent_ebp;
   int32_t parent_process_id;
+  int32_t arg_size;                 // Chars in arg array
+  uint8_t arg_arr[PCB_MAX_ARGS];    // Arg array
+
 }pcb;
 
 /* Function to get the address of the current pcb */

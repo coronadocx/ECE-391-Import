@@ -170,7 +170,7 @@ close_handlerasm:
 
 
 /* getargs_handlerasm
- * linkage function to call close
+ * linkage function to call getargs
  */
 getargs_handlerasm:
     call getargs

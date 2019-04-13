@@ -71,9 +71,11 @@ void update_cursor(){
 int terminal_write(int32_t fd,void*buf,int32_t nbytes){
   int i=0;
   int8_t* buf2= (int8_t*)buf;
-  for(i=0;buf2[i]!='\0';i++){
+
+  for(i=0;i<nbytes;i++){
     putc(buf2[i]);
   }
+
   update_cursor();
   return 0;
 }
@@ -102,12 +104,10 @@ int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
     //memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
   int i=0;
   while(i<numberofchars){
-    printf("%c",terminalbuffer[i]);
     *((int8_t*)buffer+i)=terminalbuffer[i];
      i=i+1;
   }
   *((int8_t*)buffer+i)='\n';
-  putc('\n');
   update_cursor();
   int retvalue = numberofchars;
   memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);
@@ -147,7 +147,7 @@ int32_t terminal_close(int32_t fd){
  *          nchars  - number of characters to copy
  *  OUTPUT: none
  *  RETURN VALUE: none
- *  SIDE EFFECTS: Helper function which copies contents 
+ *  SIDE EFFECTS: Helper function which copies contents
  *                of buf into the terminal buffer.
  */
 void set_terminal_buffer(uint8_t* buf,uint32_t nchars){

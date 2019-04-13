@@ -75,7 +75,7 @@ int terminal_write(int32_t fd,void*buf,int32_t nbytes){
   for(i=0;i<nbytes;i++){
     putc(buf2[i]);
   }
-  
+
   update_cursor();
   return 0;
 }
@@ -108,7 +108,6 @@ int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
      i=i+1;
   }
   *((int8_t*)buffer+i)='\n';
-  putc('\n');
   update_cursor();
   int retvalue = numberofchars;
   memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);

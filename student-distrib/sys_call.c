@@ -7,12 +7,6 @@
 #include "types.h"
 #include "rtc.h"
 #include "lib.h"
-// extern void contextswitchasm(uint32_t eipval,pcb* current_process);
-
-
-//static int8_t args[126];  // 128 characters in keyboard buffer. 1 for \n and 1 for enter  filename can take
-// otable_t rtctable,filetable,directorytable,stdin_table,stdout_table;
-// rtctable.(*open)("hello") = 0;
 
 /* Tables of function pointers */
 void* rtctable[SIZEOFOPERATIONSTABLE]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
@@ -23,6 +17,89 @@ void* stdout_table[SIZEOFOPERATIONSTABLE]={&terminal_open,NULL,&terminal_write,&
 int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE};
 //int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE}; //For a maximum of two programs
 
+/*
+ *  set_up_stdin
+ *   DESCRIPTION: Function to handle the stdin file descriptor
+ *   INPUTS: pcb* curr_pcb -- Address of Current Process Control Block
+ *   OUTPUTS:None
+ *   RETURN VALUE: NONE
+ *   SIDE EFFECTS: sets fd entry 0 in  current pcb
+ */
+void set_up_stdin(pcb* current_process){
+  // SETS UP STD IN
+  current_process->fd_array[0].operationstable=stdin_table;
+  current_process->fd_array[0].inode_num=INVALIDORFAIL;
+  current_process->fd_array[0].file_pos=DEFAULTFILEOFFSET;
+  current_process->fd_array[0].flags[0]=INUSE;
+
+}
+/*
+ *  set_up_stdout
+ *   DESCRIPTION: Function to handle the stdout file descriptor
+ *   INPUTS: pcb* curr_pcb -- Address of Current Process Control Block
+ *   OUTPUTS:None
+ *   RETURN VALUE: NONE
+ *   SIDE EFFECTS: sets fd entry 1 in  current pcb
+ */
+void set_up_stdout(pcb* current_process){
+  // SETS UP STD IN
+  current_process->fd_array[1].operationstable=stdout_table;
+  current_process->fd_array[1].inode_num=INVALIDORFAIL;
+  current_process->fd_array[1].file_pos=DEFAULTFILEOFFSET;
+  current_process->fd_array[1].flags[0]=INUSE;
+}
+/*
+ * set parent
+ *   DESCRIPTION: Function to handle the file descriptor on an open system call
+ *   INPUTS: pcb* curr_pcb -- Address of Current Process Control Block
+ *           current_pid -- id for process
+ *           parent_pcb -- Address of parent process control block
+             parent_pid -- address of parent id
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: sets parent for current process
+ */
+void set_parent(pcb* current_process,int32_t current_pid,pcb* parent_pcb,int32_t parent_pid){
+  if(current_pid!=1){
+    current_process->parent =parent_pcb ;
+    current_process->parent_process_id=parent_pid;
+  }
+  else{
+    current_process->parent=NULL;
+  }
+}
+/*
+ *  set_up_fdsandargs
+ *   DESCRIPTION: Function to handle the file descriptor array and set up the args for current process
+ *   INPUTS: pcb* curr_pcb -- Address of Current Process Control Block
+ *           int32_t arg_size -- argument size
+             int32_t arg_idx -- index from where args start
+             int32_t arg_arr -- the argument array
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS:set up the args for current process 
+ */
+void set_up_fdsandargs(pcb* current_process,int32_t arg_size,int32_t arg_idx,int8_t arg_arr[MAXBUFSIZEEXECUTE]){
+  int i=2;
+  int j;
+  /* sets the other file descriptors to not be in use */
+  while(i<ENTRIESINFDARRAY){
+  current_process->fd_array[i].file_pos=DEFAULTFILEOFFSET;
+  current_process->fd_array[i].flags[0]=NOTINUSE;
+  i=i+1;
+  }
+
+  // Clean the old buffer because we do not create new structures
+  for (i=0; i< PCB_MAX_ARGS; i++) {
+    current_process->arg_arr[i] = '\0';
+  }
+
+  // Store the rest of the command as args in the current process
+  current_process->arg_size = arg_size;
+  for (i=0, j=arg_idx; j < arg_size && arg_arr[j] != '\0'; i++,j++) { // W_SPACE ? it was zero anyways
+    current_process->arg_arr[i] = arg_arr[j];
+  }
+}
 /*
  * fd_array_handle_open
  *   DESCRIPTION: Function to handle the file descriptor on an open system call
@@ -151,7 +228,7 @@ int32_t open(const uint8_t* filename){
   if(fd_opened == INVALIDORFAIL)
     return INVALIDORFAIL;
 
-// ASK TA HOW TO CALL THE FUNCTION
+ // call using the function pointer table
  int32_t (*fun_ptr)(const uint8_t*);
  fun_ptr = (curr_pcb->fd_array[fd_opened].operationstable)[FILE_OPS_OPEN];
  (*fun_ptr)(filename);
@@ -257,13 +334,11 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
  */
 
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
-    if(fd<0){
+    if(fd<=0){
       return INVALIDORFAIL;
     }
 	 if(buf == NULL)
     return INVALIDORFAIL;
-   if(fd==0) // is that of stdin. stdin cant write !
-      return INVALIDORFAIL;
 
 	  /* Get address of relevant PCB */
   pcb* curr_pcb;
@@ -401,37 +476,12 @@ int32_t execute(const uint8_t* command){
   }
 
   // SETS UP STD IN
-  current_process->fd_array[0].operationstable=stdin_table;
-  current_process->fd_array[0].inode_num=INVALIDORFAIL;
-  current_process->fd_array[0].file_pos=DEFAULTFILEOFFSET;
-  current_process->fd_array[0].flags[0]=INUSE;
-
+ set_up_stdin(current_process);
   // SETS UP STD OUT
-  current_process->fd_array[1].operationstable=stdout_table;
-  current_process->fd_array[1].inode_num=INVALIDORFAIL;
-  current_process->fd_array[1].file_pos=DEFAULTFILEOFFSET;
-  current_process->fd_array[1].flags[0]=INUSE;
+  set_up_stdout(current_process);
 
   current_process->process_id=current_pid;
-
-  i=2;
-  /* sets the other file descriptors to not be in use */
-  while(i<ENTRIESINFDARRAY){
-  current_process->fd_array[i].file_pos=DEFAULTFILEOFFSET;
-  current_process->fd_array[i].flags[0]=NOTINUSE;
-  i=i+1;
-  }
-
-  // Clean the old buffer because we do not create new structures
-  for (i=0; i< PCB_MAX_ARGS; i++) {
-    current_process->arg_arr[i] = '\0';
-  }
-
-  // Store the rest of the command as args in the current process
-  current_process->arg_size = arg_size;
-  for (i=0, j=arg_idx; j < arg_size && arg_arr[j] != '\0'; i++,j++) { // W_SPACE ? it was zero anyways
-    current_process->arg_arr[i] = arg_arr[j];
-  }
+set_up_fdsandargs(current_process,arg_size,arg_idx,arg_arr);
 
   /* this part alters the TSS */
   tss.ss0 = KERNEL_DS;

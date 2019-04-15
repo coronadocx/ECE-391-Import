@@ -587,7 +587,7 @@ mapvirtualtovideomemory();
 
 uint32_t vmemlocation = VMEM_133MB;
 
-memcpy(screen_start,&vmemlocation,4);
+memcpy(screen_start,&vmemlocation,NUMBER_BYTES_INT);
 
 return 0;
 }

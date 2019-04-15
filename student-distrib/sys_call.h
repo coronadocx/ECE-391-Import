@@ -44,6 +44,7 @@
 #define SHIFT_FOR_PAGEDIRIDX 22
 #define MASK_FOR_PAGEDIRIDX 0xFFC00000
 #define CHECK_USER_VMEM 32
+#define NUMBER_BYTES_INT 4
 
 #define FD_STDIN        0
 #define FD_STDOUT       1

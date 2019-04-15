@@ -7,6 +7,7 @@
 #include "linkage.h"
 #include "i8259.h"
 #include "rtc.h"
+#include "sys_call.h"
 
 // idt index for keyboard and rtc
 #define KEYBOARD  0x21
@@ -22,7 +23,7 @@
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle0(){
-    printf("general Protection exception");
+    printf("general Protection exception\n");
     while(1);
 }
 /*
@@ -34,7 +35,7 @@ void handle0(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle1(){
-    printf("Debug exception");
+    printf("Debug exception\n");
     while(1);
 }
 /*
@@ -46,7 +47,7 @@ void handle1(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle2(){
-    printf("NMI Interupt");
+    printf("NMI Interupt\n");
       while(1);
 
 }
@@ -59,7 +60,7 @@ void handle2(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle3(){
-    printf("Breakpoint Exception");
+    printf("Breakpoint Exception\n");
       while(1);
 }
 /*
@@ -71,7 +72,7 @@ void handle3(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle4(){
-    printf("Overflow Exception");
+    printf("Overflow Exception\n");
       while(1);
 }
 /*
@@ -83,7 +84,7 @@ void handle4(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle5(){
-    printf("BOUND Range Exceeded Exception");
+    printf("BOUND Range Exceeded Exception\n");
       while(1);
 }
 /*
@@ -95,7 +96,7 @@ void handle5(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle6(){
-    printf("Invalid Opcode Exception");
+    printf("Invalid Opcode Exception\n");
       while(1);
 }
 /*
@@ -107,7 +108,7 @@ void handle6(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle7(){
-    printf("Device Not Available Exception");
+    printf("Device Not Available Exception\n");
       while(1);
 }
 /*
@@ -119,7 +120,7 @@ void handle7(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle8(){
-    printf("Double Fault Exception");
+    printf("Double Fault Exception\n");
       while(1);
 }
 /*
@@ -131,7 +132,7 @@ void handle8(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle9(){
-    printf("Coprocessor Segment Overrun");
+    printf("Coprocessor Segment Overrun\n");
       while(1);
 }
 /*
@@ -143,7 +144,7 @@ void handle9(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle10(){
-    printf("Invalid TSS exception");
+    printf("Invalid TSS exception\n");
       while(1);
 }
 /*
@@ -155,8 +156,8 @@ void handle10(){
  *   SIDE EFFECTS:  handles exception and sqaushes program
  */
 void handle14(){
-    printf("Page Fault exception");
-      while(1);
+    printf("Page Fault exception\n");
+      halt('P');
 }
 /*
  * commonhandler

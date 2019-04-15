@@ -225,6 +225,7 @@ systemcallasm:
 
           pushl %esi
           pushl %edi
+          pushl %ebp
 
         # %eax not saved here
 
@@ -249,6 +250,7 @@ RETURN:
     # popal
     # Restoring all values except %eax
     # We need %eax for the return value
+         popl %ebp
          popl %edi
          popl %esi
 

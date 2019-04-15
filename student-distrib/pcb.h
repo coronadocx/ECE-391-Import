@@ -36,6 +36,7 @@ typedef struct task_struct{
   int32_t parent_process_id;
   int32_t arg_size;                 // Chars in arg array
   uint8_t arg_arr[PCB_MAX_ARGS];    // Arg array
+  int32_t status ;
 
 }pcb;
 
@@ -43,6 +44,3 @@ typedef struct task_struct{
  pcb* get_pcb_address();
 
 #endif
-
-
-

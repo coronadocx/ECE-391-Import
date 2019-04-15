@@ -77,7 +77,7 @@ void set_parent(pcb* current_process,int32_t current_pid,pcb* parent_pcb,int32_t
              int32_t arg_arr -- the argument array
  *   OUTPUTS:None
  *   RETURN VALUE: None
- *   SIDE EFFECTS:set up the args for current process 
+ *   SIDE EFFECTS:set up the args for current process
  */
 void set_up_fdsandargs(pcb* current_process,int32_t arg_size,int32_t arg_idx,int8_t arg_arr[MAXBUFSIZEEXECUTE]){
   int i=2;
@@ -490,9 +490,7 @@ set_up_fdsandargs(current_process,arg_size,arg_idx,arg_arr);
   /* lets do the context switch!!!!!! */
   contextswitchasm(*((uint32_t*) executablebytes),current_process);
 
-
-
-  return 0; // success ; // success
+return current_process->status;
 }
 
 
@@ -518,6 +516,9 @@ int32_t halt(uint8_t status){
       close(i);
     }
     i=i+1;
+  }
+  if(curr_pcb->process_id!=1){
+    curr_pcb->parent->status = (uint32_t) status ;
   }
  // restore paging
   paging_change_process(parentid);

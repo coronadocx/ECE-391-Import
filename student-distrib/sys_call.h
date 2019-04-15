@@ -1,6 +1,8 @@
 #ifndef SYS_CALL_H
 #define SYS_CALL_H
 #include "types.h"
+#include "pcb.h"
+
 
 #define PCB_MASK    0xFFE000
 #define END_KMEM    0x800000
@@ -43,19 +45,37 @@
 #define MASK_FOR_PAGEDIRIDX 0xFFC00000
 #define CHECK_USER_VMEM 32
 
+#define FD_STDIN        0
+#define FD_STDOUT       1
+
+
 
 
 #define W_SPACE	0
 
+/* Function to handle the file descriptor on an open system call */
+int32_t fd_array_handle_open(pcb* curr_pcb, int32_t file_type, int32_t inode_num);
+/* Function to handle the file descriptor on a close system call */
+int32_t fd_array_handle_close(int32_t fd, pcb* curr_pcb);
+/* halt system call. tearsdown stack and restores to parent process */
 int32_t halt(uint8_t status);
+/* execute system call. Starts a process and runs it */
 int32_t execute(const uint8_t* command);
+/* Write system call. Calls the appropriate write function from file ops table */
 int32_t write(int32_t fd, const void*buf,int32_t nbytes);
+/* read system call. Calls the appropriate read function from file ops table */
 int32_t read(int32_t fd,void*buf,int32_t nbytes);
+/* close  system call. tearsdown stack and closes the file in the fd array */
 int32_t close(int32_t fd);
+/* open system call. opens a file in the fd array */
 int32_t open(const uint8_t* filename);
+/* Reads the program's command line arguments into a buffer */
 int32_t getargs(uint8_t * buf, int32_t nbytes);
+/* Maps the text mode video memory into user space at a pre-set virtal address */
 int32_t vidmap(uint8_t ** screen_start);
+/* Set_handler system call which currently only returns -1. Will be done for EC */
 int32_t set_handler(int32_t signum,void* handler_address);
+/* sigreturn system call which currently only returns -1. Will be done for EC */
 int32_t sigreturn(void);
 
 

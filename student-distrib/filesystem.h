@@ -25,7 +25,11 @@
 
 #define SKIP_TO_DIR_ENTRIES     16
 
-#define VAL_ONE                     1
+#define VAL_ONE                  1
+
+#define FTYPE_REGULAR            2
+
+#define FILETYPE_INDEX           1
 
 
 

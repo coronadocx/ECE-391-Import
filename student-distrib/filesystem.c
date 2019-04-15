@@ -74,8 +74,7 @@ int32_t fs_close()
  *   SIDE EFFECTS: populates th buffer
  */
 
-int32_t fs_read(int32_t fd, void* buf, int32_t nbytes)
-{
+int32_t fs_read(int32_t fd, void* buf, int32_t nbytes){
   /* If 0 bytes to be read, invalid input */
   if(nbytes == 0)
     return 0;
@@ -83,9 +82,27 @@ int32_t fs_read(int32_t fd, void* buf, int32_t nbytes)
   if(buf == NULL)
     return -1;
 
+  int file_type;
+  int filesize;
+  int inode_num;
+
   /* Getting current pcb address */
   pcb* curr_pcb;
   curr_pcb = get_pcb_address();
+
+/* Check for valid PCB Address */
+  if(curr_pcb == NULL)
+    return -1;
+
+  file_type = (int)curr_pcb->fd_array[fd].flags[FILETYPE_INDEX];
+  /* An fs_read is only possible on regular files */
+  if(file_type != FTYPE_REGULAR)
+    return -1;
+  inode_num = curr_pcb->fd_array[fd].inode_num;
+  filesize = get_filesize(inode_num);
+
+  if(curr_pcb->fd_array[fd].file_pos >= filesize)
+    return 0;
 
   /* Calling the read_data function and updating file_position*/
   int retval;
@@ -435,13 +452,18 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 int dir_read(int fd, void* buf, int32_t nbytes)
 {
 
+  /* Check for NULL */
 	if(boot_block_addr == NULL)
 	return -1;
+
+  /* if invalid FD, return -1 */
+  if(fd == 0 || fd == 1 || fd > 7)
+    return -1;
 
 	int dir_entries;
 	int num_inodes;
 	int num_dblocks;
-	int i;
+	//int i;
   int j;
 	uint32_t* inode_start_addr;
 	dentry_t d;

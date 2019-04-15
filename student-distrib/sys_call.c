@@ -1,4 +1,3 @@
-
 #include "linkage.h"
 #include "sys_call.h"
 #include "filesystem.h"
@@ -22,46 +21,30 @@ void* directorytable[SIZEOFOPERATIONSTABLE]={&dir_open,&dir_read,&dir_write,&dir
 void* stdin_table[SIZEOFOPERATIONSTABLE]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[SIZEOFOPERATIONSTABLE]={&terminal_open,NULL,&terminal_write,&terminal_close};
 int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE};
-
+//int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE}; //For a maximum of two programs
 
 /*
- * open
- *   DESCRIPTION: open system call. opens a file in the fd array
- *   INPUTS: filename
+ * fd_array_handle_open
+ *   DESCRIPTION: Function to handle the file descriptor on an open system call
+ *   INPUTS: pcb* curr_pcb -- Address of Current Process Control Block
+ *           file_type -- File type of file
+ *           inode_num -- Inode Number of file
  *   OUTPUTS:None
- *   RETURN VALUE: int32_t fd -> file descriptor index of opened file
+ *   RETURN VALUE: Returns fd of file on success, else -1
  *   SIDE EFFECTS:
  */
 
-int32_t open(const uint8_t* filename){
+int32_t fd_array_handle_open(pcb* curr_pcb, int32_t file_type, int32_t inode_num){
 
-  if(filename == NULL || strlen((int8_t*)filename)==0){
+  if(curr_pcb == NULL)
+    return INVALIDORFAIL;;
+
+  if(file_type != 0 && file_type != 1 && file_type != 2)
     return INVALIDORFAIL;
-  }
-  /* Directory Entry struct */
-  dentry_t dir_entry;
- /* Error handling if file not found */
-  if(read_dentry_by_name((int8_t*)filename,&dir_entry)==-1){
-    return INVALIDORFAIL;
-  }
 
-  int file_type;
-  int inode_num;
-
-/* Copy over filetype and inode number */
-  file_type = dir_entry.file_type;
-  inode_num = dir_entry.inode_num;
-
-  /* Get address of relevant PCB */
-  pcb* curr_pcb;
-  curr_pcb = get_pcb_address();
-
-
-
-/* Traverse through the relevant file descriptor array */
   int i;
   /* i starts at 2 because 0 and 1 are occupied by stdin and stdout */
-  for(i = 2; i < ENTRIESINFDARRAY; i++){
+  for(i = FDSTART; i < ENTRIESINFDARRAY; i++){
 
     /* Found an empty file descriptor spot */
     if(curr_pcb->fd_array[i].flags[IN_USE_INDEX] == NOTINUSE){
@@ -83,7 +66,7 @@ int32_t open(const uint8_t* filename){
   else if(file_type == FILETYPEDIRECTORY){ // file type 1 is directoy
     curr_pcb->fd_array[i].operationstable = (directorytable);
   }
-  else if(file_type == FILETYPEGENERAL){
+  else if(file_type == FILETYPEGENERAL){ // file type 2 is regular file
     curr_pcb->fd_array[i].operationstable =  (filetable);
   }
 
@@ -97,13 +80,84 @@ int32_t open(const uint8_t* filename){
   curr_pcb->fd_array[i].flags[IN_USE_INDEX] = INUSE;
   curr_pcb->fd_array[i].flags[FTYPE_INDEX] = file_type;
 
+  return i;
+}
+
+   /*
+    * fd_array_handle_close
+    *   DESCRIPTION: Function to handle the file descriptor on a close  system call
+    *   INPUTS: int32_t fd -- Index of file to be closed
+    *           pcb* curr_pcb -- Address of Current Process Control Block
+    *   OUTPUTS:None
+    *   RETURN VALUE: Returns 0 on successful closure, else -1
+    *   SIDE EFFECTS:
+    */
+
+int32_t fd_array_handle_close(int32_t fd, pcb* curr_pcb){
+
+  if(fd<0){
+    return INVALIDORFAIL;
+  }
+  /* Check for valid fd */
+  if(fd < FDSTART || fd > FDEND)
+    return INVALIDORFAIL;
+
+  if(curr_pcb == NULL)
+    return INVALIDORFAIL;
+
+  /* Populate and mark fd as not in use */
+  curr_pcb->fd_array[fd].operationstable = NULL;
+  curr_pcb->fd_array[fd].inode_num = 0;
+  curr_pcb->fd_array[fd].file_pos = DEFAULTFILEOFFSET;
+  curr_pcb->fd_array[fd].flags[IN_USE_INDEX] = NOTINUSE;
+  curr_pcb->fd_array[fd].flags[FTYPE_INDEX] = 0;
+  curr_pcb->fd_array[fd].flags[RSVD_INDEX_0] = 0;
+  curr_pcb->fd_array[fd].flags[RSVD_INDEX_1] = 0;
+
+  /* Return 0 on success */
+  return 0;
+
+
+}
+
+/*
+ * open
+ *   DESCRIPTION: open system call. opens a file in the fd array
+ *   INPUTS: filename
+ *   OUTPUTS:None
+ *   RETURN VALUE: int32_t fd -> file descriptor index of opened file
+ *   SIDE EFFECTS:
+ */
+
+int32_t open(const uint8_t* filename){
+
+  if(filename == NULL || strlen((int8_t*)filename)==0){
+    return INVALIDORFAIL;
+  }
+  /* Directory Entry struct */
+  dentry_t dir_entry;
+ /* Error handling if file not found */
+  if(read_dentry_by_name((int8_t*)filename,&dir_entry)==-1){
+    return INVALIDORFAIL;
+  }
+  int32_t fd_opened;
+
+  /* Get address of relevant PCB */
+  pcb* curr_pcb;
+  curr_pcb = get_pcb_address();
+
+  fd_opened = fd_array_handle_open(curr_pcb, dir_entry.file_type, dir_entry.inode_num);
+  /* Error handling for bad fd value */
+  if(fd_opened == INVALIDORFAIL)
+    return INVALIDORFAIL;
+
 // ASK TA HOW TO CALL THE FUNCTION
  int32_t (*fun_ptr)(const uint8_t*);
- fun_ptr = (curr_pcb->fd_array[i].operationstable)[FILE_OPS_OPEN];
+ fun_ptr = (curr_pcb->fd_array[fd_opened].operationstable)[FILE_OPS_OPEN];
  (*fun_ptr)(filename);
-  //curr_pcb->fd_array[i].operationstable[FILE_OPS_OPEN](filename);
 
-  return i;
+ /* Return index of the file descriptor opened */
+  return fd_opened;
 
 }
 
@@ -119,13 +173,13 @@ int32_t open(const uint8_t* filename){
 
 
 int32_t close(int32_t fd){
+
   if(fd<0){
     return INVALIDORFAIL;
   }
   /* Check for valid fd */
-    if(fd < FDSTART || fd > FDEND)
-      return INVALIDORFAIL;
-
+  if(fd < FDSTART || fd > FDEND)
+    return INVALIDORFAIL;
 
   /* Get address of relevant PCB */
     pcb* curr_pcb;
@@ -142,20 +196,8 @@ int32_t close(int32_t fd){
     int32_t (*fun_ptr)(int32_t);
     fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_CLOSE];
     (*fun_ptr)(fd);
-    //if((curr_pcb->fd_array[fd].operationstable[FILE_OPS_CLOSE](fd)) == -1)
-      //return -1;
 
-    /* Populate and mark fd as not in use */
-    curr_pcb->fd_array[fd].operationstable = NULL;
-    curr_pcb->fd_array[fd].inode_num = 0;
-    curr_pcb->fd_array[fd].file_pos = DEFAULTFILEOFFSET;
-    curr_pcb->fd_array[fd].flags[IN_USE_INDEX] = NOTINUSE;
-    curr_pcb->fd_array[fd].flags[FTYPE_INDEX] = 0;
-    curr_pcb->fd_array[fd].flags[RSVD_INDEX_0] = 0;
-    curr_pcb->fd_array[fd].flags[RSVD_INDEX_1] = 0;
-
-    /* Return 0 on success */
-    return 0;
+    return fd_array_handle_close(fd, curr_pcb);
 
 }
 
@@ -172,14 +214,16 @@ int32_t close(int32_t fd){
 
 
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
+
+  /* Initial Error handling */
   if(fd<0){
     return INVALIDORFAIL;
   }
   if(buf == NULL)
     return INVALIDORFAIL;
 
-  if(fd == 1)
-    return -1; // success ;
+  if(fd == FD_STDOUT)
+    return -1;
 
   /* Get address of relevant PCB */
   pcb* curr_pcb;
@@ -193,34 +237,9 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
   int32_t (*fun_ptr)(int32_t, void*, int32_t);
   fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_READ];
 
-
-  int file_type;
-	int filesize;
-	int inode_num;
-    /* For rtc_read and terminal read */
-  if(file_type == FILETYPEDEVICE || fd == 0){
-    return (*fun_ptr)(fd, buf, nbytes);
-   }
-
-
-   /* Get filesize from the inode */
-
-	file_type = (int)curr_pcb->fd_array[fd].flags[FTYPE_INDEX];
-  inode_num = curr_pcb->fd_array[fd].inode_num;
-  filesize = get_filesize(inode_num);
-
-  /* Beyond this point, we would only need to handle reads for files
-	 * and directories
-   */
-
-	 /* If file position is greater than filesize, return 0 */
-	if(file_type==FILETYPEGENERAL && curr_pcb->fd_array[fd].file_pos >= filesize)
-	 return 0; // success ;
-
 	/* Handles file and directory reads */
 	int retval;
 	retval = (*fun_ptr)(fd, buf, nbytes);
-
   return retval;
 
 }
@@ -253,15 +272,12 @@ int32_t write(int32_t fd, const void*buf,int32_t nbytes){
   /* File needs to be in use for write */
   if(curr_pcb->fd_array[fd].flags[IN_USE_INDEX] == NOTINUSE)
     return INVALIDORFAIL;
-	//int file_type = (int)curr_pcb->fd_array[fd].flags[FTYPE_INDEX];
-  /* Function pointer points to read of file operations table of fd*/
-  //if(fd==1 || file_type==0){
+
   int32_t (*fun_ptr)(int32_t, void*, int32_t);
   fun_ptr = (curr_pcb->fd_array[fd].operationstable)[FILE_OPS_WRITE];
    return (*fun_ptr)(fd, (void*) buf, nbytes);
-  //}
 
-//return 0;
+
 }
 
 
@@ -282,6 +298,8 @@ int32_t execute(const uint8_t* command){
   int32_t arg_size; // XXX tmp var to hold array size
   int32_t arg_idx;  // XXX tmp var to hold command starting idx
   int8_t arg_arr[MAXBUFSIZEEXECUTE]; // XXX tmp var to hold cmd
+
+  /* Error handling for NULL */
   if(command==NULL){
     return -1;
   }
@@ -332,7 +350,7 @@ int32_t execute(const uint8_t* command){
   /* checks if you can read data */
   int8_t check_buf[METADATAEXECUTESIZE];
   uint8_t executablebytes[SIZEOFOPERATIONSTABLE];
-  if( read_data(dir_entry.inode_num,0,(uint8_t*) check_buf,METADATAEXECUTESIZE)==INVALIDORFAIL){
+  if( read_data(dir_entry.inode_num,0,(uint8_t*) check_buf,METADATAEXECUTESIZE) != METADATAEXECUTESIZE){
     return INVALIDORFAIL;
   }
 
@@ -343,9 +361,6 @@ int32_t execute(const uint8_t* command){
 
   /* set the bytes 24 to 27 */
   read_data(dir_entry.inode_num, STARTOFEIPINEXECUTABLE, (uint8_t*) executablebytes,SIZEOFOPERATIONSTABLE);
-
-
-
 
   /* create pcb and set parent pcb */
   i=1;
@@ -359,7 +374,8 @@ int32_t execute(const uint8_t* command){
     i=i+1;
   }
   if(current_pid==-1){
-    return INVALIDORFAIL;
+    printf("Maximum number of processes reached\n");
+        return INVALIDORFAIL;
   }
 
   pcb* parent_pcb;
@@ -490,7 +506,7 @@ return ;
 /*
  * vidmap
  *   DESCRIPTION: Maps the text mode video memory into user space at a pre-set
- *                virtal address
+ *                virtual address
  *   INPUTS: uint8_t screen_start Location where the virtual address must be stored
  *   OUTPUTS:None
  *   RETURN VALUE: None

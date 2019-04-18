@@ -3,11 +3,12 @@
 #include "i8259.h"
 #include "keyboard.h"
 #include"terminal.h"
+#include "scheduler.h"
 static char chararray[NUM_KEYS]={' ','\0','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
 '\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
 static char shiftarray[NUMBERSONKEYBOARD]={'~','!','@','#','$','%','^','&','*','('};  // handling if shift is pressed on any num keys on qwerty keyboard
 static char linebuffer[KEYBOARD_BUFFER_LENGTH];
-static int numberofchars=0;
+
 
 
 
@@ -26,6 +27,9 @@ static int numberofchars=0;
 void check_input(){
 
  uint32_t a;
+ int current_terminal = get_current_terminal();
+ int numberofchars = get_current_noc();
+ set_line_buffer(linebuffer);
  a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
  switch(a){
    case  LEFTSHIFT: chararray[ LEFTSHIFT]='1';break;    // check if left shift is pressed
@@ -34,12 +38,16 @@ void check_input(){
    case RIGHTSHIFTRELEASED:chararray[RIGHTSHIFT]='0';break;  // check if right shift is released
    case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;  // check if control is pressed
    case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break; // check is control is released
+   case ALTPRESSED:chararray[0x38]='1'; break;
+   case ALTRELEASED:chararray[0x38]='0';break;
    case BACKSPACE:{  // check for backspace
                     if(numberofchars!=0){
                     handlebackspace();
+
                     linebuffer[numberofchars]='\0';
-               
-                    numberofchars=numberofchars-1; // backspace removes the number of chars
+
+                    numberofchars-=1; // backspace removes the number of chars
+                    set_global_buffer(linebuffer,numberofchars);
 					}
                     break;
                   }
@@ -50,7 +58,8 @@ void check_input(){
                    // reset the linebuffer
                    set_terminal_buffer((uint8_t*)linebuffer,numberofchars);
                    memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
-                    numberofchars=0; // reset the number of chars read
+                   numberofchars=0; // reset the number of chars read
+                   set_global_buffer(linebuffer,numberofchars);
                     break;
                   }
    case CAPSLOCK:{
@@ -65,6 +74,20 @@ void check_input(){
                    break;
                 /* deciding how to put the character on the screen */
    default:{
+            if(chararray[0x38]=='1' ){
+              if(a==0x3C){
+                switch_terminals(1);
+              }
+              else if(a==0x3D){
+                switch_terminals(2);
+              }
+              else if(a==0x3B){
+                switch_terminals(1);
+              }
+             current_terminal = get_current_terminal();
+             numberofchars = get_current_noc();
+
+            }
             if( ( chararray[CAPSLOCK]=='1'|| chararray[ LEFTSHIFT]=='1'||chararray[RIGHTSHIFT]=='1') && chararray[a]>=ASCIILOWERCASEA && chararray[a]<=ASCIILOWERCASEZ)
               {
 
@@ -75,6 +98,7 @@ void check_input(){
                     update_cursor(); // update the position of the cursor
                     numberofchars=0; // reset number of chars in keyboard buffer
                     memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
+                    set_global_buffer(linebuffer,numberofchars);
 
                 }
                 else{
@@ -82,7 +106,8 @@ void check_input(){
                 linebuffer[numberofchars]=temp;
                 putc(temp);
                   update_cursor(); // update the position of the cursor
-                numberofchars=numberofchars+1; // add number of chars in keyboard buffer
+                numberofchars+=1; // add number of chars in keyboard buffer
+                set_global_buffer(linebuffer,numberofchars);
               }
               }
                 }
@@ -116,6 +141,7 @@ void check_input(){
                   linebuffer[numberofchars]=temp;
                   putc(temp);
                   numberofchars++;
+                  set_global_buffer(linebuffer,numberofchars);
                     update_cursor();  // update the position of the cursor
 
                 }
@@ -128,6 +154,7 @@ void check_input(){
                 linebuffer[numberofchars]=chararray[a];
                 putc(chararray[a]);
                 numberofchars++;
+                set_global_buffer(linebuffer,numberofchars);
                   update_cursor(); // update the position of the cursor
                   }
 
@@ -158,6 +185,7 @@ void init_keyboard(){
 // letters for the demo
 chararray[CAPSLOCK]='0';  // intially capslock is off
 chararray[ LEFTSHIFT]='0'; // initially left shift is not pressed.
+chararray[0x38]='0';
 
 
 }

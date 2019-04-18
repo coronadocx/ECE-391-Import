@@ -293,9 +293,10 @@ int32_t close(int32_t fd){
 int32_t read(int32_t fd,void*buf,int32_t nbytes){
 
   /* Initial Error handling */
-  if(fd<0){
+  if(fd<0 || fd>FDEND){
     return INVALIDORFAIL;
   }
+
   if(buf == NULL)
     return INVALIDORFAIL;
 
@@ -334,7 +335,7 @@ int32_t read(int32_t fd,void*buf,int32_t nbytes){
  */
 
 int32_t write(int32_t fd, const void*buf,int32_t nbytes){
-    if(fd<=0){
+    if(fd<=0 || fd>FDEND){
       return INVALIDORFAIL;
     }
 	 if(buf == NULL)

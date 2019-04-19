@@ -13,6 +13,11 @@
 
 #define KER_START_ADDR	0x400000			//Starting address of the Kernel (1-expage)
 #define VID_START_ADDR	0xB8000				//Starting address of the video memory (8-page)
+
+#define T1_BUF 0xB9000
+#define T2_BUF 0xBA000
+#define T3_BUF 0xBB000
+
 #define USR_START_ADDR  0x800000
 
 #define VMEM_PAGE       184

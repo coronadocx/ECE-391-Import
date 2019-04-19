@@ -4,6 +4,7 @@
 static uint32_t page_directory[PAGE_SIZE] __attribute__((aligned(4096))); //Single page directory for system, 1024 entries
 static uint32_t page_table_0M_4M[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
 static uint32_t new_page_table[PAGE_SIZE] __attribute__((aligned(4096)));   //Page table for memory block 0-4MB, 1024 entries
+// The allignment allows there to be no first few bits in the address to the page table hence can be used to set specific bits/ eg: enable
 
 
 /*
@@ -24,8 +25,13 @@ void paging_initialize()
 
     //Populate the first page table
     for (i=0; i<PAGE_SIZE; i++) {
-        if (i == VMEM_PAGE)
+        if (i == VMEM_PAGE){
             page_table_0M_4M[i] = (VID_START_ADDR | VMEM_OR_MASK);
+
+						page_table_0M_4M[i+1] = (T1_BUF | VMEM_OR_MASK);
+						page_table_0M_4M[i+2] = (T2_BUF | VMEM_OR_MASK);
+						page_table_0M_4M[i+2] = (T3_BUF | VMEM_OR_MASK);
+				}
     	else
     		page_table_0M_4M[i] = 0x0;	//Set every other page as "not present"
 

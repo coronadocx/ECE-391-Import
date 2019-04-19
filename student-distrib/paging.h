@@ -51,7 +51,7 @@ typedef struct pg_struct {							//Page Entry Struct
 
 extern void paging_initialize();
 extern uint32_t paging_change_process(uint32_t process_id);
-extern uint32_t mapvirtualtovideomemory();
+extern uint32_t paging_vidmap();
 // extern uint32_t paging_create_entry(pe_t entry);
 
 #endif

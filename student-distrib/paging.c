@@ -120,11 +120,20 @@ uint32_t paging_change_process(uint32_t pid)
  */
 
 
-uint32_t mapvirtualtovideomemory(){
+uint32_t paging_vidmap()
+{
+    int32_t i;
 
-page_directory[VMEM_33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK_USER);
+    // Initialize new paging table
+    for (i = 0; i < PAGE_SIZE; i++){
+        if (i == ONEMB_PAGETABLE)
+            new_page_table[i] = (VID_START_ADDR | UMEM_OR_MASK);
+        else
+            new_page_table[i] = 0x0;
+    }
 
-new_page_table[ONEMB_PAGETABLE] = (VID_START_ADDR | UMEM_OR_MASK);
+    // Assign page table to proper directory entry
+    page_directory[VMEM_33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK_USER);
 
-return 0;
+    return 0;
 }

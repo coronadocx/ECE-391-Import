@@ -583,7 +583,7 @@ if(page_dir_idx !=CHECK_USER_VMEM ){
   return -1;
 }
 
-paging_vidmamp();
+paging_vidmap();
 
 uint32_t vmemlocation = VMEM_133MB;
 

@@ -5,6 +5,17 @@
 #include "pcb.h"
 #include "x86_desc.h"
 #define USER_DS     0x002B
+
+
+/*
+ *	pithandlerasm
+ * 	DESCRIPTION: Assembly linkage function for pit
+ *	INPUT: 	none
+ *	OUTPUT: none
+ *	RETURN: none
+ */
+
+ void pithandlerasm();
 /*
  *	keyboardhandlerasm
  * 	DESCRIPTION: Assembly linkage function for keyboard.
@@ -53,7 +64,7 @@ void contextswitchasm(uint32_t eipval,pcb* current_process);
  * 			esp		-	stack pointer
  *
  * 	OUTPUT: status	- 	return argument to be sent to parent
- *	RETURN: uint32_t 
+ *	RETURN: uint32_t
  */
 uint32_t restoreparent(uint32_t ebp,uint32_t esp,uint32_t status);
 #endif

@@ -294,6 +294,19 @@ idt[SYSTEMCALLNO].reserved0=0;
 idt[SYSTEMCALLNO].size=1;
 SET_IDT_ENTRY(idt[SYSTEMCALLNO],systemcallasm);
 
+idt[PITNO].present=1;
+idt[PITNO].dpl=3; // called from user using INT
+idt[PITNO].seg_selector=KERNEL_CS;
+idt[PITNO].reserved4=0;
+idt[PITNO].reserved3=1;
+idt[PITNO].reserved2=1;
+idt[PITNO].reserved1=1;
+idt[PITNO].reserved0=0;
+idt[PITNO].size=1;
+SET_IDT_ENTRY(idt[PITNO],pithandlerasm);
+
+
+
 
 
 

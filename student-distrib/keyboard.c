@@ -82,7 +82,7 @@ void check_input(){
                 switch_terminals(2);
               }
               else if(a==0x3B){
-                switch_terminals(1);
+                switch_terminals(0);
               }
              current_terminal = get_current_terminal();
              numberofchars = get_current_noc();

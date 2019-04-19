@@ -26,11 +26,17 @@ void paging_initialize()
     //Populate the first page table
     for (i=0; i<PAGE_SIZE; i++) {
         if (i == VMEM_PAGE){
-            page_table_0M_4M[i] = (VID_START_ADDR | VMEM_OR_MASK);
 
-						page_table_0M_4M[i+1] = (T1_BUF | VMEM_OR_MASK);
-						page_table_0M_4M[i+2] = (T2_BUF | VMEM_OR_MASK);
-						page_table_0M_4M[i+2] = (T3_BUF | VMEM_OR_MASK);
+            page_table_0M_4M[i] = (VID_START_ADDR | VMEM_OR_MASK);
+				}
+				else if(i==185){
+					page_table_0M_4M[i] = (T1_BUF | 0x0);
+				}
+				else if(i==186){
+					page_table_0M_4M[i] = (T2_BUF | 0x0);
+				}
+				else if(i==187){
+					page_table_0M_4M[i] = (T3_BUF | 0x0);
 				}
     	else
     		page_table_0M_4M[i] = 0x0;	//Set every other page as "not present"

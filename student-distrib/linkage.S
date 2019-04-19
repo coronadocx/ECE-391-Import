@@ -20,6 +20,7 @@
 .global systemcallasm
 .global contextswitchasm
 .global restoreparent
+.global pithandlerasm
 /*
  * 	contextswitchasm
  *	DESCRIPTION: Assembly linkage function for context switches
@@ -93,6 +94,18 @@ keyboardhandlerasm:
    popal
    iret
 
+
+/* pithandlerasm
+ * INPUTS -- none
+ * OUTPUTS -- none
+ * RETURN Value -- none
+ * Side Effects -- calls c pithandler
+ */
+pithandlerasm:
+      pushal
+      call pithandler
+      popal
+      iret
 
 /* rtchandlerasm
  * INPUTS -- none

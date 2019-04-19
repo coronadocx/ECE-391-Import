@@ -1,6 +1,6 @@
-#include "rtc.h"
-
-
+#include "pit.h"
+#include "lib.h"
+#include "i8259.h"
 
 // void init_pit(){
 // /* referenced wiki.osdev.org/RTC to understand the rtc */
@@ -19,3 +19,13 @@
 //
 //
 // }
+void pithandler(){
+
+}
+void init_pit(uint32_t rate){
+enable_irq(0);
+uint32_t divisor = 1193180 /rate;
+outb(0x36,0x43);
+outb((uint8_t) (divisor & 0xFF),0x40);
+outb((uint8_t) ( (divisor>>8) & 0xFF ),0x40);
+}

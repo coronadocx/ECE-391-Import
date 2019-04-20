@@ -18,6 +18,8 @@
 #define T2_BUF 0xBA000
 #define T3_BUF 0xBB000
 
+#define VMEM_SIZE 4096
+
 #define USR_START_ADDR  0x800000
 
 #define VMEM_PAGE       184

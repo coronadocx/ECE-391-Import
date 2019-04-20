@@ -10,9 +10,9 @@ void init_global_scheduler(int current_terminal){
   global_scheduler.terminals[0].noc=0;
   global_scheduler.terminals[1].noc=0;
   global_scheduler.terminals[2].noc=0;
-  global_scheduler.vidmaps[0].start_address=(uint32_t**)T1_BUF;
-  global_scheduler.vidmaps[1].start_address=(uint32_t**)T2_BUF;
-  global_scheduler.vidmaps[2].start_address=(uint32_t**)T3_BUF;
+  global_scheduler.vidmaps[0].start_address=(uint32_t**)T1_BUF_ADDR;
+  global_scheduler.vidmaps[1].start_address=(uint32_t**)T2_BUF_ADDR;
+  global_scheduler.vidmaps[2].start_address=(uint32_t**)T3_BUF_ADDR;
 
 }
 

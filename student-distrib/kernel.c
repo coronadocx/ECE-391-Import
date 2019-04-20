@@ -164,6 +164,8 @@ void entry(unsigned long magic, unsigned long addr) {
      * PIC, any other initialization stuff... */
     init_keyboard();
     init_rtc();
+
+    init_pit(50);
     /* Masking RTC for testing*/
     // disable_irq(RTC_IRQ_NO);
 

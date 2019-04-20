@@ -213,6 +213,14 @@ void rtchandler(){
 }
 
 
+void pithandler(){
+
+  send_eoi(0);
+
+// printf("Pit handler");
+}
+
+
 /*
  * initialize_IDT
  *   DESCRIPTION: function that sets up the IDT

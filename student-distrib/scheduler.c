@@ -11,9 +11,9 @@ void init_global_scheduler(int current_terminal){
   global_scheduler.terminals[1].noc=0;
   global_scheduler.terminals[2].noc=0;
   global_scheduler.terminals[3].noc=0;
-  global_scheduler.vidmaps[0].start_address=0xB9000;
-  global_scheduler.vidmaps[1].start_address=0xBA000;
-  global_scheduler.vidmaps[2].start_address=0xBB000;
+  global_scheduler.vidmaps[0].start_address=(uint32_t**)0xB9000;
+  global_scheduler.vidmaps[1].start_address=(uint32_t**)0xBA000;
+  global_scheduler.vidmaps[2].start_address=(uint32_t**)0xBB000;
 
   // uint32_t* vmem = 0xB8000;
   //
@@ -31,7 +31,7 @@ void switch_terminals(int next_terminal){
 
   global_scheduler.curr_t=next_terminal;
 
-  uint32_t** vmem = 0xB8000;
+  uint32_t** vmem =(uint32_t**) 0xB8000;
 
   // memcpy(&buf1,&vmem,100);
   memcpy(current_terminal_buf,vmem,4096);

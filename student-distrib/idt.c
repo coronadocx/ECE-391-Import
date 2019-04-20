@@ -157,6 +157,15 @@ void handle10(){
  */
 void handle14(){
     printf("Page Fault exception\n");
+int address;
+    asm volatile("                \n\
+  movl	%0, %%eax	            \n\
+  movl 	%%cr2, %%eax			    \n\
+  "
+  : "=a"(address)
+);
+printf("The Exception occurred at:%x",address);
+
       halt('P');
 }
 /*

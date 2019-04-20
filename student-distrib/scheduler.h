@@ -1,13 +1,15 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include "lib.h"
+
 typedef struct terminal_struct{
 char lb[128];
 int noc;
 }terminal;
 
 typedef struct videomaps{
- int start_address;
+ uint32_t** start_address;
 }vid_map;
 
 typedef struct sched{

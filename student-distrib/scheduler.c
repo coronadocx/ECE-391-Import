@@ -10,24 +10,33 @@ void init_global_scheduler(int current_terminal){
   global_scheduler.terminals[0].noc=0;
   global_scheduler.terminals[1].noc=0;
   global_scheduler.terminals[2].noc=0;
-  global_scheduler.vidmaps[0].start_address=0xB9000<<12;
-  global_scheduler.vidmaps[1].start_address=0xBA000<<12;
-  global_scheduler.vidmaps[2].start_address=0xBB000<<12;
+  global_scheduler.terminals[3].noc=0;
+  global_scheduler.vidmaps[0].start_address=0xB9000;
+  global_scheduler.vidmaps[1].start_address=0xBA000;
+  global_scheduler.vidmaps[2].start_address=0xBB000;
 
+  // uint32_t* vmem = 0xB8000;
+  //
+  // memcpy(global_scheduler.vidmaps[0].start_address,vmem,4096);
+  // memcpy(global_scheduler.vidmaps[1].start_address,vmem,4096);
+  // memcpy(global_scheduler.vidmaps[2].start_address,vmem,4096);
 }
 
 void switch_terminals(int next_terminal){
 
   int current_terminal = global_scheduler.curr_t;
-  uint32_t current_terminal_buf = global_scheduler.vidmaps[current_terminal].start_address;
-  uint32_t next_terminal_buf = global_scheduler.vidmaps[next_terminal].start_address;
-  uint32_t vid_addr=VID_START_ADDR<<12;
+  uint32_t** current_terminal_buf = global_scheduler.vidmaps[current_terminal].start_address;
+  uint32_t** next_terminal_buf = global_scheduler.vidmaps[next_terminal].start_address;
+
 
   global_scheduler.curr_t=next_terminal;
 
-  memcpy(&current_terminal_buf,&vid_addr,4096);
-//  memcpy(&vid_addr,&next_terminal_buf,4096);
-  printf("done switching");
+  uint32_t** vmem = 0xB8000;
+
+  // memcpy(&buf1,&vmem,100);
+  memcpy(current_terminal_buf,vmem,4096);
+  memcpy(vmem,next_terminal_buf,4096);
+  // memcpy(VID_START_*ADDR,next_terminal_buf,4096);*
 
 
 }

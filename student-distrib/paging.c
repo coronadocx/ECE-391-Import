@@ -30,13 +30,13 @@ void paging_initialize()
             page_table_0M_4M[i] = (VID_START_ADDR | VMEM_OR_MASK);
 				}
 				else if(i==185){
-					page_table_0M_4M[i] = (T1_BUF | 0x0);
+					page_table_0M_4M[i] = (T1_BUF | VMEM_OR_MASK);
 				}
 				else if(i==186){
-					page_table_0M_4M[i] = (T2_BUF | 0x0);
+					page_table_0M_4M[i] = (T2_BUF | VMEM_OR_MASK);
 				}
 				else if(i==187){
-					page_table_0M_4M[i] = (T3_BUF | 0x0);
+					page_table_0M_4M[i] = (T3_BUF | VMEM_OR_MASK);
 				}
     	else
     		page_table_0M_4M[i] = 0x0;	//Set every other page as "not present"

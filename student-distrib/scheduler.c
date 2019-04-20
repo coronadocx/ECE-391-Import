@@ -2,52 +2,104 @@
 #include "lib.h"
 #include "paging.h"
 
-static scheduler global_scheduler;
+static scheduler_t global_scheduler;
 
+/* 
+ *  init_global_scheduler
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: creates and populates global_scheduler object
+ */
+void init_global_scheduler()
+{
+  uint32_t i;
 
-void init_global_scheduler(int current_terminal){
-  global_scheduler.curr_t=current_terminal;
-  global_scheduler.terminals[0].noc=0;
-  global_scheduler.terminals[1].noc=0;
-  global_scheduler.terminals[2].noc=0;
-  global_scheduler.vidmaps[0].start_address=(uint32_t**)T1_BUF_ADDR;
-  global_scheduler.vidmaps[1].start_address=(uint32_t**)T2_BUF_ADDR;
-  global_scheduler.vidmaps[2].start_address=(uint32_t**)T3_BUF_ADDR;
-
+  global_scheduler.curr_t = 0;
+  for (i=0; i<NUM_TERMS; i++) {
+    global_scheduler.terminals[i].noc = 0;
+    global_scheduler.vid_bufs[i] = (uint8_t*)(T1_BUF_ADDR + VMEM_SIZE*i);
+  }
 }
 
-void switch_terminals(int next_terminal){
+/*
+ *  switch_terminals
+ *  INPUT:  next_terminal
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: switches which terminal is being viewed by the user
+ *  SIDE EFFECT: modifies video memory and terminal video buffers
+ */
+void switch_terminals(int32_t next_terminal)
+{
+  int32_t  prev_terminal;
+  uint8_t* prev_terminal_buf;
+  uint8_t* next_terminal_buf; 
+  uint8_t* vmem;
 
-  // get the current terminal index and corresponding memory addresses for terminals
-  int current_terminal = global_scheduler.curr_t;
-  uint32_t** current_terminal_buf = global_scheduler.vidmaps[current_terminal].start_address;
-  uint32_t** next_terminal_buf = global_scheduler.vidmaps[next_terminal].start_address;
+  // Get previous terminal and its buffer
+  prev_terminal = global_scheduler.curr_t;
+  prev_terminal_buf = global_scheduler.vid_bufs[prev_terminal];
 
+  // Set next terminal and get its buffer
+  global_scheduler.curr_t = next_terminal;
+  next_terminal_buf = global_scheduler.vid_bufs[next_terminal];
 
-  global_scheduler.curr_t=next_terminal;
+  vmem = (uint8_t*)VID_START_ADDR;
 
-  uint32_t** vmem =(uint32_t**) VID_START_ADDR;
+  memcpy(prev_terminal_buf, vmem, VMEM_SIZE);   // Savem vmem to previous terminal buffer
+  memcpy(vmem, next_terminal_buf, VMEM_SIZE);   // Write next terminal buffer to vmem
 
-  // Save the current video memory to the current terminal buffer
-  // and copy over the new/next terminal buffer to videomemory
-  memcpy(current_terminal_buf,vmem,VMEM_SIZE);
-  memcpy(vmem,next_terminal_buf,VMEM_SIZE);
-
-
-
+  return; 
 }
-int get_current_noc(){
+
+
+/*
+ *  get_current_noc
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: the noc value of the current terminal
+ *  EFFECT: helper, gets the noc value of the current terminal
+ */
+int32_t get_current_noc()
+{
   return global_scheduler.terminals[global_scheduler.curr_t].noc;
 }
-int get_current_terminal(){
+
+
+/*
+ *  get_current_terminal()
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, gets the value for the current terminal
+ */
+int32_t get_current_terminal()
+{
   return global_scheduler.curr_t;
 }
 
-void set_line_buffer(char linebuffer[128]){
+/*
+ *  set_line_buffer
+ *  INPUT:  linebuffer - TODO 
+ *  OUTPUT: TODO
+ *  RETURN: none
+ *  EFFECT: TODO
+ */
+void set_line_buffer(char linebuffer[128])
+{
   memcpy(linebuffer,global_scheduler.terminals[global_scheduler.curr_t].lb,global_scheduler.terminals[global_scheduler.curr_t].noc);
 }
-void set_global_buffer(char linebuffer[128],int numberofchars){
+
+/*
+ *  set_global_buffer
+ *  INPUT:  TODO
+ *  OUTPUT: TODO 
+ *  RETURN: none  
+ *  EFFECT: TODO
+ */
+void set_global_buffer(char linebuffer[128],int numberofchars)
+{
   global_scheduler.terminals[global_scheduler.curr_t].noc=numberofchars;
   memcpy(global_scheduler.terminals[global_scheduler.curr_t].lb,linebuffer,numberofchars);
-
 }

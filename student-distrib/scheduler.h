@@ -3,24 +3,22 @@
 
 #include "lib.h"
 
-typedef struct terminal_struct{
-char lb[128];
-int noc;
-}terminal;
+#define NUM_TERMS	3
 
-typedef struct videomaps{
- uint32_t** start_address;
-}vid_map;
+typedef struct terminal_struct{
+	int8_t		lb[128];
+	int32_t 	noc;
+}terminal_t;
 
 typedef struct sched{
-  terminal terminals[3];
-  vid_map  vidmaps[3];
-  int curr_t;
-}scheduler;
+  	terminal_t 	terminals[3];
+  	uint8_t * 	vid_bufs[3];
+  	int32_t 	curr_t;
+}scheduler_t;
 
 
-void init_global_scheduler(int current_terminal);
-void switch_terminals(int next_terminal);
+void init_global_scheduler();
+void switch_terminals(int32_t next_terminal);
 int get_current_noc();
 int get_current_terminal();
 void set_line_buffer(char linebuffer[128]);

@@ -64,4 +64,9 @@ extern uint32_t paging_change_process(uint32_t process_id);
 extern uint32_t paging_vidmap();
 // extern uint32_t paging_create_entry(pe_t entry);
 
+// CP5
+extern void _flush();   // Internal helper
+extern void paging_set_write_to_videomem();
+extern void paging_set_write_to_buffer(int32_t buffer);
+
 #endif

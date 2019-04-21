@@ -13,7 +13,8 @@ typedef struct terminal_struct{
 typedef struct sched{
   	terminal_t 	terminals[3];
   	uint8_t * 	vid_bufs[3];
-  	int32_t 	curr_t;
+  	int32_t 	visable_term;	// Terminal being viewed
+  	int32_t 	current_term;	// Terminal being scheduled
 }scheduler_t;
 
 
@@ -23,4 +24,5 @@ int get_current_noc();
 int get_current_terminal();
 void set_line_buffer(char linebuffer[128]);
 void set_global_buffer(char linebuffer[128],int numberofchars);
+void scheduler_next();
 #endif

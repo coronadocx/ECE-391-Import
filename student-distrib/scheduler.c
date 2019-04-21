@@ -15,7 +15,8 @@ void init_global_scheduler()
 {
   uint32_t i;
 
-  global_scheduler.curr_t = 0;
+  global_scheduler.current_term = 0;
+  global_scheduler.visable_term = 0;
   for (i=0; i<NUM_TERMS; i++) {
     global_scheduler.terminals[i].noc = 0;
     global_scheduler.vid_bufs[i] = (uint8_t*)(T1_BUF_ADDR + VMEM_SIZE*i);
@@ -38,17 +39,29 @@ void switch_terminals(int32_t next_terminal)
   uint8_t* vmem;
 
   // Get previous terminal and its buffer
-  prev_terminal = global_scheduler.curr_t;
+  prev_terminal = global_scheduler.visable_term;
   prev_terminal_buf = global_scheduler.vid_bufs[prev_terminal];
 
   // Set next terminal and get its buffer
-  global_scheduler.curr_t = next_terminal;
+  global_scheduler.visable_term = next_terminal;
   next_terminal_buf = global_scheduler.vid_bufs[next_terminal];
 
   vmem = (uint8_t*)VID_START_ADDR;
 
+  cli();
   memcpy(prev_terminal_buf, vmem, VMEM_SIZE);   // Savem vmem to previous terminal buffer
   memcpy(vmem, next_terminal_buf, VMEM_SIZE);   // Write next terminal buffer to vmem
+
+  // If current terminal is being viewed
+  if (global_scheduler.current_term == global_scheduler.visable_term){
+    // Have virtural map to video memory
+    paging_set_write_to_videomem();
+  }
+  else{
+    // Have virtural map to buffer
+    paging_set_write_to_buffer(global_scheduler.current_term);
+  }
+  sti();
 
   return; 
 }
@@ -63,7 +76,7 @@ void switch_terminals(int32_t next_terminal)
  */
 int32_t get_current_noc()
 {
-  return global_scheduler.terminals[global_scheduler.curr_t].noc;
+  return global_scheduler.terminals[global_scheduler.visable_term].noc;
 }
 
 
@@ -76,7 +89,7 @@ int32_t get_current_noc()
  */
 int32_t get_current_terminal()
 {
-  return global_scheduler.curr_t;
+  return global_scheduler.visable_term;
 }
 
 /*
@@ -88,7 +101,7 @@ int32_t get_current_terminal()
  */
 void set_line_buffer(char linebuffer[128])
 {
-  memcpy(linebuffer,global_scheduler.terminals[global_scheduler.curr_t].lb,global_scheduler.terminals[global_scheduler.curr_t].noc);
+  memcpy(linebuffer,global_scheduler.terminals[global_scheduler.visable_term].lb,global_scheduler.terminals[global_scheduler.visable_term].noc);
 }
 
 /*
@@ -100,6 +113,32 @@ void set_line_buffer(char linebuffer[128])
  */
 void set_global_buffer(char linebuffer[128],int numberofchars)
 {
-  global_scheduler.terminals[global_scheduler.curr_t].noc=numberofchars;
-  memcpy(global_scheduler.terminals[global_scheduler.curr_t].lb,linebuffer,numberofchars);
+  global_scheduler.terminals[global_scheduler.visable_term].noc=numberofchars;
+  memcpy(global_scheduler.terminals[global_scheduler.visable_term].lb,linebuffer,numberofchars);
+}
+
+/*
+ *  scheduler_next
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: Increments the counter which keeps track of which terminal is 
+ *          being processed. Then, depending on which terminal is being viewed, 
+ *          may change paging structure to show or hide accordingly
+ */
+void scheduler_next()
+{
+  cli();
+  global_scheduler.current_term = (global_scheduler.current_term+1)%3;  // Set next terminal
+
+  // If current terminal is being viewed
+  if (global_scheduler.current_term == global_scheduler.visable_term){
+    // Have virtural map to video memory
+    paging_set_write_to_videomem();
+  }
+  else{
+    // Have virtural map to buffer
+    paging_set_write_to_buffer(global_scheduler.current_term);
+  }
+  sti();
 }

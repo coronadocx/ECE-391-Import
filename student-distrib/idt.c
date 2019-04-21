@@ -216,6 +216,7 @@ void rtchandler(){
 void pithandler(){
 
   send_eoi(0);
+  // scheduler_next();
 
 // printf("Pit handler");
 }

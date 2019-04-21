@@ -113,15 +113,8 @@ uint32_t paging_change_process(uint32_t pid)
     //Point user memory (v128MB) to given process (p8MB+)
     page_directory[USER_MEM_LOCATION] = ((USR_START_ADDR + (PROCESS_SIZE*pid)) | UMEM_OR_MASK);
 
-    //Flush the TLB
-    asm volatile("                      \n\
-        movl    %%cr3, %%eax            \n\
-        movl    %%eax, %%cr3            \n\
-        "
-        :
-        :
-        :"eax", "cc"
-    );
+    _flush();   //Flush the TLB
+
 
     return 0;
 }
@@ -136,8 +129,6 @@ uint32_t paging_change_process(uint32_t pid)
  *  SIDE EFFECTS:   Maps Virtual Memory 133MB to video memory by creating a new page table
  *
  */
-
-
 uint32_t paging_vidmap()
 {
     int32_t i;
@@ -152,6 +143,67 @@ uint32_t paging_vidmap()
 
     // Assign page table to proper directory entry
     page_directory[VMEM_33] = (((uint32_t) new_page_table) | PTABLE_OR_MASK_USER);
+    
+    _flush();   // Flush the TLB
 
     return 0;
 }
+
+
+/*
+ *  _flush
+ *  INPUT: none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper function, flushes the TLB
+ */
+void _flush()
+{
+    asm volatile("                      \n\
+        movl    %%cr3, %%eax            \n\
+        movl    %%eax, %%cr3            \n\
+        "
+        :
+        :
+        :"eax", "cc"
+    );
+
+    return;   
+}
+
+/*
+ *  paging_set_write_to_videomem
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: changes paging structure such virtural video memory maps to 
+ *          physical video memory.
+ */
+void paging_set_write_to_videomem()
+{
+    page_table_0M_4M[VMEM_PAGE] = (VID_START_ADDR | VMEM_OR_MASK);
+    new_page_table[ONEMB_PAGETABLE] = (VID_START_ADDR | VMEM_OR_MASK);
+    return;
+}
+
+
+/*
+ *  paging_set_write_to_buffer
+ *  INPUT:  buffer - number (0-2) indicating which buffer to remap to
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: changes paging structure such that virtural video memory maps to 
+ *          the provided backup buffer in physical memory.
+ */
+void paging_set_write_to_buffer(int32_t buffer)
+{
+    uint32_t addr;
+
+    addr = (T1_BUF_ADDR + (VMEM_SIZE*buffer));
+    page_table_0M_4M[VMEM_PAGE] = (addr | VMEM_OR_MASK);
+    new_page_table[ONEMB_PAGETABLE] = (addr | VMEM_OR_MASK);
+    return; 
+}
+
+
+

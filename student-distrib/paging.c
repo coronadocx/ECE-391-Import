@@ -182,7 +182,10 @@ void _flush()
 void paging_set_write_to_videomem()
 {
     page_table_0M_4M[VMEM_PAGE] = (VID_START_ADDR | VMEM_OR_MASK);
-    new_page_table[ONEMB_PAGETABLE] = (VID_START_ADDR | VMEM_OR_MASK);
+    new_page_table[ONEMB_PAGETABLE] = (VID_START_ADDR | UMEM_OR_MASK);
+    
+    _flush();
+    
     return;
 }
 
@@ -198,10 +201,28 @@ void paging_set_write_to_videomem()
 void paging_set_write_to_buffer(int32_t buffer)
 {
     uint32_t addr;
+    switch(buffer) {
+        case 0:
+            addr = T1_BUF_ADDR;
+            break;
 
-    addr = (T1_BUF_ADDR + (VMEM_SIZE*buffer));
+        case 1:
+            addr = T2_BUF_ADDR;
+            break;
+
+        case 2:
+            addr = T3_BUF_ADDR;
+            break;
+
+        default:
+            addr = T1_BUF_ADDR;
+    }
+
     page_table_0M_4M[VMEM_PAGE] = (addr | VMEM_OR_MASK);
-    new_page_table[ONEMB_PAGETABLE] = (addr | VMEM_OR_MASK);
+    new_page_table[ONEMB_PAGETABLE] = (addr | UMEM_OR_MASK);
+
+    _flush();
+
     return; 
 }
 

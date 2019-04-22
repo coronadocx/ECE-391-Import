@@ -8,12 +8,14 @@
 #include "i8259.h"
 #include "rtc.h"
 #include "sys_call.h"
+#include "scheduler.h"
+
+uint32_t pit_flag = 0;
 
 // idt index for keyboard and rtc
 #define KEYBOARD  0x21
 #define RTC 0x28
 // Assembly functions that handle the stack when keyboard or rtc interuppts are generated
-
 /*
  * handle0
  *   DESCRIPTION: function exception handler for divide by zero
@@ -216,9 +218,10 @@ void rtchandler(){
 void pithandler(){
 
   send_eoi(0);
-  // scheduler_next();
+  // if (pit_flag)
+    scheduler_next();
 
-// printf("Pit handler");
+  // printf(".");
 }
 
 
@@ -234,6 +237,7 @@ void pithandler(){
 void initialize_IDT(){
 
    int i=0;
+   pit_flag = 0; 
 
 
 

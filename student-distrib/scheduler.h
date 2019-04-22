@@ -11,8 +11,8 @@ typedef struct terminal_struct{
 }terminal_t;
 
 typedef struct sched{
-  	terminal_t 	terminals[3];
-  	uint8_t * 	vid_bufs[3];
+  	terminal_t 	terminals[NUM_TERMS];
+  	uint8_t * 	vid_bufs[NUM_TERMS];
   	int32_t 	visable_term;	// Terminal being viewed
   	int32_t 	current_term;	// Terminal being scheduled
 }scheduler_t;

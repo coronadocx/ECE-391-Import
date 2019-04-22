@@ -164,8 +164,8 @@ void entry(unsigned long magic, unsigned long addr) {
      * PIC, any other initialization stuff... */
     init_keyboard();
     init_rtc();
-
-    init_pit(50);
+    init_global_scheduler();
+    init_pit(1000);
     /* Masking RTC for testing*/
     // disable_irq(RTC_IRQ_NO);
 
@@ -176,11 +176,11 @@ void entry(unsigned long magic, unsigned long addr) {
     /* Do not enable the following until after you have set up your
      * IDT correctly otherwise QEMU will triple fault and simple close
      * without showing you any output */
-    init_global_scheduler();
     printf("Enabling Interrupts\n");
-    sti();
     clear();
-    		setposition(0,0);
+    sti();
+    // pit_flag = 1; 
+    setposition(0,0);
 	while(1){
 		uint8_t command[7]={'s','h','e','l','l','\n','\0'}; // magic number 7 is used for sending the shell command
 		const uint8_t* a=command;

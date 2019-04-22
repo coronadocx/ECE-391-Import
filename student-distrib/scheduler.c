@@ -33,14 +33,19 @@ void init_global_scheduler()
  */
 void switch_terminals(int32_t next_terminal)
 {
+  cli();
   int32_t  prev_terminal;
   uint8_t* prev_terminal_buf;
   uint8_t* next_terminal_buf; 
   uint8_t* vmem;
 
+
   // Get previous terminal and its buffer
   prev_terminal = global_scheduler.visable_term;
   prev_terminal_buf = global_scheduler.vid_bufs[prev_terminal];
+
+  if (next_terminal == prev_terminal)
+    return;
 
   // Set next terminal and get its buffer
   global_scheduler.visable_term = next_terminal;
@@ -48,22 +53,31 @@ void switch_terminals(int32_t next_terminal)
 
   vmem = (uint8_t*)VID_START_ADDR;
 
-  cli();
+  // // cli();
+  paging_set_write_to_videomem();
   memcpy(prev_terminal_buf, vmem, VMEM_SIZE);   // Savem vmem to previous terminal buffer
   memcpy(vmem, next_terminal_buf, VMEM_SIZE);   // Write next terminal buffer to vmem
-
-  // If current terminal is being viewed
-  if (global_scheduler.current_term == global_scheduler.visable_term){
-    // Have virtural map to video memory
-    paging_set_write_to_videomem();
-  }
-  else{
-    // Have virtural map to buffer
-    paging_set_write_to_buffer(global_scheduler.current_term);
-  }
+  paging_set_write_to_buffer(global_scheduler.current_term);
   sti();
 
-  return; 
+  // paging_set_write_to_videomem();
+  // // If current terminal is being viewed
+  // if (global_scheduler.current_term == global_scheduler.visable_term){
+  //   // Have virtural map to video memory
+  //   paging_set_write_to_videomem();
+  // }
+  // else{
+  //   // Have virtural map to buffer
+  //   paging_set_write_to_buffer(global_scheduler.current_term);
+  // }
+  // // sti();
+
+  // if (global_scheduler.visable_term == 0)
+  //   paging_set_write_to_videomem();
+  // else
+  //   paging_set_write_to_buffer(global_scheduler.visable_term);
+
+  // return; 
 }
 
 
@@ -128,7 +142,6 @@ void set_global_buffer(char linebuffer[128],int numberofchars)
  */
 void scheduler_next()
 {
-  cli();
   global_scheduler.current_term = (global_scheduler.current_term+1)%3;  // Set next terminal
 
   // If current terminal is being viewed
@@ -140,5 +153,4 @@ void scheduler_next()
     // Have virtural map to buffer
     paging_set_write_to_buffer(global_scheduler.current_term);
   }
-  sti();
 }

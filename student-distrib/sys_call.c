@@ -14,8 +14,10 @@ void* filetable[SIZEOFOPERATIONSTABLE]={&fs_open,&fs_read,&fs_write,&fs_close};
 void* directorytable[SIZEOFOPERATIONSTABLE]={&dir_open,&dir_read,&dir_write,&dir_close};
 void* stdin_table[SIZEOFOPERATIONSTABLE]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[SIZEOFOPERATIONSTABLE]={&terminal_open,NULL,&terminal_write,&terminal_close};
-int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE};
+int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {1,1,1,0,0,0};
 //int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE}; //For a maximum of two programs
+
+
 
 /*
  *  set_up_stdin
@@ -504,9 +506,17 @@ return current_process->status;
  */
 
 int32_t halt(uint8_t status){
+
   /* get the address of the process to halt */
   pcb* curr_pcb;
   curr_pcb = get_pcb_address();
+
+  // Don't close the first 3 processes (shells)
+  // if (curr_pcb->process_id == 1 ||curr_pcb->process_id == 2 ||curr_pcb->process_id == 3){
+  //   printf("Cannot close base process.\n");
+  //   return;
+  // }
+
   processes_running[curr_pcb->process_id-1]=NOTINUSE;
   uint32_t parentid=curr_pcb->parent_process_id;
   int i=0;

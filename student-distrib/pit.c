@@ -2,6 +2,7 @@
 #include "lib.h"
 #include "i8259.h"
 
+
 // void init_pit(){
 // /* referenced wiki.osdev.org/RTC to understand the rtc */
 // outb(REG_B,RTC_CMD_PORT);
@@ -29,3 +30,8 @@ outb((uint8_t) ( (divisor>>8) & 0xFF ),0x40);
 enable_irq(0);
 printf("Printing in pit");
 }
+
+
+
+
+

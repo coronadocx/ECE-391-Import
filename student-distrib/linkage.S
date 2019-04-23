@@ -102,6 +102,19 @@ keyboardhandlerasm:
  * Side Effects -- calls c pithandler
  */
 pithandlerasm:
+      # Saving esp and ebp
+      xorl %edx, %edx
+      xorl %ecx, %ecx
+      movl %esp, %ecx
+      movl %ebp, %edx
+
+      pushl %edx
+      pushl %ecx
+
+      call save_esp_ebp
+
+      addl $8, %esp
+
       pushal
       call pithandler
       popal
@@ -276,3 +289,6 @@ RETURN:
 jumptable:
    .long halt_handlerasm,execute_handlerasm,read_handlerasm,write_handlerasm,open_handlerasm,close_handlerasm,getargs_handlerasm,vidmap_handlerasm,set_handlerasm,sigreturn_handlerasm
 .end
+      
+      
+

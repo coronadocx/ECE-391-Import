@@ -218,10 +218,9 @@ void rtchandler(){
 void pithandler(){
 
   send_eoi(0);
-  // if (pit_flag)
-    scheduler_next();
 
-  // printf(".");
+  // if (pit_flag)
+  scheduler_next();
 }
 
 

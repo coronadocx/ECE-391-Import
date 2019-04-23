@@ -4,6 +4,7 @@
 #include "types.h"
 #include "pcb.h"
 #include "x86_desc.h"
+#include "pit.h"
 #define USER_DS     0x002B
 
 
@@ -67,4 +68,5 @@ void contextswitchasm(uint32_t eipval,pcb* current_process);
  *	RETURN: uint32_t
  */
 uint32_t restoreparent(uint32_t ebp,uint32_t esp,uint32_t status);
+
 #endif

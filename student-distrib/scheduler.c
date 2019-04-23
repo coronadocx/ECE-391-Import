@@ -4,7 +4,7 @@
 
 static scheduler_t global_scheduler;
 
-/* 
+/*
  *  init_global_scheduler
  *  INPUT:  none
  *  OUTPUT: none
@@ -36,7 +36,7 @@ void switch_terminals(int32_t next_terminal)
   cli();
   int32_t  prev_terminal;
   uint8_t* prev_terminal_buf;
-  uint8_t* next_terminal_buf; 
+  uint8_t* next_terminal_buf;
   uint8_t* vmem;
 
 
@@ -57,7 +57,7 @@ void switch_terminals(int32_t next_terminal)
   paging_set_write_to_videomem();
   memcpy(prev_terminal_buf, vmem, VMEM_SIZE);   // Savem vmem to previous terminal buffer
   memcpy(vmem, next_terminal_buf, VMEM_SIZE);   // Write next terminal buffer to vmem
-  paging_set_write_to_buffer(global_scheduler.current_term);
+  paging_set_write_to_buffer(prev_terminal);
   sti();
 
   // paging_set_write_to_videomem();
@@ -77,7 +77,7 @@ void switch_terminals(int32_t next_terminal)
   // else
   //   paging_set_write_to_buffer(global_scheduler.visable_term);
 
-  // return; 
+  // return;
 }
 
 
@@ -103,12 +103,22 @@ int32_t get_current_noc()
  */
 int32_t get_current_terminal()
 {
+  return global_scheduler.current_term;
+}
+/*
+ *  get_current_terminal()
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, gets the value for the current terminal
+ */
+int32_t get_visible_terminal()
+{
   return global_scheduler.visable_term;
 }
-
 /*
  *  set_line_buffer
- *  INPUT:  linebuffer - TODO 
+ *  INPUT:  linebuffer - TODO
  *  OUTPUT: TODO
  *  RETURN: none
  *  EFFECT: TODO
@@ -121,8 +131,8 @@ void set_line_buffer(char linebuffer[128])
 /*
  *  set_global_buffer
  *  INPUT:  TODO
- *  OUTPUT: TODO 
- *  RETURN: none  
+ *  OUTPUT: TODO
+ *  RETURN: none
  *  EFFECT: TODO
  */
 void set_global_buffer(char linebuffer[128],int numberofchars)
@@ -136,8 +146,8 @@ void set_global_buffer(char linebuffer[128],int numberofchars)
  *  INPUT:  none
  *  OUTPUT: none
  *  RETURN: none
- *  EFFECT: Increments the counter which keeps track of which terminal is 
- *          being processed. Then, depending on which terminal is being viewed, 
+ *  EFFECT: Increments the counter which keeps track of which terminal is
+ *          being processed. Then, depending on which terminal is being viewed,
  *          may change paging structure to show or hide accordingly
  */
 void scheduler_next()

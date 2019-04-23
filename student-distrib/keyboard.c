@@ -27,7 +27,7 @@ static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 void check_input(){
 
  uint32_t a;
- int current_terminal = get_current_terminal();
+int current_terminal,visible_terminal;
  int numberofchars = get_current_noc();
  set_line_buffer(linebuffer);
  a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
@@ -42,7 +42,18 @@ void check_input(){
    case ALTRELEASED:chararray[0x38]='0';break;
    case BACKSPACE:{  // check for backspace
                     if(numberofchars!=0){
-                    handlebackspace();
+                      while(1){
+                        current_terminal=get_current_terminal();
+                        visible_terminal=get_visible_terminal();
+                        if(current_terminal==visible_terminal){
+
+                                handlebackspace();
+                            
+                             break;
+                        }
+                      }
+
+
 
                     linebuffer[numberofchars]='\0';
 
@@ -52,7 +63,16 @@ void check_input(){
                     break;
                   }
    case ENTER:    {  // adding newline to buffer. This triggers a terminal read
-                    putc(chararray[a]);
+
+                    while(1){
+                      current_terminal=get_current_terminal();
+                      visible_terminal=get_visible_terminal();
+                      if(current_terminal==visible_terminal){
+                           putc(chararray[a]);
+                           break;
+                      }
+                    }
+
                     linebuffer[numberofchars]='\n';
 
                    // reset the linebuffer
@@ -84,7 +104,7 @@ void check_input(){
               else if(a==0x3B){
                 switch_terminals(0);
               }
-             current_terminal = get_current_terminal();
+
              numberofchars = get_current_noc();
 
             }
@@ -104,7 +124,15 @@ void check_input(){
                 else{
                 if(numberofchars!=KEYBOARD_BUFFER_LENGTH-1){// -1 because last character is reserved for \n
                 linebuffer[numberofchars]=temp;
-                putc(temp);
+                while(1){
+                  current_terminal=get_current_terminal();
+                  visible_terminal=get_visible_terminal();
+                  if(current_terminal==visible_terminal){
+                       putc(temp);
+                       break;
+                  }
+                }
+
                   update_cursor(); // update the position of the cursor
                 numberofchars+=1; // add number of chars in keyboard buffer
                 set_global_buffer(linebuffer,numberofchars);
@@ -139,7 +167,15 @@ void check_input(){
                     }
                   }
                   linebuffer[numberofchars]=temp;
-                  putc(temp);
+                  while(1){
+                    current_terminal=get_current_terminal();
+                    visible_terminal=get_visible_terminal();
+                    if(current_terminal==visible_terminal){
+                        putc(temp);
+                         break;
+                    }
+                  }
+
                   numberofchars++;
                   set_global_buffer(linebuffer,numberofchars);
                     update_cursor();  // update the position of the cursor
@@ -152,7 +188,14 @@ void check_input(){
                 if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1&&chararray[a]!='\0')// -1 because last character is reserved for \n
                 {
                 linebuffer[numberofchars]=chararray[a];
-                putc(chararray[a]);
+                while(1){
+                  current_terminal=get_current_terminal();
+                  visible_terminal=get_visible_terminal();
+                  if(current_terminal==visible_terminal){
+                    putc(chararray[a]);
+                       break;
+                  }
+                }
                 numberofchars++;
                 set_global_buffer(linebuffer,numberofchars);
                   update_cursor(); // update the position of the cursor

@@ -25,4 +25,6 @@ int get_current_terminal();
 void set_line_buffer(char linebuffer[128]);
 void set_global_buffer(char linebuffer[128],int numberofchars);
 void scheduler_next();
+int32_t get_visible_terminal();
+
 #endif

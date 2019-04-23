@@ -30,7 +30,7 @@ void init_global_scheduler()
   // Set bytes 24-27
   (void)read_data(dir_entry.inode_num, STARTOFEIPINEXECUTABLE, global_scheduler.exe_bytes, SIZEOFOPERATIONSTABLE);
 
-  // Create PCBs for the 3 initial shells, set up paging for first terminal  
+  // Create PCBs for the 3 initial shells, set up paging for first terminal
   for (i=0; i<NUM_TERMS; i++) {
     // Set up PCBs
     // processes_running[i] = 1; // Mark process as running
@@ -70,7 +70,7 @@ void init_global_scheduler()
  */
 void switch_terminals(int32_t next_terminal)
 {
-  cli();
+  // cli();
   int32_t  prev_terminal;
   uint8_t* prev_terminal_buf;
   uint8_t* next_terminal_buf;
@@ -96,7 +96,7 @@ void switch_terminals(int32_t next_terminal)
   memcpy(vmem, next_terminal_buf, VMEM_SIZE);   // Write next terminal buffer to vmem
   if (global_scheduler.current_term != global_scheduler.visable_term)
     paging_set_write_to_buffer(global_scheduler.current_term);
-  sti();
+  // sti();
 
   // paging_set_write_to_videomem();
   // // If current terminal is being viewed
@@ -175,7 +175,9 @@ void set_global_buffer(char linebuffer[128],int numberofchars)
   global_scheduler.terminals[global_scheduler.visable_term].noc=numberofchars;
   memcpy(global_scheduler.terminals[global_scheduler.visable_term].lb,linebuffer,numberofchars);
 }
-
+void set_pid(uint32_t pid){
+  global_scheduler.terminals_pcb[global_scheduler.current_term]->process_id=pid;
+}
 /*
  *  scheduler_next
  *  INPUT:  none
@@ -187,41 +189,45 @@ void set_global_buffer(char linebuffer[128],int numberofchars)
  */
 void scheduler_next()
 {
-  cli();
+  save_esp_ebpasm();
   uint32_t pid;
+
+  // if (global_scheduler.current_term == global_scheduler.visable_term){
+  //   paging_set_write_to_videomem(); // Have virtural map to video memory
+  // }
 
   global_scheduler.current_term = (global_scheduler.current_term+1)%3;  // Set next terminal
   pid = global_scheduler.terminals_pcb[global_scheduler.current_term]->process_id;
 
   // If current terminal is being viewed
   if (global_scheduler.current_term == global_scheduler.visable_term){
-    // Have virtural map to video memory
-    paging_set_write_to_videomem();
+    paging_set_write_to_videomem(); // Have virtural map to video memory
   }
   else{
-    // Have virtural map to buffer
-    paging_set_write_to_buffer(global_scheduler.current_term);
+    paging_set_write_to_buffer(global_scheduler.current_term);  // Have virtural map to buffer
   }
-
+  paging_change_process(pid);
   if (global_scheduler.is_on[global_scheduler.current_term] == 0){
     global_scheduler.is_on[global_scheduler.current_term] = 1; // Set init off
     tss.ss0 = KERNEL_DS;
-    tss.esp0 = global_scheduler.esp0[global_scheduler.current_term];
-    sti();
-    (void)contextswitchasm(*(uint32_t*)global_scheduler.exe_bytes, global_scheduler.terminals_pcb[global_scheduler.current_term]);
-    
+    tss.esp0 = END_KMEM - (global_scheduler.current_term+1)*KERNEL_MEM_SIZE;
+
+    (void)contextswitchasm(
+      *(uint32_t*)global_scheduler.exe_bytes,
+      global_scheduler.terminals_pcb[global_scheduler.current_term]);
+
   }
 
   else{
     // Switch to next process
-    paging_change_process(pid);
+
     tss.ss0 = KERNEL_DS;
     tss.esp0 = (END_KMEM - (pid*KERNEL_MEM_SIZE));
 
-    sti();
+      
     (void)restoreparent(
-      global_scheduler.terminals[global_scheduler.current_term].esp,
       global_scheduler.terminals[global_scheduler.current_term].ebp,
+      global_scheduler.terminals[global_scheduler.current_term].esp,
       0
       );
   }

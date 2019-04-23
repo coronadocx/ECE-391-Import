@@ -165,7 +165,7 @@ void entry(unsigned long magic, unsigned long addr) {
     init_keyboard();
     init_rtc();
     init_global_scheduler();
-    init_pit(500);
+     init_pit(500);
 
 
     /* Enable interrupts */
@@ -179,14 +179,14 @@ void entry(unsigned long magic, unsigned long addr) {
     // pit_flag = 1;
 
     // volatile uint32_t tmp = 1;
-    while(1); //Spin and wait for PIT interrupts to begin execution
-
+     while(1); //Spin and wait for PIT interrupts to begin execution
+/*
 	while(1){
 		uint8_t command[7]={'s','h','e','l','l','\n','\0'}; // magic number 7 is used for sending the shell command
 		const uint8_t* a=command;
         execute(a);
 	}
-
+*/
 #ifdef RUN_TESTS
     /* Run tests */
     launch_tests(start);

@@ -450,11 +450,12 @@ int32_t execute(const uint8_t* command){
     }
     i=i+1;
   }
+
   if(current_pid==-1){
     printf("Maximum number of processes reached\n");
         return INVALIDORFAIL;
   }
-
+  set_pid(current_pid);
   pcb* parent_pcb;
   int parent_pid;
   int*y;
@@ -530,6 +531,7 @@ int32_t halt(uint8_t status){
   if(curr_pcb->process_id!=1){
     curr_pcb->parent->status = (uint32_t) status ;
   }
+  set_pid(parentid);
  // restore paging
   paging_change_process(parentid);
   tss.ss0=KERNEL_DS; // switch back to parent stack

@@ -236,7 +236,7 @@ void pithandler(){
 void initialize_IDT(){
 
    int i=0;
-   pit_flag = 0; 
+   pit_flag = 0;
 
 
 
@@ -319,7 +319,7 @@ idt[PITNO].present=1;
 idt[PITNO].dpl=3; // called from user using INT
 idt[PITNO].seg_selector=KERNEL_CS;
 idt[PITNO].reserved4=0;
-idt[PITNO].reserved3=1;
+idt[PITNO].reserved3=0;
 idt[PITNO].reserved2=1;
 idt[PITNO].reserved1=1;
 idt[PITNO].reserved0=0;

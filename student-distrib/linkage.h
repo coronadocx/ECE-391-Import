@@ -7,7 +7,7 @@
 #include "pit.h"
 #define USER_DS     0x002B
 
-
+void save_esp_ebpasm();
 /*
  *	pithandlerasm
  * 	DESCRIPTION: Assembly linkage function for pit

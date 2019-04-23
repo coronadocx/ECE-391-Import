@@ -26,7 +26,7 @@ typedef struct sched{
   	uint8_t		exe_bytes[SIZEOFOPERATIONSTABLE];
 }scheduler_t;
 
-
+void set_pid(uint32_t pid);
 void init_global_scheduler();
 void switch_terminals(int32_t next_terminal);
 int get_current_noc();

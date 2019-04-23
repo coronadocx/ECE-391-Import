@@ -108,6 +108,7 @@ void handlebackspace(){
   *(uint8_t *)(video_mem + (i << 1))=' ';
   *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
 }
+
 /*
  * scroll
  *   DESCRIPTION: handles vertical scrolling

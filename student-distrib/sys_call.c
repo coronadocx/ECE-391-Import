@@ -7,14 +7,14 @@
 #include "types.h"
 #include "rtc.h"
 #include "lib.h"
-
+#include "scheduler.h"
 /* Tables of function pointers */
 void* rtctable[SIZEOFOPERATIONSTABLE]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
 void* filetable[SIZEOFOPERATIONSTABLE]={&fs_open,&fs_read,&fs_write,&fs_close};
 void* directorytable[SIZEOFOPERATIONSTABLE]={&dir_open,&dir_read,&dir_write,&dir_close};
 void* stdin_table[SIZEOFOPERATIONSTABLE]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[SIZEOFOPERATIONSTABLE]={&terminal_open,NULL,&terminal_write,&terminal_close};
-int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {1,1,1,0,0,0};
+int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {0,0,0,0,0,0};
 //int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE}; //For a maximum of two programs
 
 
@@ -465,12 +465,13 @@ int32_t execute(const uint8_t* command){
   /*  read data into virtual address 128 MB */
   read_data(dir_entry.inode_num,0,(uint8_t*) VIRTUALADDRESSFOREXECUTABLEDATA,EXTENDEDPAGESIZE);
   /* Bit-Mask 0xFFE000 should give us an 8KB aligned address of the PCB */
-  parent_pcb = get_pcb_address();
-  parent_pid = (END_KMEM - (unsigned int) parent_pcb)/(PCB_SIZE) - 1;
+
   /* this part is to create the pcb */
   pcb* current_process=(pcb*)((int)END_KMEM-(current_pid+1)*PCB_SIZE); // start at 8MB-2*8kb
 
-  if(current_pid!=1){
+  if(current_pid>3){
+    parent_pcb = get_pcb_address();
+    parent_pid = (END_KMEM - (unsigned int) parent_pcb)/(PCB_SIZE) - 1;
     current_process->parent =parent_pcb ;
     current_process->parent_process_id=parent_pid;
   }
@@ -528,7 +529,7 @@ int32_t halt(uint8_t status){
     }
     i=i+1;
   }
-  if(curr_pcb->process_id!=1){
+  if(curr_pcb->process_id>3){
     curr_pcb->parent->status = (uint32_t) status ;
   }
   set_pid(parentid);

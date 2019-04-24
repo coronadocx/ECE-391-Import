@@ -4,6 +4,7 @@
 #include "keyboard.h"
 #include"terminal.h"
 #include "scheduler.h"
+#include "paging.h"
 static char chararray[NUM_KEYS]={' ','\0','1','2','3','4','5','6','7','8','9','0','-','=','b','t','q','w','e','r','t','y','u','i','o','p','[',']',
 '\n','0','a','s','d','f','g','h','j','k','l',';','\'','`','s','\\','z','x','c','v','b','n','m',',','.','/','r','\0','\0',' '};
 static char shiftarray[NUMBERSONKEYBOARD]={'~','!','@','#','$','%','^','&','*','('};  // handling if shift is pressed on any num keys on qwerty keyboard
@@ -30,6 +31,9 @@ void check_input(){
   int current_terminal,visible_terminal;
   int numberofchars = get_current_noc();
   set_line_buffer(linebuffer);
+  int screen_x=getpositionx();
+  int screen_y=getpositiony();
+  setposition(get_global_screen_x(),get_global_screen_y());
   a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
   paging_set_write_to_videomem();
   switch(a){
@@ -191,6 +195,8 @@ void check_input(){
   if (get_current_terminal() != get_visable_terminal())
   {
       paging_set_write_to_buffer(get_current_terminal());
+      setposition(screen_x,screen_y);
+
     }
 send_eoi(1); // send the end of intrupt signal for keyboard interupt which is at irq 1
 }

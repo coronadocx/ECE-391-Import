@@ -17,6 +17,7 @@
 //#include "../syscalls/ece391syscall.h"
 #include "sys_call.h"
 #include "scheduler.h"
+#include "pit.h"
 
 #define RUN_TESTS
 
@@ -174,8 +175,9 @@ void entry(unsigned long magic, unsigned long addr) {
      * without showing you any output */
     printf("Enabling Interrupts\n");
     clear();
-    sti();
     setposition(0,0);
+    sti();
+
     // pit_flag = 1;
 
     // volatile uint32_t tmp = 1;

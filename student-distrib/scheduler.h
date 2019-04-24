@@ -6,12 +6,15 @@
 #include "sys_call.h"
 
 #define NUM_TERMS	3
-
+#define KEYBOARD_BUFFER_LENGTH 128
 typedef struct terminal_struct{
 	int8_t		lb[128];
 	int32_t 	noc;
 	int32_t 	esp;
 	int32_t		ebp;
+	int32_t   pid;
+	int32_t screen_x;
+	int32_t screen_y;
 }terminal_t;
 
 typedef struct sched{
@@ -36,4 +39,7 @@ void set_line_buffer(char linebuffer[128]);
 void set_global_buffer(char linebuffer[128],int numberofchars);
 void scheduler_next();
 void save_esp_ebp(int32_t esp,int32_t ebp);
+uint32_t get_current_pid();
+int32_t get_global_screen_y();
+int32_t get_global_screen_x();
 #endif

@@ -192,6 +192,10 @@ void check_input(){
       break;
     }
   }
+  screen_x = getpositionx();
+  screen_y =getpositiony();
+  set_global_screen_x(screen_x);
+  set_global_screen_y(screen_y);
   if (get_current_terminal() != get_visable_terminal())
   {
       paging_set_write_to_buffer(get_current_terminal());

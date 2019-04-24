@@ -167,6 +167,12 @@ int32_t get_global_screen_y()
 {
   return global_scheduler.terminals[global_scheduler.visable_term].screen_y;
 }
+void set_global_screen_x(uint32_t x){
+     global_scheduler.terminals[global_scheduler.visable_term].screen_x=x;
+}
+void set_global_screen_y(uint32_t y){
+     global_scheduler.terminals[global_scheduler.visable_term].screen_x=y;
+}
 /*
  *  set_line_buffer
  *  INPUT:  linebuffer - TODO
@@ -229,12 +235,16 @@ void scheduler_next()
 
 
   // If current terminal is being viewed
+  setposition(newx,newy);
   if (global_scheduler.current_term == global_scheduler.visable_term){
     paging_set_write_to_videomem(); // Have virtural map to video memory
+     update_cursor();
   }
   else{
     paging_set_write_to_buffer(global_scheduler.current_term);  // Have virtural map to buffer
   }
+ 
+ 
 
 
 

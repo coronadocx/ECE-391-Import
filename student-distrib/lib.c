@@ -4,7 +4,7 @@
 #include "lib.h"
 #include "i8259.h"
 #include "terminal.h"
-
+#include "scheduler.h"
 
 
 
@@ -55,8 +55,9 @@ void clear(void) {
  */
 
 void setposition(int x,int y){
-  screen_x=x;
-  screen_y=y;
+  set_global_screen_x(x);
+  // screen_y=y;
+  set_global_screen_y(y);
 }
 /*
  * getpositiony
@@ -92,22 +93,28 @@ int getpositionx(){
  */
 
 void handlebackspace(){
-  if(screen_x-1<0){
-    if(screen_y!=0){
-    screen_y=screen_y-1;
-    screen_x=NUM_COLS-1;
+  if(get_global_screen_x()-1<0){
+    if(get_global_screen_y()!=0){
+
+      set_global_screen_y(get_global_screen_y()-1);
+      set_global_screen_x(NUM_COLS-1);
+    // screen_y=screen_y-1;
+    // screen_x=NUM_COLS-1;
   }
   }
   else{
-    screen_x=screen_x-1;
+
+    set_global_screen_x(get_global_screen_x()-1);
+    // screen_x=screen_x-1;
   }
   update_cursor();
 
 
-  int i=NUM_COLS*screen_y+screen_x;
+  int i=NUM_COLS*get_global_screen_y()+get_global_screen_x();
   *(uint8_t *)(video_mem + (i << 1))=' ';
   *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
 }
+
 /*
  * scroll
  *   DESCRIPTION: handles vertical scrolling
@@ -138,11 +145,48 @@ void scroll(){
     }
     y=y+1;
   }
-  screen_y=NUM_ROWS-1;
-  screen_x=0;
+
+  set_global_screen_y(NUM_ROWS-1);
+  set_global_screen_x(0);
+
+  // screen_y=NUM_ROWS-1;
+  // screen_x=0;
 
 
 }
+
+
+void scroll_modified(){
+  int x=0;
+  int y=0;
+  int i=0;
+  int j=0;
+  while(y<NUM_ROWS){
+    x=0;
+    while(x<NUM_COLS){
+    i=NUM_COLS*y+x;
+    j=NUM_COLS*(y+1)+x;
+    if(y==NUM_ROWS-1){
+        *(uint8_t *)(video_mem + (i << 1))=' ';
+    }
+    else{
+    *(uint8_t *)(video_mem + (i << 1)) =*(uint8_t *)(video_mem + (j << 1)) ;
+  }
+    *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+    x=x+1;
+    }
+    y=y+1;
+  }
+
+  set_current_screen_y(NUM_ROWS-1);
+  set_current_screen_x(0);
+  // screen_y=NUM_ROWS-1;
+  // screen_x=0;
+
+
+}
+
+
 /* Standard printf().
  * Only supports the following format strings:
  * %%  - print a literal '%' character
@@ -286,40 +330,127 @@ int32_t puts(int8_t* s) {
  * Inputs: uint_8* c = character to print
  * Return Value: void
  *  Function: Output a character to the console */
+// void putc(uint8_t c) {
+//
+//     if(c == '\n' || c == '\r') {
+//       screen_y++;
+//       if(!(screen_y<NUM_ROWS)){
+//         scroll();
+//       }
+//         screen_x = 0;
+//
+//     } else {
+//         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
+//         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
+//         screen_x++;
+//         if(!(screen_x<NUM_COLS)){
+//           screen_y=screen_y+1;
+//           if(!(screen_y<NUM_ROWS)){
+//             scroll();
+//           }
+//           else{
+//           setposition(0,screen_y);
+//          }
+//         }
+//         else{
+//             screen_x %= NUM_COLS;
+//         }
+//         if(!(screen_y<NUM_ROWS)){
+//           scroll();
+//         }
+//         else{
+//         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+//       }
+//     }
+//
+//     update_cursor();
+// }
+
+
 void putc(uint8_t c) {
 
     if(c == '\n' || c == '\r') {
-      screen_y++;
-      if(!(screen_y<NUM_ROWS)){
+      set_global_screen_y(get_global_screen_y()+1);
+      if(!(get_global_screen_y()<NUM_ROWS)){
         scroll();
+        // scroll_modified();
       }
-        screen_x = 0;
+        set_global_screen_x(0);
 
     } else {
-        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
-        screen_x++;
-        if(!(screen_x<NUM_COLS)){
-          screen_y=screen_y+1;
-          if(!(screen_y<NUM_ROWS)){
+        *(uint8_t *)(video_mem + ((NUM_COLS * get_global_screen_y() + get_global_screen_x()) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS * get_global_screen_y() + get_global_screen_x()) << 1) + 1) = ATTRIB;
+        set_global_screen_x(get_global_screen_x()+1);
+        if(!(get_global_screen_x()<NUM_COLS)){
+          set_global_screen_y(get_global_screen_y()+1);
+          if(!(get_global_screen_y()<NUM_ROWS)){
             scroll();
           }
           else{
-          setposition(0,screen_y);
+          set_global_screen_x(0);
          }
         }
         else{
-            screen_x %= NUM_COLS;
+          set_global_screen_x(get_global_screen_x()%NUM_COLS);
+            // screen_x %= NUM_COLS;
         }
-        if(!(screen_y<NUM_ROWS)){
+        if(!(get_global_screen_y()<NUM_ROWS)){
           scroll();
         }
         else{
-        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+          set_global_screen_y((get_global_screen_y()+(get_global_screen_x()/NUM_COLS))%NUM_ROWS);
+        // screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
       }
     }
+
     update_cursor();
 }
+
+
+/* void putc(uint8_t c);
+ * Inputs: uint_8* c = character to print
+ * Return Value: void
+ *  Function: Output a character to the console */
+void putc_modified(uint8_t c) {
+
+    if(c == '\n' || c == '\r') {
+      set_current_screen_y(get_current_screen_y()+1);
+      if(!(get_current_screen_y()<NUM_ROWS)){
+        scroll_modified();
+      }
+        set_current_screen_x(0);
+
+    } else {
+        *(uint8_t *)(video_mem + ((NUM_COLS * get_current_screen_y() + get_current_screen_x()) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS * get_current_screen_y() + get_current_screen_x()) << 1) + 1) = ATTRIB;
+        set_current_screen_x(get_current_screen_x()+1);
+        if(!(get_current_screen_x()<NUM_COLS)){
+          set_current_screen_y(get_current_screen_y()+1);
+          if(!(get_current_screen_y()<NUM_ROWS)){
+            scroll_modified();
+          }
+          else{
+          set_current_screen_x(0);
+         }
+        }
+        else{
+          set_current_screen_x(get_current_screen_x()%NUM_COLS);
+            // screen_x %= NUM_COLS;
+        }
+        if(!(get_current_screen_y()<NUM_ROWS)){
+          scroll_modified();
+        }
+        else{
+          set_current_screen_y((get_current_screen_y()+(get_current_screen_x()/NUM_COLS))%NUM_ROWS);
+        // screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+      }
+    }
+
+    // update_cursor();
+}
+
+
+
 
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
  * Inputs: uint32_t value = number to convert

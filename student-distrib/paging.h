@@ -13,9 +13,19 @@
 
 #define KER_START_ADDR	0x400000			//Starting address of the Kernel (1-expage)
 #define VID_START_ADDR	0xB8000				//Starting address of the video memory (8-page)
+
+#define T1_BUF_ADDR     0xB9000
+#define T2_BUF_ADDR     0xBA000
+#define T3_BUF_ADDR     0xBB000
+
+#define VMEM_SIZE       4096
+
 #define USR_START_ADDR  0x800000
 
 #define VMEM_PAGE       184
+#define T1_BUF_PAGE     185
+#define T2_BUF_PAGE     186
+#define T3_BUF_PAGE     187
 
 //Masks
 #define VMEM_OR_MASK    0x7
@@ -51,7 +61,12 @@ typedef struct pg_struct {							//Page Entry Struct
 
 extern void paging_initialize();
 extern uint32_t paging_change_process(uint32_t process_id);
-extern uint32_t mapvirtualtovideomemory();
+extern uint32_t paging_vidmap();
 // extern uint32_t paging_create_entry(pe_t entry);
+
+// CP5
+extern void _flush();   // Internal helper
+extern void paging_set_write_to_videomem();
+extern void paging_set_write_to_buffer(int32_t buffer);
 
 #endif

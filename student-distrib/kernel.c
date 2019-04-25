@@ -16,6 +16,8 @@
 #include "terminal.h"
 //#include "../syscalls/ece391syscall.h"
 #include "sys_call.h"
+#include "scheduler.h"
+#include "pit.h"
 
 #define RUN_TESTS
 
@@ -163,26 +165,30 @@ void entry(unsigned long magic, unsigned long addr) {
      * PIC, any other initialization stuff... */
     init_keyboard();
     init_rtc();
-    /* Masking RTC for testing*/
-    // disable_irq(RTC_IRQ_NO);
+    init_global_scheduler();
+     init_pit(500);
 
-
-    // asm volatile("int $40");
 
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your
      * IDT correctly otherwise QEMU will triple fault and simple close
      * without showing you any output */
     printf("Enabling Interrupts\n");
-    sti();
     clear();
-    		setposition(0,0);
+    setposition(0,0);
+    sti();
+
+    // pit_flag = 1;
+
+    // volatile uint32_t tmp = 1;
+     while(1); //Spin and wait for PIT interrupts to begin execution
+/*
 	while(1){
-		uint8_t command[7]={'s','h','e','l','l','\n','\0'}; // magic number 7 is used for sending the shell command 
+		uint8_t command[7]={'s','h','e','l','l','\n','\0'}; // magic number 7 is used for sending the shell command
 		const uint8_t* a=command;
         execute(a);
 	}
-
+*/
 #ifdef RUN_TESTS
     /* Run tests */
     launch_tests(start);

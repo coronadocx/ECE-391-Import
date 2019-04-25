@@ -80,8 +80,8 @@ void switch_terminals(int32_t next_terminal)
   uint8_t* next_terminal_buf;
   uint8_t* vmem;
 
-  global_scheduler.terminals[global_scheduler.visable_term].screen_x=get_global_screen_x();
-  global_scheduler.terminals[global_scheduler.visable_term].screen_y=get_global_screen_y();
+  // global_scheduler.terminals[global_scheduler.visable_term].screen_x=get_global_screen_x();
+  // global_scheduler.terminals[global_scheduler.visable_term].screen_y=get_global_screen_y();
   // Get previous terminal and its buffer
   prev_terminal = global_scheduler.visable_term;
   prev_terminal_buf = global_scheduler.vid_bufs[prev_terminal];
@@ -91,7 +91,7 @@ void switch_terminals(int32_t next_terminal)
 
   // Set next terminal and get its buffer
   global_scheduler.visable_term = next_terminal;
-  setposition(global_scheduler.terminals[global_scheduler.visable_term].screen_x,global_scheduler.terminals[global_scheduler.visable_term].screen_y);
+  // setposition(global_scheduler.terminals[global_scheduler.visable_term].screen_x,global_scheduler.terminals[global_scheduler.visable_term].screen_y);
   // set_global_screen_x()
 
   update_cursor();
@@ -248,14 +248,14 @@ void scheduler_next()
   // if (global_scheduler.current_term == global_scheduler.visable_term){
   //   paging_set_write_to_videomem(); // Have virtural map to video memory
   // }
-  uint32_t x= get_current_screen_x();
-  uint32_t y= get_current_screen_y();
+  // uint32_t x= get_current_screen_x();
+  // uint32_t y= get_current_screen_y();
   uint32_t newx,newy;
-  global_scheduler.terminals[global_scheduler.current_term].screen_x=x;
-  global_scheduler.terminals[global_scheduler.current_term].screen_y=y;
+  // global_scheduler.terminals[global_scheduler.current_term].screen_x=x;
+  // global_scheduler.terminals[global_scheduler.current_term].screen_y=y;
   global_scheduler.current_term = (global_scheduler.current_term+1)%3;  // Set next terminal
-  newx=global_scheduler.terminals[global_scheduler.current_term].screen_x;
-  newy=global_scheduler.terminals[global_scheduler.current_term].screen_y;
+  // newx=global_scheduler.terminals[global_scheduler.current_term].screen_x;
+  // newy=global_scheduler.terminals[global_scheduler.current_term].screen_y;
 
   pid = global_scheduler.terminals[global_scheduler.current_term].pid;
 

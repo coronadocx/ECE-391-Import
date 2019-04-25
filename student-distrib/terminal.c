@@ -107,7 +107,7 @@ int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
     sizetocopy=numberofchars[current_t];
   }
     //memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
-    printf("%d",current_t);
+    // printf("%d",current_t);
   int i=0;
   while(i<numberofchars[current_t]){
     *((int8_t*)buffer+i)=terminalbuffer[current_t][i];//[current_t][i];

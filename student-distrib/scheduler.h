@@ -42,4 +42,14 @@ void save_esp_ebp(int32_t esp,int32_t ebp);
 uint32_t get_current_pid();
 int32_t get_global_screen_y();
 int32_t get_global_screen_x();
+
+void set_global_screen_y();
+void set_global_screen_x();
+
+void set_current_screen_y();
+void set_current_screen_x();
+int32_t get_current_screen_y();
+int32_t get_current_screen_x();
+
+
 #endif

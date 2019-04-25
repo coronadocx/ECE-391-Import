@@ -52,8 +52,8 @@ void enable_cursor(){
 
 void update_cursor(){
   /*referenced wiki.osdev.org/Text_Mode_cursor*/
-  int x= getpositionx();
-  int y= getpositiony();
+  int x= get_global_screen_x();
+  int y= get_global_screen_y();
   int pos= y*X_WIDTH+x;
   outb(REG_F,VMEMPORT_3D4);
   outb((uint8_t) (pos &MASK_LOWER_8 ),VMEMPORT_3D5);
@@ -77,7 +77,7 @@ int terminal_write(int32_t fd,void*buf,int32_t nbytes){
   int8_t* buf2= (int8_t*)buf;
 
   for(i=0;i<nbytes;i++){
-    putc(buf2[i]);
+    putc_modified(buf2[i]);
   }
 
   update_cursor();

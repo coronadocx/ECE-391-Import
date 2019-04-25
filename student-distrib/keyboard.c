@@ -31,9 +31,11 @@ void check_input(){
   int current_terminal,visible_terminal;
   int numberofchars = get_current_noc();
   set_line_buffer(linebuffer);
-  int screen_x=getpositionx();
-  int screen_y=getpositiony();
-  setposition(get_global_screen_x(),get_global_screen_y());
+  //int screen_x=getpositionx();
+  //int screen_y=getpositiony();
+  int screen_x;
+  int screen_y;
+  //setposition(get_global_screen_x(),get_global_screen_y());
   a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
   paging_set_write_to_videomem();
   switch(a){
@@ -192,14 +194,14 @@ void check_input(){
       break;
     }
   }
-  screen_x = getpositionx();
-  screen_y =getpositiony();
-  set_global_screen_x(screen_x);
-  set_global_screen_y(screen_y);
+  //screen_x = getpositionx();
+  //screen_y =getpositiony();
+  //set_global_screen_x(screen_x);
+  //set_global_screen_y(screen_y);
   if (get_current_terminal() != get_visable_terminal())
   {
       paging_set_write_to_buffer(get_current_terminal());
-      setposition(screen_x,screen_y);
+      //setposition(screen_x,screen_y);
 
     }
 send_eoi(1); // send the end of intrupt signal for keyboard interupt which is at irq 1

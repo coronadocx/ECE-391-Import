@@ -45,4 +45,10 @@ int32_t get_global_screen_x();
 void set_global_screen_x(uint32_t x);
 void set_global_screen_y(uint32_t y);
 
+void set_current_x(uint32_t x);
+void set_current_y(uint32_t y);
+int32_t get_current_x();
+int32_t get_current_y();
+
+
 #endif

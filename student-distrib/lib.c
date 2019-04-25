@@ -4,6 +4,7 @@
 #include "lib.h"
 #include "i8259.h"
 #include "terminal.h"
+#include "scheduler.h"
 
 
 
@@ -27,6 +28,9 @@ void writetovideomem(){
 
   screen_x = rtcInterruptCount%NUM_COLS;
   screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+
+  //set_global_screen_x(rtcInterruptCount%NUM_COLS);
+  //set_global_screen_y();
   putc('X');
 
 
@@ -109,6 +113,26 @@ void handlebackspace(){
   *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
 }
 
+
+/*
+void handlebackspace(){
+  if(get_global_screen_x()-1<0){
+    if(get_global_screen_y()!=0){
+    set_global_screen_y(get_global_screen_y()-1);
+    set_global_screen_x(NUM_COLS-1);
+  }
+  }
+  else{
+    set_global_screen_x(get_global_screen_x() - 1);
+  }
+  update_cursor();
+
+
+  int i=NUM_COLS*get_global_screen_y()+get_global_screen_x();
+  *(uint8_t *)(video_mem + (i << 1))=' ';
+  *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+}
+*/
 /*
  * scroll
  *   DESCRIPTION: handles vertical scrolling
@@ -139,11 +163,21 @@ void scroll(){
     }
     y=y+1;
   }
-  screen_y=NUM_ROWS-1;
-  screen_x=0;
+  //screen_y=NUM_ROWS-1;
+  //screen_x=0;
+
+  set_current_y(NUM_ROWS-1);
+  set_current_x(0);
 
 
 }
+
+
+
+
+
+
+
 /* Standard printf().
  * Only supports the following format strings:
  * %%  - print a literal '%' character
@@ -287,6 +321,7 @@ int32_t puts(int8_t* s) {
  * Inputs: uint_8* c = character to print
  * Return Value: void
  *  Function: Output a character to the console */
+
 void putc(uint8_t c) {
 
     if(c == '\n' || c == '\r') {
@@ -319,9 +354,50 @@ void putc(uint8_t c) {
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
       }
     }
-    
+
     update_cursor();
 }
+
+/*
+void putc(uint8_t c) {
+
+    if(c == '\n' || c == '\r') {
+      set_current_y(get_current_y()+1);
+      if(!(get_current_y()<NUM_ROWS)){
+        scroll();
+      }
+        set_current_x(0);
+
+    } else {
+        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
+        set_current_x(get_current_x()+1);
+        if(!(get_current_x()<NUM_COLS)){
+          set_current_y(get_current_y()+1);
+          if(!(get_current_y()<NUM_ROWS)){
+            scroll();
+          }
+          else{
+          set_current_x(0);
+          //setposition(0,screen_y);
+         }
+        }
+        else{
+          set_current_x(get_current_x()%NUM_COLS);
+            //screen_x %= NUM_COLS;
+        }
+        if(!(get_current_y()<NUM_ROWS)){
+          scroll();
+        }
+        else{
+        set_current_y((get_current_y() + (get_current_x() / NUM_COLS)) % NUM_ROWS);
+      }
+    }
+
+    update_cursor();
+}
+*/
+
 
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
  * Inputs: uint32_t value = number to convert

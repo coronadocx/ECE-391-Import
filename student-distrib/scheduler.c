@@ -94,6 +94,7 @@ void switch_terminals(int32_t next_terminal)
   setposition(global_scheduler.terminals[global_scheduler.visable_term].screen_x,global_scheduler.terminals[global_scheduler.visable_term].screen_y);
   // set_global_screen_x()
 
+  update_cursor();
   next_terminal_buf = global_scheduler.vid_bufs[next_terminal];
 
   vmem = (uint8_t*)VID_START_ADDR;
@@ -240,7 +241,7 @@ uint32_t get_current_pid(){
  */
 void scheduler_next()
 {
-  cli();
+  // cli();
   save_esp_ebpasm();
   uint32_t pid;
 
@@ -301,7 +302,7 @@ void scheduler_next()
       0
       );
   }
-  sti();
+  // sti();
 }
 
 //helper function

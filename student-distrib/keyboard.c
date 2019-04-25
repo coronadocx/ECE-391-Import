@@ -196,8 +196,8 @@ void check_input(){
   {
       paging_set_write_to_buffer(get_current_terminal());
       // setposition(screen_x,screen_y);
-      // set_current_screen_x(get_global_screen_x());
-      // set_current_screen_y(get_global_screen_y());
+      set_current_screen_x(get_global_screen_x());
+      set_current_screen_y(get_global_screen_y());
 
     }
 send_eoi(1); // send the end of intrupt signal for keyboard interupt which is at irq 1

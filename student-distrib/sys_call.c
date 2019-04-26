@@ -515,10 +515,12 @@ int32_t halt(uint8_t status){
   curr_pcb = get_pcb_address();
 
   // Don't close the first 3 processes (shells)
-  // if (curr_pcb->process_id == 1 ||curr_pcb->process_id == 2 ||curr_pcb->process_id == 3){
-  //   printf("Cannot close base process.\n");
-  //   return;
-  // }
+  if (curr_pcb->process_id < 4){
+    printf("Cannot close base process -- ");
+    cli();
+    processes_running[(curr_pcb->process_id-1)] = 0;
+    execute((uint8_t*)"shell");    
+  }
 
   processes_running[curr_pcb->process_id-1]=NOTINUSE;
   uint32_t parentid=curr_pcb->parent_process_id;

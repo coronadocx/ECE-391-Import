@@ -32,19 +32,6 @@ void init_global_scheduler()
 
   // Create PCBs for the 3 initial shells, set up paging for first terminal
   for (i=0; i<NUM_TERMS; i++) {
-    // Set up PCBs
-    // processes_running[i] = 1; // Mark process as running
-    // global_scheduler.terminals_pcb[i] = (pcb*)(END_KMEM - ((i+2)*PCB_SIZE)); // Grab PCB addr FIXME
-    // global_scheduler.terminals_pcb[i]->parent = NULL;   // Starting process has no parent
-    // global_scheduler.terminals_pcb[i]->process_id = (i+1);  // Process IDs are 1 indexed
-    // global_scheduler.ss0[i] = KERNEL_DS;  // All datasegments are the same
-    // global_scheduler.esp0[i] = (END_KMEM - ((i+1)*KERNEL_MEM_SIZE));
-    // set_up_stdin(global_scheduler.terminals_pcb[i]);
-    // set_up_stdout(global_scheduler.terminals_pcb[i]);
-    // set_up_fdsandargs(global_scheduler.terminals_pcb[i], 0, 0, exe_name);
-    // paging_change_process(i+1);
-    // (void)read_data(dir_entry.inode_num,0,(uint8_t*) VIRTUALADDRESSFOREXECUTABLEDATA,EXTENDEDPAGESIZE);
-
 
     // Initialize rest of scheduler object
     global_scheduler.terminals[i].noc = 0;
@@ -80,8 +67,6 @@ void switch_terminals(int32_t next_terminal)
   uint8_t* next_terminal_buf;
   uint8_t* vmem;
 
-  // global_scheduler.terminals[global_scheduler.visable_term].screen_x=get_global_screen_x();
-  // global_scheduler.terminals[global_scheduler.visable_term].screen_y=get_global_screen_y();
   // Get previous terminal and its buffer
   prev_terminal = global_scheduler.visable_term;
   prev_terminal_buf = global_scheduler.vid_bufs[prev_terminal];
@@ -91,8 +76,6 @@ void switch_terminals(int32_t next_terminal)
 
   // Set next terminal and get its buffer
   global_scheduler.visable_term = next_terminal;
-  // setposition(global_scheduler.terminals[global_scheduler.visable_term].screen_x,global_scheduler.terminals[global_scheduler.visable_term].screen_y);
-  // set_global_screen_x()
 
   update_cursor();
   next_terminal_buf = global_scheduler.vid_bufs[next_terminal];
@@ -107,24 +90,7 @@ void switch_terminals(int32_t next_terminal)
     paging_set_write_to_buffer(global_scheduler.current_term);
   sti();
 
-  // paging_set_write_to_videomem();
-  // // If current terminal is being viewed
-  // if (global_scheduler.current_term == global_scheduler.visable_term){
-  //   // Have virtural map to video memory
-  //   paging_set_write_to_videomem();
-  // }
-  // else{
-  //   // Have virtural map to buffer
-  //   paging_set_write_to_buffer(global_scheduler.current_term);
-  // }
-  // // sti();
 
-  // if (global_scheduler.visable_term == 0)
-  //   paging_set_write_to_videomem();
-  // else
-  //   paging_set_write_to_buffer(global_scheduler.visable_term);
-
-  // return;
 }
 
 
@@ -153,56 +119,127 @@ int32_t get_current_terminal()
   return global_scheduler.current_term;
 }
 
+/*
+ *  set_current_screen_x(int x)
+ *  INPUT:  int x - x Value to set the current activate terminal screen_x
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, Sets the active terminall screenx
+ */
 
 void set_current_screen_x(int x)
 {
   global_scheduler.terminals[global_scheduler.current_term].screen_x=x;
 }
+
+/*
+ *  set_current_screen_y(int y)
+ *  INPUT:  int y - y Value to set the current activate terminal screen_y
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, Sets the active terminall screen_y
+ */
+
 void set_current_screen_y(int y)
 {
   global_scheduler.terminals[global_scheduler.current_term].screen_y=y;
 }
 
+/*
+ *  get_current_screen_x()
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, gets the current active terminal screen_X
+ */
+
 int32_t get_current_screen_x()
 {
   return global_scheduler.terminals[global_scheduler.current_term].screen_x;
 }
+
+
+/*
+ *  get_current_screen_y()
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, gets the current active terminal screen_y
+ */
+
 int32_t get_current_screen_y()
 {
   return global_scheduler.terminals[global_scheduler.current_term].screen_y;
 }
 
-
-
 /*
- * TODO
+ *  get_visile_terminal()
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, gets the value for the visible terminal
  */
+
 int32_t get_visable_terminal()
 {
   return global_scheduler.visable_term;
 }
 
+/*
+ *  set_global_screen_x(int x)
+ *  INPUT:  int x
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, sets the value for the visible terminal screen_x
+ */
+
 void set_global_screen_x(int x)
 {
   global_scheduler.terminals[global_scheduler.visable_term].screen_x=x;
 }
+
+/*
+ *  set_global_screen_y(int y)
+ *  INPUT:  int y
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, sets the value for the visible terminal screen_y
+ */
+
 void set_global_screen_y(int y)
 {
   global_scheduler.terminals[global_scheduler.visable_term].screen_y=y;
 }
 
+/*
+ *  get_global_screen_x()
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, gets the current visible terminal screen_y
+ */
 
 int32_t get_global_screen_x()
 {
   return global_scheduler.terminals[global_scheduler.visable_term].screen_x;
 }
+
+/*
+ *  get_global_screen_y()
+ *  INPUT:  none
+ *  OUTPUT: none
+ *  RETURN: none
+ *  EFFECT: helper, gets the current visible terminal screen_y
+ */
+
 int32_t get_global_screen_y()
 {
   return global_scheduler.terminals[global_scheduler.visable_term].screen_y;
 }
+
 /*
  *  set_line_buffer
- *  INPUT:  linebuffer - TODO
+ *  INPUT:  char linebuffer[128]
  *  OUTPUT: TODO
  *  RETURN: none
  *  EFFECT: TODO
@@ -214,7 +251,7 @@ void set_line_buffer(char linebuffer[128])
 
 /*
  *  set_global_buffer
- *  INPUT:  TODO
+ *  INPUT:  char linebuffer[128], int numberofcharss
  *  OUTPUT: TODO
  *  RETURN: none
  *  EFFECT: TODO
@@ -227,6 +264,9 @@ void set_global_buffer(char linebuffer[128],int numberofchars)
 void set_pid(uint32_t pid){
     global_scheduler.terminals[global_scheduler.current_term].pid=pid;
 }
+
+
+
 uint32_t get_current_pid(){
     return global_scheduler.terminals[global_scheduler.current_term].pid;
 }
@@ -245,17 +285,10 @@ void scheduler_next()
   save_esp_ebpasm();
   uint32_t pid;
 
-  // if (global_scheduler.current_term == global_scheduler.visable_term){
-  //   paging_set_write_to_videomem(); // Have virtural map to video memory
-  // }
-  // uint32_t x= get_current_screen_x();
-  // uint32_t y= get_current_screen_y();
   uint32_t newx,newy;
-  // global_scheduler.terminals[global_scheduler.current_term].screen_x=x;
-  // global_scheduler.terminals[global_scheduler.current_term].screen_y=y;
+
   global_scheduler.current_term = (global_scheduler.current_term+1)%3;  // Set next terminal
-  // newx=global_scheduler.terminals[global_scheduler.current_term].screen_x;
-  // newy=global_scheduler.terminals[global_scheduler.current_term].screen_y;
+
 
   pid = global_scheduler.terminals[global_scheduler.current_term].pid;
 
@@ -270,21 +303,11 @@ void scheduler_next()
     paging_set_write_to_buffer(global_scheduler.current_term);  // Have virtural map to buffer
   }
 
-
-
-
   if (global_scheduler.is_on[global_scheduler.current_term] == 0){
     global_scheduler.is_on[global_scheduler.current_term] = 1;
     if(execute("shell")<0){
       printf("failed");
     }
-    // global_scheduler.is_on[global_scheduler.current_term] = 1; // Set init off
-    // tss.ss0 = KERNEL_DS;
-    // tss.esp0 = END_KMEM - (global_scheduler.current_term+1)*KERNEL_MEM_SIZE;
-    //
-    // (void)contextswitchasm(
-    //   *(uint32_t*)global_scheduler.exe_bytes,
-    //   global_scheduler.terminals_pcb[global_scheduler.current_term]);
 
   }
 

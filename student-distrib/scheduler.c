@@ -284,8 +284,8 @@ void scheduler_next()
   // cli();
   save_esp_ebpasm();
   uint32_t pid;
-
-  uint32_t newx,newy;
+  uint8_t exe_name[] = "shell";
+  // uint32_t newx,newy;
 
   global_scheduler.current_term = (global_scheduler.current_term+1)%3;  // Set next terminal
 
@@ -305,7 +305,7 @@ void scheduler_next()
 
   if (global_scheduler.is_on[global_scheduler.current_term] == 0){
     global_scheduler.is_on[global_scheduler.current_term] = 1;
-    if(execute("shell")<0){
+    if(execute(exe_name)<0){
       printf("failed");
     }
 

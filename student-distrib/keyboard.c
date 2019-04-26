@@ -28,11 +28,11 @@ static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 void check_input(){
 
   uint32_t a;
-  int current_terminal,visible_terminal;
+  // int current_terminal,visible_terminal;
   int numberofchars = get_current_noc();
   set_line_buffer(linebuffer);
-  int screen_x=get_global_screen_x();
-  int screen_y=get_global_screen_y();
+  // int screen_x=get_global_screen_x();
+  // int screen_y=get_global_screen_y();
   setposition(get_global_screen_x(),get_global_screen_y());
   a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
   paging_set_write_to_videomem();

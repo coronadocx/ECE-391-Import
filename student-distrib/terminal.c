@@ -2,10 +2,12 @@
 
 #include "keyboard.h"
 #include "terminal.h"
+#include "scheduler.h"
 #include "lib.h"
- char terminalbuffer[KEYBOARD_BUFFER_LENGTH];
-volatile int flag=0;
-volatile int numberofchars=0;
+ char terminalbuffer[3][KEYBOARD_BUFFER_LENGTH];
+
+volatile int flags[3]={0,0,0};
+volatile int numberofchars[3]={0,0,0};
 
 /* int init()
  *
@@ -17,7 +19,9 @@ volatile int numberofchars=0;
 
 
 int init(){
-  memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);
+  memset(terminalbuffer[0],0,KEYBOARD_BUFFER_LENGTH);
+  memset(terminalbuffer[1],0,KEYBOARD_BUFFER_LENGTH);
+  memset(terminalbuffer[2],0,KEYBOARD_BUFFER_LENGTH);
 
   return 0;
 }
@@ -48,8 +52,8 @@ void enable_cursor(){
 
 void update_cursor(){
   /*referenced wiki.osdev.org/Text_Mode_cursor*/
-  int x= getpositionx();
-  int y= getpositiony();
+  int x= get_global_screen_x();
+  int y= get_global_screen_y();
   int pos= y*X_WIDTH+x;
   outb(REG_F,VMEMPORT_3D4);
   outb((uint8_t) (pos &MASK_LOWER_8 ),VMEMPORT_3D5);
@@ -73,7 +77,7 @@ int terminal_write(int32_t fd,void*buf,int32_t nbytes){
   int8_t* buf2= (int8_t*)buf;
 
   for(i=0;i<nbytes;i++){
-    putc(buf2[i]);
+    putc_modified(buf2[i]);
   }
 
   update_cursor();
@@ -91,28 +95,30 @@ int terminal_read(int32_t fd,void* buffer,int32_t nbytes){
 
 
   int sizetocopy;
+  int current_t=get_current_terminal();
   memset(buffer,0,nbytes);
-  while(!flag){
+  while(!flags[current_t]){
 
   }
-  if(nbytes<numberofchars){
+  if(nbytes<numberofchars[current_t]){
     sizetocopy=nbytes;
   }
   else{
-    sizetocopy=numberofchars;
+    sizetocopy=numberofchars[current_t];
   }
     //memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
+    // printf("%d",current_t);
   int i=0;
-  while(i<numberofchars){
-    *((int8_t*)buffer+i)=terminalbuffer[i];
+  while(i<numberofchars[current_t]){
+    *((int8_t*)buffer+i)=terminalbuffer[current_t][i];//[current_t][i];
      i=i+1;
   }
   *((int8_t*)buffer+i)='\n';
   update_cursor();
-  int retvalue = numberofchars;
-  memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);
-  numberofchars=0;
-  flag=0;
+  int retvalue = numberofchars[current_t];
+  memset(terminalbuffer[current_t],0,KEYBOARD_BUFFER_LENGTH);
+  numberofchars[current_t]=0;
+  flags[current_t]=0;
 
   return retvalue+1;
 }
@@ -152,13 +158,14 @@ int32_t terminal_close(int32_t fd){
  */
 void set_terminal_buffer(uint8_t* buf,uint32_t nchars){
   int i=0;
-  memset(terminalbuffer,0,KEYBOARD_BUFFER_LENGTH);
+  int32_t current_t = get_visable_terminal();
+  memset(terminalbuffer[current_t],0,KEYBOARD_BUFFER_LENGTH);
   while(i<nchars){
-    terminalbuffer[i]=*(buf+i);
+    terminalbuffer[current_t][i]=*(buf+i);
     i=i+1;
   }
-  numberofchars=nchars;
-  terminalbuffer[numberofchars]='\n';
-  flag=1;
+  numberofchars[current_t]=nchars;
+  terminalbuffer[current_t][numberofchars[current_t]]='\n';
+  flags[current_t]=1;
 
 }

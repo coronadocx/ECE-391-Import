@@ -20,6 +20,23 @@
 .global systemcallasm
 .global contextswitchasm
 .global restoreparent
+.global pithandlerasm
+.global save_esp_ebpasm
+save_esp_ebpasm:
+xorl %edx, %edx
+xorl %ecx, %ecx
+movl %esp, %ecx
+movl %ebp, %edx
+
+
+pushl %edx
+pushl %ecx
+
+call save_esp_ebp
+
+addl $8, %esp
+ret
+
 /*
  * 	contextswitchasm
  *	DESCRIPTION: Assembly linkage function for context switches
@@ -53,6 +70,9 @@ contextswitchasm:
     pushl $USER_DS
     pushl $ESPARG
     pushfl
+    popl %eax
+    orl $0x200, %eax
+    pushl %eax
     pushl $USER_CS
     pushl %edx
 
@@ -93,6 +113,20 @@ keyboardhandlerasm:
    popal
    iret
 
+
+/* pithandlerasm
+ * INPUTS -- none
+ * OUTPUTS -- none
+ * RETURN Value -- none
+ * Side Effects -- calls c pithandler
+ */
+pithandlerasm:
+      # Saving esp and ebp
+
+      pushal
+      call pithandler
+      popal
+      iret
 
 /* rtchandlerasm
  * INPUTS -- none

@@ -7,15 +7,17 @@
 #include "types.h"
 #include "rtc.h"
 #include "lib.h"
-
+#include "scheduler.h"
 /* Tables of function pointers */
 void* rtctable[SIZEOFOPERATIONSTABLE]={&rtc_open,&rtc_read,&rtc_write,&rtc_close};
 void* filetable[SIZEOFOPERATIONSTABLE]={&fs_open,&fs_read,&fs_write,&fs_close};
 void* directorytable[SIZEOFOPERATIONSTABLE]={&dir_open,&dir_read,&dir_write,&dir_close};
 void* stdin_table[SIZEOFOPERATIONSTABLE]={&terminal_open,&terminal_read,NULL,&terminal_close};
 void* stdout_table[SIZEOFOPERATIONSTABLE]={&terminal_open,NULL,&terminal_write,&terminal_close};
-int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE,NOTINUSE};
+int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {0,0,0,0,0,0};
 //int8_t processes_running[NUMBEROFPROCESSESSUPPORTED] = {NOTINUSE,NOTINUSE}; //For a maximum of two programs
+
+
 
 /*
  *  set_up_stdin
@@ -449,11 +451,12 @@ int32_t execute(const uint8_t* command){
     }
     i=i+1;
   }
+
   if(current_pid==-1){
     printf("Maximum number of processes reached\n");
         return INVALIDORFAIL;
   }
-
+  set_pid(current_pid);
   pcb* parent_pcb;
   int parent_pid;
   int*y;
@@ -463,12 +466,13 @@ int32_t execute(const uint8_t* command){
   /*  read data into virtual address 128 MB */
   read_data(dir_entry.inode_num,0,(uint8_t*) VIRTUALADDRESSFOREXECUTABLEDATA,EXTENDEDPAGESIZE);
   /* Bit-Mask 0xFFE000 should give us an 8KB aligned address of the PCB */
-  parent_pcb = get_pcb_address();
-  parent_pid = (END_KMEM - (unsigned int) parent_pcb)/(PCB_SIZE) - 1;
+
   /* this part is to create the pcb */
   pcb* current_process=(pcb*)((int)END_KMEM-(current_pid+1)*PCB_SIZE); // start at 8MB-2*8kb
 
-  if(current_pid!=1){
+  if(current_pid>3){
+    parent_pcb = get_pcb_address();
+    parent_pid = (END_KMEM - (unsigned int) parent_pcb)/(PCB_SIZE) - 1;
     current_process->parent =parent_pcb ;
     current_process->parent_process_id=parent_pid;
   }
@@ -505,9 +509,19 @@ return current_process->status;
  */
 
 int32_t halt(uint8_t status){
+
   /* get the address of the process to halt */
   pcb* curr_pcb;
   curr_pcb = get_pcb_address();
+
+  // Don't close the first 3 processes (shells)
+  if (curr_pcb->process_id < 4){
+    printf("Cannot close base process -- ");
+    cli();
+    processes_running[(curr_pcb->process_id-1)] = 0;
+    execute((uint8_t*)"shell");    
+  }
+
   processes_running[curr_pcb->process_id-1]=NOTINUSE;
   uint32_t parentid=curr_pcb->parent_process_id;
   int i=0;
@@ -518,9 +532,10 @@ int32_t halt(uint8_t status){
     }
     i=i+1;
   }
-  if(curr_pcb->process_id!=1){
+  if(curr_pcb->process_id>3){
     curr_pcb->parent->status = (uint32_t) status ;
   }
+  set_pid(parentid);
  // restore paging
   paging_change_process(parentid);
   tss.ss0=KERNEL_DS; // switch back to parent stack
@@ -584,7 +599,7 @@ if(page_dir_idx !=CHECK_USER_VMEM ){
   return -1;
 }
 
-mapvirtualtovideomemory();
+paging_vidmap();
 
 uint32_t vmemlocation = VMEM_133MB;
 

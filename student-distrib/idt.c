@@ -8,12 +8,14 @@
 #include "i8259.h"
 #include "rtc.h"
 #include "sys_call.h"
+#include "scheduler.h"
+
+uint32_t pit_flag = 0;
 
 // idt index for keyboard and rtc
 #define KEYBOARD  0x21
 #define RTC 0x28
 // Assembly functions that handle the stack when keyboard or rtc interuppts are generated
-
 /*
  * handle0
  *   DESCRIPTION: function exception handler for divide by zero
@@ -157,6 +159,15 @@ void handle10(){
  */
 void handle14(){
     printf("Page Fault exception\n");
+int address;
+    asm volatile("                \n\
+  movl	%0, %%eax	            \n\
+  movl 	%%cr2, %%eax			    \n\
+  "
+  : "=a"(address)
+);
+printf("The Exception occurred at:%x",address);
+
       halt('P');
 }
 /*
@@ -204,6 +215,15 @@ void rtchandler(){
 }
 
 
+void pithandler(){
+
+  send_eoi(0);
+
+  // if (pit_flag)
+  scheduler_next();
+}
+
+
 /*
  * initialize_IDT
  *   DESCRIPTION: function that sets up the IDT
@@ -216,6 +236,7 @@ void rtchandler(){
 void initialize_IDT(){
 
    int i=0;
+   pit_flag = 0;
 
 
 
@@ -293,6 +314,19 @@ idt[SYSTEMCALLNO].reserved1=1;
 idt[SYSTEMCALLNO].reserved0=0;
 idt[SYSTEMCALLNO].size=1;
 SET_IDT_ENTRY(idt[SYSTEMCALLNO],systemcallasm);
+
+idt[PITNO].present=1;
+idt[PITNO].dpl=3; // called from user using INT
+idt[PITNO].seg_selector=KERNEL_CS;
+idt[PITNO].reserved4=0;
+idt[PITNO].reserved3=0;
+idt[PITNO].reserved2=1;
+idt[PITNO].reserved1=1;
+idt[PITNO].reserved0=0;
+idt[PITNO].size=1;
+SET_IDT_ENTRY(idt[PITNO],pithandlerasm);
+
+
 
 
 

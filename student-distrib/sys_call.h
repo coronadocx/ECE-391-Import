@@ -54,6 +54,9 @@
 
 #define W_SPACE	0
 
+extern int8_t processes_running[NUMBEROFPROCESSESSUPPORTED];
+
+
 /* Function to handle the file descriptor on an open system call */
 int32_t fd_array_handle_open(pcb* curr_pcb, int32_t file_type, int32_t inode_num);
 /* Function to handle the file descriptor on a close system call */
@@ -79,5 +82,9 @@ int32_t set_handler(int32_t signum,void* handler_address);
 /* sigreturn system call which currently only returns -1. Will be done for EC */
 int32_t sigreturn(void);
 
+void set_up_stdin(pcb* current_process);
+void set_up_stdout(pcb* current_process);
+void set_up_fdsandargs(pcb* current_process,int32_t arg_size,int32_t arg_idx,int8_t arg_arr[MAXBUFSIZEEXECUTE]);
+// void set_process(int32_t pid); 
 
 #endif

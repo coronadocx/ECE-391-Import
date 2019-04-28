@@ -21,7 +21,8 @@
 #define ASCII1 49
 #define ASCII9 57
 #define NUMBERSONKEYBOARD 10
-
+#define ALTPRESSED 0x38
+#define ALTRELEASED 0xB8
 
 void check_input();
 void init_keyboard();

@@ -4,6 +4,7 @@
 #include "lib.h"
 #include "pcb.h"
 #include "sys_call.h"
+#include "filesystem.h"
 
 #define NUM_TERMS	3
 #define KEYBOARD_BUFFER_LENGTH 128
@@ -50,6 +51,7 @@ void set_current_screen_y();
 void set_current_screen_x();
 int32_t get_current_screen_y();
 int32_t get_current_screen_x();
+
 
 
 #endif

@@ -164,6 +164,7 @@ void entry(unsigned long magic, unsigned long addr) {
     /* Initialize devices, memory, filesystem, enable device interrupts on the
      * PIC, any other initialization stuff... */
     init_keyboard();
+    init_history_buffer(); //Added 04/27/2019
     init_rtc();
     init_global_scheduler();
      init_pit(500);

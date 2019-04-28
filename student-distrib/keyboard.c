@@ -11,7 +11,28 @@ static char shiftarray[NUMBERSONKEYBOARD]={'~','!','@','#','$','%','^','&','*','
 static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 
 
+static char temp_linebuffer[NUM_TERMINALS][KEYBOARD_BUFFER_LENGTH];
+static char history_buffer_0[HISTORY_LENGTH][KEYBOARD_BUFFER_LENGTH];
+static char history_buffer_1[HISTORY_LENGTH][KEYBOARD_BUFFER_LENGTH];
+static char history_buffer_2[HISTORY_LENGTH][KEYBOARD_BUFFER_LENGTH];
+int history_buffer_index[NUM_TERMINALS];
+int buffer_index;
+int num_presses[NUM_TERMINALS];
 
+void init_history_buffer(){
+  int i;
+  for(i=0; i < NUM_TERMINALS; i++){
+  history_buffer_index[i] = 0;
+  num_presses[NUM_TERMINALS] = 0;
+  memset(temp_linebuffer[i],0,KEYBOARD_BUFFER_LENGTH);
+  }
+  for(i=0; i < HISTORY_LENGTH; i++){
+    memset(history_buffer_0[i],0,KEYBOARD_BUFFER_LENGTH);
+    memset(history_buffer_1[i],0,KEYBOARD_BUFFER_LENGTH);
+    memset(history_buffer_2[i],0,KEYBOARD_BUFFER_LENGTH);
+  }
+
+}
 
 
  /*
@@ -24,10 +45,48 @@ static char linebuffer[KEYBOARD_BUFFER_LENGTH];
   */
 
 
+void write_history_buffer(int terminal_number, char linebuffer[KEYBOARD_BUFFER_LENGTH]){
+  if(terminal_number < 0 || terminal_number > 2)
+    return;
+  switch(terminal_number){
+
+  case 0:
+  if(history_buffer_index[terminal_number] == HISTORY_LENGTH)
+    history_buffer_index[terminal_number] = 0;
+  memset(history_buffer_0[history_buffer_index[terminal_number]], 0, KEYBOARD_BUFFER_LENGTH);
+  memcpy(history_buffer_0[history_buffer_index[terminal_number]], linebuffer, KEYBOARD_BUFFER_LENGTH);
+  history_buffer_index[terminal_number]++;
+  break;
+
+  case 1:
+  if(history_buffer_index[terminal_number] == HISTORY_LENGTH)
+    history_buffer_index[terminal_number] = 0;
+  memset(history_buffer_1[history_buffer_index[terminal_number]], 0, KEYBOARD_BUFFER_LENGTH);
+  memcpy(history_buffer_1[history_buffer_index[terminal_number]], linebuffer, KEYBOARD_BUFFER_LENGTH);
+  history_buffer_index[terminal_number]++;
+  break;
+
+  case 2:
+  if(history_buffer_index[terminal_number] == HISTORY_LENGTH)
+    history_buffer_index[terminal_number] = 0;
+  memset(history_buffer_2[history_buffer_index[terminal_number]], 0, KEYBOARD_BUFFER_LENGTH);
+  memcpy(history_buffer_2[history_buffer_index[terminal_number]], linebuffer, KEYBOARD_BUFFER_LENGTH);
+  history_buffer_index[terminal_number]++;
+  break;
+
+  default:
+    break;
+
+  return;
+  }
+}
+
 /* 1 is used to indicate the shift,capslock, control are pressed. 0 in the chararray indicates that they are not pressed or released */
 void check_input(){
 
   uint32_t a;
+  int buffer_length;
+  int i;
   // int current_terminal,visible_terminal;
   int numberofchars = get_current_noc();
   set_line_buffer(linebuffer);
@@ -37,8 +96,8 @@ void check_input(){
   a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
   paging_set_write_to_videomem();
   switch(a){
-    case  LEFTSHIFT: chararray[ LEFTSHIFT]='1';break;    // check if left shift is pressed
-    case  LEFTSHIFTRELEASED :chararray[ LEFTSHIFT]='0';break; // check if left shift is released
+    case  LEFTSHIFT: chararray[LEFTSHIFT]='1';break;    // check if left shift is pressed
+    case  LEFTSHIFTRELEASED :chararray[LEFTSHIFT]='0';break; // check if left shift is released
     case RIGHTSHIFT:chararray[RIGHTSHIFT]='1';break;  // check if right shift is pressed
     case RIGHTSHIFTRELEASED:chararray[RIGHTSHIFT]='0';break;  // check if right shift is released
     case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;  // check if control is pressed
@@ -55,10 +114,71 @@ void check_input(){
 			}
       break;
 
+    case UP_PRESSED:
+    /* If num_presses for visible terminal > 20, break */
+    if(num_presses[get_visable_terminal()] == HISTORY_LENGTH - 1)
+      break;
+    /* Increment number of presses without Enter being pressed */  
+    num_presses[get_visable_terminal()]++;
+    memcpy(temp_linebuffer[get_visable_terminal()],linebuffer,KEYBOARD_BUFFER_LENGTH);
+    buffer_index = history_buffer_index[get_visable_terminal()] - num_presses[get_visable_terminal()];
+    memset(linebuffer,0,KEYBOARD_BUFFER_LENGTH);
+    if(buffer_index < 0)
+    {
+    buffer_index = HISTORY_LENGTH + buffer_index + history_buffer_index[get_visable_terminal()];
+    }
+
+
+    if(get_visable_terminal() == 0){
+    buffer_length = strlen(history_buffer_0[buffer_index]);
+    memcpy(linebuffer, history_buffer_0[buffer_index], buffer_length);
+  }
+
+    else if(get_visable_terminal() == 1){
+    buffer_length = strlen(history_buffer_1[buffer_index]);
+    memcpy(linebuffer, history_buffer_1[buffer_index], buffer_length);
+  }
+
+    else if(get_visable_terminal() == 2){
+    buffer_length = strlen(history_buffer_2[buffer_index]);
+    memcpy(linebuffer, history_buffer_2[buffer_index], buffer_length);
+  }
+
+  else{
+    break;
+  }
+
+    for(i = 0; i < buffer_length; i++){
+      putc(linebuffer[i]);
+    }
+
+    update_cursor(); // update the position of the cursor
+    numberofchars = buffer_length; // add number of chars in keyboard buffer
+    set_global_buffer(linebuffer,numberofchars);
+
+
+
+      break;
+
+      case DOWN_PRESSED:
+      buffer_length = strlen(temp_linebuffer[get_visable_terminal()]);
+      memcpy(linebuffer, temp_linebuffer[get_visable_terminal()],KEYBOARD_BUFFER_LENGTH);
+      for(i = 0; i < buffer_length; i++){
+        putc(linebuffer[i]);
+      }
+
+      update_cursor(); // update the position of the cursor
+      numberofchars = buffer_length; // add number of chars in keyboard buffer
+      set_global_buffer(linebuffer,numberofchars);
+      //printf("Down button pressed\n");
+
+      break;
+
     case ENTER: // adding newline to buffer. This triggers a terminal read
     //  while(get_current_terminal() != get_visable_terminal());
       putc(chararray[a]);
-
+      write_history_buffer(get_visable_terminal(), linebuffer);
+      num_presses[get_visable_terminal()] = 0;
       linebuffer[numberofchars]='\n';
 
       // reset the linebuffer

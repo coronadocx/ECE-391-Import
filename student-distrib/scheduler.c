@@ -51,6 +51,7 @@ void init_global_scheduler()
   return;
 }
 
+
 /*
  *  switch_terminals
  *  INPUT:  next_terminal

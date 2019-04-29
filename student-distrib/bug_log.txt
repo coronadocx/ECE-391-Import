@@ -1,5 +1,4 @@
 
-
 1. 
 Error: 		 Initializing paging causes tripplefault
 Bug description: Paging table and directory were initialized wrong
@@ -34,3 +33,18 @@ Bug description: Since scheduling has been implemented, the scheduled terminal m
 Member:		 Rohan/Janish
 Checkpoint#:	 Checkpoint 5
 Fix:	         Fixed by having three separate terminal buffers and setting the terminal buffer from only the terminal that is being viewed.
+
+6. 
+Error: 		 pagefaults with extremely large file names in terminal
+Bug description: The read dentry by name function did not protect against extremely large file names
+Member:		 Janish  
+Checkpoint#:	 Checkpoint 4
+Fix:	         Added handler to check for extremely large file names 
+
+7. 
+Error: 	Backspacing in shell would erase the ece391shell> prompt. 	 
+Bug description: Error in the way backspace was handled in the keyboard.c file
+Member:		 Rohan  
+Checkpoint#:	 Checkpoint 3
+Fix:	         Ensured that every time a shell is started number of characters in keyboard buffer is 0 
+

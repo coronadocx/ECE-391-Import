@@ -198,7 +198,7 @@ void init_keyboard(){
 // letters for the demo
 chararray[CAPSLOCK]='0';  // intially capslock is off
 chararray[ LEFTSHIFT]='0'; // initially left shift is not pressed.
-chararray[0x38]='0';
+chararray[ALTPRESSED]='0';
 
 
 }

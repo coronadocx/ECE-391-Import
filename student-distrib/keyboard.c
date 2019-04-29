@@ -92,7 +92,13 @@ void check_input(){
       }
 
       if( ( chararray[CAPSLOCK]=='1'|| chararray[ LEFTSHIFT]=='1'||chararray[RIGHTSHIFT]=='1') && chararray[a]>=ASCIILOWERCASEA && chararray[a]<=ASCIILOWERCASEZ){
-        char temp = chararray[a]-ASCII_TO_HEX;
+        char temp;
+        if(chararray[CAPSLOCK]=='1' && (chararray[LEFTSHIFT]=='1'||chararray[RIGHTSHIFT]=='1')){
+            temp=chararray[a];
+        }
+        else{
+        temp= chararray[a]-ASCII_TO_HEX;
+        }
         if(temp=='L' && chararray[LEFTCONTROLPRESSED]=='1' ){
           clear();
           setposition(0,0);  // clear the screen and set the x y position to 0,0

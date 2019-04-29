@@ -432,7 +432,7 @@ int32_t execute(const uint8_t* command){
     return INVALIDORFAIL;
   }
 
-  /* check if the file is an executable. these four magic numbers are used to check if a fine is an executable  */
+  /* check if the file is an executable. these four magic numbers are used to check if a file is an executable  */
   if(check_buf[0]!=0x7f || check_buf[1]!=0x45||check_buf[2]!=0x4C||check_buf[3]!=0x46){  // we use these magic numbers only once and hence they are not macros
     return INVALIDORFAIL ;
   }
@@ -470,7 +470,7 @@ int32_t execute(const uint8_t* command){
   /* this part is to create the pcb */
   pcb* current_process=(pcb*)((int)END_KMEM-(current_pid+1)*PCB_SIZE); // start at 8MB-2*8kb
 
-  if(current_pid>3){
+  if(current_pid>NUM_TERMINALS){
     parent_pcb = get_pcb_address();
     parent_pid = (END_KMEM - (unsigned int) parent_pcb)/(PCB_SIZE) - 1;
     current_process->parent =parent_pcb ;
@@ -515,11 +515,11 @@ int32_t halt(uint8_t status){
   curr_pcb = get_pcb_address();
 
   // Don't close the first 3 processes (shells)
-  if (curr_pcb->process_id < 4){
+  if (curr_pcb->process_id < (NUM_TERMINALS + 1)){
     printf("Cannot close base process -- ");
     cli();
     processes_running[(curr_pcb->process_id-1)] = 0;
-    execute((uint8_t*)"shell");    
+    execute((uint8_t*)"shell");
   }
 
   processes_running[curr_pcb->process_id-1]=NOTINUSE;
@@ -532,7 +532,7 @@ int32_t halt(uint8_t status){
     }
     i=i+1;
   }
-  if(curr_pcb->process_id>3){
+  if(curr_pcb->process_id>NUM_TERMINALS){
     curr_pcb->parent->status = (uint32_t) status ;
   }
   set_pid(parentid);

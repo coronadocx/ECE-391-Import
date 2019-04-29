@@ -45,8 +45,8 @@ void init_global_scheduler()
 
   paging_change_process(1); // Make paging look at shell 1 initially
 
-  global_scheduler.current_term = 2;
-  global_scheduler.visable_term = 0;
+  global_scheduler.current_term = FIRST_CURRENT_T;
+  global_scheduler.visable_term = FIRST_VISIBLE_T;
 
   return;
 }
@@ -244,7 +244,7 @@ int32_t get_global_screen_y()
  *  RETURN: none
  *  EFFECT: Copies values from the global linebuffer into the linebuffer for keyboard
  */
-void set_line_buffer(char linebuffer[128])
+void set_line_buffer(char linebuffer[KEYBOARD_BUFFER_LENGTH])
 {
   memcpy(linebuffer,global_scheduler.terminals[global_scheduler.visable_term].lb,global_scheduler.terminals[global_scheduler.visable_term].noc);
 }
@@ -256,7 +256,7 @@ void set_line_buffer(char linebuffer[128])
  *  RETURN: none
  *  EFFECT:  Copies values from the linebuffer into the global linebuffer for visible terminal
  */
-void set_global_buffer(char linebuffer[128],int numberofchars)
+void set_global_buffer(char linebuffer[KEYBOARD_BUFFER_LENGTH],int numberofchars)
 {
   global_scheduler.terminals[global_scheduler.visable_term].noc=numberofchars;
   memcpy(global_scheduler.terminals[global_scheduler.visable_term].lb,linebuffer,numberofchars);
@@ -293,7 +293,7 @@ void scheduler_next()
   uint8_t exe_name[] = "shell";
   // uint32_t newx,newy;
 
-  global_scheduler.current_term = (global_scheduler.current_term+1)%3;  // Set next terminal
+  global_scheduler.current_term = (global_scheduler.current_term+1)%NUM_TERMS;  // Set next terminal
 
 
   pid = global_scheduler.terminals[global_scheduler.current_term].pid;

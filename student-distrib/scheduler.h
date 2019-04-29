@@ -7,8 +7,12 @@
 
 #define NUM_TERMS	3
 #define KEYBOARD_BUFFER_LENGTH 128
+#define FIRST_CURRENT_T 2
+#define FIRST_VISIBLE_T 0
+
+
 typedef struct terminal_struct{
-	int8_t		lb[128];
+	int8_t		lb[KEYBOARD_BUFFER_LENGTH];
 	int32_t 	noc;
 	int32_t 	esp;
 	int32_t		ebp;
@@ -42,9 +46,9 @@ int32_t get_current_terminal();
 /* gets the value for the visible terminal */
 int32_t get_visable_terminal();
 /* Copies values from the global linebuffer of visible terminal into the linebuffer for keyboard */
-void set_line_buffer(char linebuffer[128]);
+void set_line_buffer(char linebuffer[KEYBOARD_BUFFER_LENGTH]);
 /* Copies values from the linebuffer into the global linebuffer for visible terminal */
-void set_global_buffer(char linebuffer[128],int numberofchars);
+void set_global_buffer(char linebuffer[KEYBOARD_BUFFER_LENGTH],int numberofchars);
 /* Schedules next terminal to be processed, works with the PIT handler interrupts */
 void scheduler_next();
 /* Saves the registers %esp and %ebp before running a new process */

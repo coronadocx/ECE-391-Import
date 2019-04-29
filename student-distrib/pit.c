@@ -12,15 +12,15 @@
 // enable_irq(RTC_IRQ_NO);
 //   return;
 // }
-//
-//
-// int32_t pit_write(int32_t fd,const void * buf, int32_t nbytes){
-//
-//
-//
-//
-// }
 
+
+/*
+ *	init_pit
+ *	INPUT: uint32_t rate
+ *	OUTPUT: none
+ *  SIDE EFFECTS: Sets the rate of the PIT
+ *	RETURN VALUE: none
+ */
 void init_pit(uint32_t rate){
 
 uint32_t divisor = 1193182 /rate;
@@ -30,8 +30,3 @@ outb((uint8_t) ( (divisor>>8) & 0xFF ),0x40);
 enable_irq(0);
 printf("Printing in pit");
 }
-
-
-
-
-

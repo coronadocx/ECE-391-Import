@@ -49,6 +49,8 @@
 #define FD_STDIN        0
 #define FD_STDOUT       1
 
+#define NUM_TERMINALS   3
+
 
 
 
@@ -85,6 +87,6 @@ int32_t sigreturn(void);
 void set_up_stdin(pcb* current_process);
 void set_up_stdout(pcb* current_process);
 void set_up_fdsandargs(pcb* current_process,int32_t arg_size,int32_t arg_idx,int8_t arg_arr[MAXBUFSIZEEXECUTE]);
-// void set_process(int32_t pid); 
+// void set_process(int32_t pid);
 
 #endif

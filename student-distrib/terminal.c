@@ -4,14 +4,14 @@
 #include "terminal.h"
 #include "scheduler.h"
 #include "lib.h"
- char terminalbuffer[3][KEYBOARD_BUFFER_LENGTH];
+ char terminalbuffer[TERMINALS][KEYBOARD_BUFFER_LENGTH];
 
-volatile int flags[3]={0,0,0};
-volatile int numberofchars[3]={0,0,0};
+volatile int flags[TERMINALS]={0,0,0};
+volatile int numberofchars[TERMINALS]={0,0,0};
 
 /* int init()
  *
- * Initializes the terminalbuffer
+ * Initializes the terminalbuffers
  * Inputs: None
  * Outputs: 0 always
  * Side Effects: None

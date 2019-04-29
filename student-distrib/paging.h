@@ -58,15 +58,19 @@ typedef struct pg_struct {							//Page Entry Struct
     uint8_t ps;
     uint8_t is_directory_entry;				//Used to differentiate between page table entries and page data entries
 } pe_t;
-
+/* Changes x86 control registers to allow paging */
 extern void paging_initialize();
+/* Changes physical mapping of v128MB */
 extern uint32_t paging_change_process(uint32_t process_id);
+/* Maps Virtual Memory 133MB to video memory by creating a new page table */
 extern uint32_t paging_vidmap();
-// extern uint32_t paging_create_entry(pe_t entry);
 
 // CP5
+/* flushes the TLB */
 extern void _flush();   // Internal helper
+/* changes paging structure such virtural video memory maps to physical video memory. */
 extern void paging_set_write_to_videomem();
+/* changes paging structure such that virtural video memory maps to the provided backup buffer in physical memory. */
 extern void paging_set_write_to_buffer(int32_t buffer);
 
 #endif

@@ -20,6 +20,7 @@
 #include "pit.h"
 
 #define RUN_TESTS
+#define PIT_RATE    500
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -166,7 +167,7 @@ void entry(unsigned long magic, unsigned long addr) {
     init_keyboard();
     init_rtc();
     init_global_scheduler();
-     init_pit(500);
+     init_pit(PIT_RATE);
 
 
     /* Enable interrupts */

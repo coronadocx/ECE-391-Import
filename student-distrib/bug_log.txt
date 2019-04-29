@@ -1,4 +1,3 @@
-
 1. 
 Error: 		 Initializing paging causes tripplefault
 Bug description: Paging table and directory were initialized wrong
@@ -47,4 +46,10 @@ Bug description: Error in the way backspace was handled in the keyboard.c file
 Member:		 Rohan  
 Checkpoint#:	 Checkpoint 3
 Fix:	         Ensured that every time a shell is started number of characters in keyboard buffer is 0 
+8. 
+Error: 	with capslock on when you would hit shift you would still get upper case characters 	 
+Bug description: Error in the way capslock and shift was handled
+Member:		 Rohan  
+Checkpoint#:	 Checkpoint 2
+Fix:	         Add an extra if condition in the code to handle the specific case
 

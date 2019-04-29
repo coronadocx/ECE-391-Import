@@ -28,14 +28,12 @@ static char linebuffer[KEYBOARD_BUFFER_LENGTH];
 void check_input(){
 
   uint32_t a;
-  // int current_terminal,visible_terminal;
   int numberofchars = get_current_noc();
   set_line_buffer(linebuffer);
-  // int screen_x=get_global_screen_x();
-  // int screen_y=get_global_screen_y();
   setposition(get_global_screen_x(),get_global_screen_y());
   a=inb(KEYBOARD_CMD_PORT);  // read from the keyboard port
   paging_set_write_to_videomem();
+
   switch(a){
     case  LEFTSHIFT: chararray[ LEFTSHIFT]='1';break;    // check if left shift is pressed
     case  LEFTSHIFTRELEASED :chararray[ LEFTSHIFT]='0';break; // check if left shift is released
@@ -47,7 +45,7 @@ void check_input(){
     case ALTRELEASED:chararray[0x38]='0';break;
     case BACKSPACE:  // check for backspace
       if(numberofchars!=0){
-      //  while(get_current_terminal() != get_visable_terminal());
+
         handlebackspace();
         linebuffer[numberofchars]='\0';
         numberofchars-=1; // backspace removes the number of chars
@@ -56,7 +54,7 @@ void check_input(){
       break;
 
     case ENTER: // adding newline to buffer. This triggers a terminal read
-    //  while(get_current_terminal() != get_visable_terminal());
+
       putc(chararray[a]);
 
       linebuffer[numberofchars]='\n';
@@ -107,15 +105,7 @@ void check_input(){
         else{
           if(numberofchars!=KEYBOARD_BUFFER_LENGTH-1){// -1 because last character is reserved for \n
             linebuffer[numberofchars]=temp;
-            // while(1){
-            //   current_terminal=get_current_terminal();
-            //   visible_terminal=get_visable_terminal();
-            //   if(current_terminal==visible_terminal){
-            //
-            //        break;
-            //   }
-            // }
-        //    while(get_current_terminal() != get_visable_terminal());
+
             putc(temp);
 
             update_cursor(); // update the position of the cursor
@@ -151,14 +141,6 @@ void check_input(){
             }
           }
           linebuffer[numberofchars]=temp;
-          // while(1){
-          //   current_terminal=get_current_terminal();
-          //   visible_terminal=get_visable_terminal();
-          //   if(current_terminal==visible_terminal){
-          //        break;
-          //   }
-          // }
-          //while(get_current_terminal() != get_visable_terminal());
           putc(temp);
 
 
@@ -173,15 +155,7 @@ void check_input(){
         // -1 because last character is reserved for \n
         if(chararray[a]&& numberofchars!=KEYBOARD_BUFFER_LENGTH-1&&chararray[a]!='\0'){
           linebuffer[numberofchars]=chararray[a];
-          // while(1){
-          //   current_terminal=get_current_terminal();
-          //   visible_terminal=get_visable_terminal();
-          //   if(current_terminal==visible_terminal){
-          //
-          //        break;
-          //   }
-          // }
-          //while(get_current_terminal() != get_visable_terminal());
+
           putc(chararray[a]);
           numberofchars++;
           set_global_buffer(linebuffer,numberofchars);
@@ -195,9 +169,6 @@ void check_input(){
   if (get_current_terminal() != get_visable_terminal())
   {
       paging_set_write_to_buffer(get_current_terminal());
-      // setposition(screen_x,screen_y);
-      // set_current_screen_x(get_global_screen_x());
-      // set_current_screen_y(get_global_screen_y());
 
     }
 send_eoi(1); // send the end of intrupt signal for keyboard interupt which is at irq 1

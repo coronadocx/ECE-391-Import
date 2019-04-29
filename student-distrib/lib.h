@@ -8,15 +8,20 @@
 #include "types.h"
 
 int32_t printf(int8_t *format, ...);
+/* Output a character to the console */
 void putc(uint8_t c);
+/*Output a character to the visible console */
 void putc_modified(uint8_t c);
 int32_t puts(int8_t *s);
 int8_t *itoa(uint32_t value, int8_t* buf, int32_t radix);
 int8_t *strrev(int8_t* s);
 uint32_t strlen(const int8_t* s);
+/* Clears video memory */
 void clear(void);
 void test_interrupts(void);
+/* reorientes the screen scrolls at bottom edge for scheduled screen */
 void scroll_modified();
+
 void* memset(void* s, int32_t c, uint32_t n);
 void* memset_word(void* s, int32_t c, uint32_t n);
 void* memset_dword(void* s, int32_t c, uint32_t n);
@@ -25,12 +30,18 @@ void* memmove(void* dest, const void* src, uint32_t n);
 int32_t strncmp(const int8_t* s1, const int8_t* s2, uint32_t n);
 int8_t* strcpy(int8_t* dest, const int8_t*src);
 int8_t* strncpy(int8_t* dest, const int8_t*src, uint32_t n);
-void setposition(int x,int y);
-int getpositionx();
-int getpositiony();
-void scroll();
-void handlebackspace();
 
+/* set the video mem screen x and screen y */
+void setposition(int x,int y);
+/* returns current screenx */
+int getpositionx();
+/* returns current screenx */
+int getpositiony();
+/* reorientes the screen scrolls at bottom edge */
+void scroll();
+/* sets screen_x and screen_y appropriately to handle backspace */
+void handlebackspace();
+/* Writes the value of Rtc Interrupt count at a specific location */
 void writetovideomem();
 
 

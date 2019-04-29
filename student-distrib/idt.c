@@ -10,7 +10,7 @@
 #include "sys_call.h"
 #include "scheduler.h"
 
-uint32_t pit_flag = 0;
+
 
 // idt index for keyboard and rtc
 #define KEYBOARD  0x21
@@ -214,12 +214,18 @@ void rtchandler(){
 
 }
 
-
+/*
+ * pit_handler()
+ *   DESCRIPTION: function that handles PIT interrupts
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: handles periodic PIT interrupts
+ */
 void pithandler(){
 
+  /* Sending end of interrupt */
   send_eoi(0);
-
-  // if (pit_flag)
   scheduler_next();
 }
 
@@ -236,9 +242,6 @@ void pithandler(){
 void initialize_IDT(){
 
    int i=0;
-   pit_flag = 0;
-
-
 
  for(i=0;i<EXCEPTION_COUNT;i++){
    idt[i].dpl=0;
@@ -304,6 +307,7 @@ SET_IDT_ENTRY(idt[KEYBOARD],keyboardhandlerasm);
  idt[RTC].size=1;
  SET_IDT_ENTRY(idt[RTC],rtchandlerasm);
 
+/* Setting up the System Call Entries */
 idt[SYSTEMCALLNO].present=1;
 idt[SYSTEMCALLNO].dpl=3; // called from user using INT
 idt[SYSTEMCALLNO].seg_selector=KERNEL_CS;
@@ -315,6 +319,8 @@ idt[SYSTEMCALLNO].reserved0=0;
 idt[SYSTEMCALLNO].size=1;
 SET_IDT_ENTRY(idt[SYSTEMCALLNO],systemcallasm);
 
+
+/* Setting up the Pit Handler */
 idt[PITNO].present=1;
 idt[PITNO].dpl=3; // called from user using INT
 idt[PITNO].seg_selector=KERNEL_CS;

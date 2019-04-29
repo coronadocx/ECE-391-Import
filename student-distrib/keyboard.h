@@ -24,7 +24,9 @@
 #define ALTPRESSED 0x38
 #define ALTRELEASED 0xB8
 
+/* Function that handles keyboard inputs  */
 void check_input();
+/* Function which initializes the Keyboard by enabling the first IRQ */
 void init_keyboard();
 
 #endif

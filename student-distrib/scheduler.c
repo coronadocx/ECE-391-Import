@@ -242,7 +242,7 @@ int32_t get_global_screen_y()
  *  INPUT:  char linebuffer[128]
  *  OUTPUT: TODO
  *  RETURN: none
- *  EFFECT: TODO
+ *  EFFECT: Copies values from the global linebuffer into the linebuffer for keyboard
  */
 void set_line_buffer(char linebuffer[128])
 {
@@ -254,7 +254,7 @@ void set_line_buffer(char linebuffer[128])
  *  INPUT:  char linebuffer[128], int numberofcharss
  *  OUTPUT: TODO
  *  RETURN: none
- *  EFFECT: TODO
+ *  EFFECT:  Copies values from the linebuffer into the global linebuffer for visible terminal
  */
 void set_global_buffer(char linebuffer[128],int numberofchars)
 {
@@ -266,7 +266,13 @@ void set_pid(uint32_t pid){
 }
 
 
-
+/*
+ *  set_current_pid
+ *  INPUT:  none
+ *  OUTPUT: TODO
+ *  RETURN: none
+ *  EFFECT:  Gets the process ID of scheduled terminal
+ */
 uint32_t get_current_pid(){
     return global_scheduler.terminals[global_scheduler.current_term].pid;
 }

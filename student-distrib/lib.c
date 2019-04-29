@@ -56,7 +56,6 @@ void clear(void) {
 
 void setposition(int x,int y){
   set_global_screen_x(x);
-  // screen_y=y;
   set_global_screen_y(y);
 }
 /*
@@ -98,9 +97,8 @@ void handlebackspace(){
 
       set_global_screen_y(get_global_screen_y()-1);
       set_global_screen_x(NUM_COLS-1);
-    // screen_y=screen_y-1;
-    // screen_x=NUM_COLS-1;
-  }
+
+    }
   }
   else{
 
@@ -155,7 +153,14 @@ void scroll(){
 
 }
 
-
+/*
+ * scroll_modified
+ *   DESCRIPTION: handles vertical scrolling
+ *   INPUTS: None
+ *   OUTPUTS:None
+ *   RETURN VALUE: None
+ *   SIDE EFFECTS:  reorientes the screen scrolls at bottom edge
+ */
 void scroll_modified(){
   int x=0;
   int y=0;
@@ -180,8 +185,6 @@ void scroll_modified(){
 
   set_current_screen_y(NUM_ROWS-1);
   set_current_screen_x(0);
-  // screen_y=NUM_ROWS-1;
-  // screen_x=0;
 
 
 }
@@ -330,43 +333,6 @@ int32_t puts(int8_t* s) {
  * Inputs: uint_8* c = character to print
  * Return Value: void
  *  Function: Output a character to the console */
-// void putc(uint8_t c) {
-//
-//     if(c == '\n' || c == '\r') {
-//       screen_y++;
-//       if(!(screen_y<NUM_ROWS)){
-//         scroll();
-//       }
-//         screen_x = 0;
-//
-//     } else {
-//         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
-//         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
-//         screen_x++;
-//         if(!(screen_x<NUM_COLS)){
-//           screen_y=screen_y+1;
-//           if(!(screen_y<NUM_ROWS)){
-//             scroll();
-//           }
-//           else{
-//           setposition(0,screen_y);
-//          }
-//         }
-//         else{
-//             screen_x %= NUM_COLS;
-//         }
-//         if(!(screen_y<NUM_ROWS)){
-//           scroll();
-//         }
-//         else{
-//         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
-//       }
-//     }
-//
-//     update_cursor();
-// }
-
-
 void putc(uint8_t c) {
 
     if(c == '\n' || c == '\r') {
@@ -407,7 +373,7 @@ void putc(uint8_t c) {
 }
 
 
-/* void putc(uint8_t c);
+/* void putc_modified(uint8_t c);
  * Inputs: uint_8* c = character to print
  * Return Value: void
  *  Function: Output a character to the console */

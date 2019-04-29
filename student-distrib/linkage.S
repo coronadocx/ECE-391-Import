@@ -22,6 +22,15 @@
 .global restoreparent
 .global pithandlerasm
 .global save_esp_ebpasm
+
+/*
+ * 	save_esp_ebpasm
+ *	DESCRIPTION: Assembly linkage function for saving the values of ebp and esp
+ *	INPUT: 	esp			- ESP of process
+ *			    ebp	    - EBP of process  
+ *	OUTPUT: none
+ *	RETURN: none
+ */
 save_esp_ebpasm:
 xorl %edx, %edx
 xorl %ecx, %ecx

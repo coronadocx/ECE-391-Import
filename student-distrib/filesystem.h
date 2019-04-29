@@ -83,6 +83,8 @@ extern int32_t dir_open(const int8_t* filename);
 
 /* return the size of a particular file */
 extern int32_t get_filesize(uint32_t inode);
+
+/* Returns 0, read-only filesystem */
 extern int32_t dir_write(int32_t fd,const void* buf,int32_t nbytes);
 
 #endif

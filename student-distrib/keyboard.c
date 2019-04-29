@@ -41,8 +41,8 @@ void check_input(){
     case RIGHTSHIFTRELEASED:chararray[RIGHTSHIFT]='0';break;  // check if right shift is released
     case LEFTCONTROLPRESSED:chararray[LEFTCONTROLPRESSED]='1';break;  // check if control is pressed
     case LEFTCONTROLRELEASED:chararray[LEFTCONTROLPRESSED]='0';break; // check is control is released
-    case ALTPRESSED:chararray[0x38]='1'; break;
-    case ALTRELEASED:chararray[0x38]='0';break;
+    case ALTPRESSED:chararray[ALTPRESSED]='1'; break;
+    case ALTRELEASED:chararray[ALTPRESSED]='0';break;
     case BACKSPACE:  // check for backspace
       if(numberofchars!=0){
 
